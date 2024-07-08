@@ -7,11 +7,11 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1720286626,
-        "narHash": "sha256-L06ANxK6DLO8EWGI4qL0OpRm9LFPLBHhYjfK/JYTp/k=",
+        "lastModified": 1720373012,
+        "narHash": "sha256-BkabNGgSi6iZ/lnvx6vtjo1Cg2XMsAIFnJxts8FaSxI=",
         "owner": "m15a",
         "repo": "flake-awesome-neovim-plugins",
-        "rev": "7c1c69fd4a2b7ec62c4eef98abea249e2b33d44c",
+        "rev": "eba8b51f86d53caf2e9cc9c32eaaf17fcc1a10ca",
         "type": "github"
       },
       "original": {
@@ -231,11 +231,11 @@
     "edgy-nvim": {
       "flake": false,
       "locked": {
-        "lastModified": 1720333751,
-        "narHash": "sha256-v85SozJbGk7suXOpM5KjdNUV+85t77xVHXeOXZpSp7Y=",
+        "lastModified": 1720380303,
+        "narHash": "sha256-lkhIL1uSQqejy9A2zHKiJ80wJYmtochDPy7k6gWKAwQ=",
         "owner": "folke",
         "repo": "edgy.nvim",
-        "rev": "3a88691ad3956ee619e6776c7c8084a9460ce2c4",
+        "rev": "1fe28978ab5671e9534fca40dca10280430ba727",
         "type": "github"
       },
       "original": {
