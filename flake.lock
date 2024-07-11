@@ -7,11 +7,11 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1720545767,
-        "narHash": "sha256-UvzYZ6+dDh9b4YiA7bpVzHGrPMkvYZtfiUsMElaSiy0=",
+        "lastModified": 1720632120,
+        "narHash": "sha256-ZZeRZdqfEEPcdVIxZXgln9BpdEWhnoOgl88TCjMk+fI=",
         "owner": "m15a",
         "repo": "flake-awesome-neovim-plugins",
-        "rev": "7ba7ec9cd6ed14916c1de02545abbeb89902f548",
+        "rev": "1ba69e1be6ccf21538d8d59f4579662c048d583a",
         "type": "github"
       },
       "original": {
@@ -479,11 +479,11 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1720418205,
-        "narHash": "sha256-cPJoFPXU44GlhWg4pUk9oUPqurPlCFZ11ZQPk21GTPU=",
+        "lastModified": 1720542800,
+        "narHash": "sha256-ZgnNHuKV6h2+fQ5LuqnUaqZey1Lqqt5dTUAiAnqH0QQ=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "655a58a72a6601292512670343087c2d75d859c1",
+        "rev": "feb2849fdeb70028c70d73b848214b00d324a497",
         "type": "github"
       },
       "original": {
@@ -778,11 +778,11 @@
     "vim-dadbod-ui": {
       "flake": false,
       "locked": {
-        "lastModified": 1720556813,
-        "narHash": "sha256-bB8BtIlg36T3PF15QFFoOEAamddr6E7Ws6xjiLXY/Oo=",
+        "lastModified": 1720604493,
+        "narHash": "sha256-StzTacEapczZQf/n86lwUbz+rgtqv7RfnLhk1OjQG9w=",
         "owner": "kristijanhusak",
         "repo": "vim-dadbod-ui",
-        "rev": "b6f72022f04f02e3d8b06d9a334fa946460315ac",
+        "rev": "acfb660447f41634b6a299039e034abac126653a",
         "type": "github"
       },
       "original": {
