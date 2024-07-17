@@ -247,11 +247,11 @@
     "fd": {
       "flake": false,
       "locked": {
-        "lastModified": 1719871525,
-        "narHash": "sha256-6fdyvfjSEmBzt48/nMzTJMz5uknjYKyfduPZ6Ra7reg=",
+        "lastModified": 1721167050,
+        "narHash": "sha256-aHEwdrowX5gealrsd1fggJzN590RCzZM7x5cBbmU1G0=",
         "owner": "sharkdp",
         "repo": "fd",
-        "rev": "9cefd79ef4a0e6f9d8dfb560f95921e46fe59e1c",
+        "rev": "cfced9787ee544d99f36e455762defec87c6be16",
         "type": "github"
       },
       "original": {
