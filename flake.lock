@@ -714,11 +714,11 @@
     "tree-sitter-just": {
       "flake": false,
       "locked": {
-        "lastModified": 1719279247,
-        "narHash": "sha256-rJXgKNYnAjpAh+1dfYH9W6v5t457ROLtjqU3ndzvjr8=",
+        "lastModified": 1722314416,
+        "narHash": "sha256-EVISh9r+aJ6Og1UN8bGCLk4kVjS/cEOYyhqHF40ztqg=",
         "owner": "IndianBoy42",
         "repo": "tree-sitter-just",
-        "rev": "379fbe36d1e441bc9414ea050ad0c85c9d6935ea",
+        "rev": "6648ac1c0cdadaec8ee8bcf9a4ca6ace5102cf21",
         "type": "github"
       },
       "original": {
@@ -762,11 +762,11 @@
     "vim-dadbod-completion": {
       "flake": false,
       "locked": {
-        "lastModified": 1722074391,
-        "narHash": "sha256-7HisZzk5uJdn/ca5ov7ll3QENTDs8PEhxaMiC26w0TM=",
+        "lastModified": 1722322587,
+        "narHash": "sha256-AGj6A0p9u5iZ8HOF65wyAshdA8yuKLs4QxPzGz/kSk4=",
         "owner": "kristijanhusak",
         "repo": "vim-dadbod-completion",
-        "rev": "7204845f9c4bbd60a77ae40375661819b764020b",
+        "rev": "c3ab458fb7c94c2fc4baae4e2cd5601eec9d27bc",
         "type": "github"
       },
       "original": {
