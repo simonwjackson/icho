@@ -13,6 +13,6 @@
 
   replace = {
     diffView = pkgs.awesomeNeovimPlugins.diffview-nvim;
-    plenary = pkgs.awesomeNeovimPlugins.plenary-nvim;
+    plenary = pkgs.vimPlugins.plenary-nvim;
   };
 }

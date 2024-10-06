@@ -32,7 +32,7 @@
     obsidian = pkgs.awesomeNeovimPlugins.obsidian-nvim;
     oneDark = pkgs.awesomeNeovimPlugins.onedark-nvim;
     overseer = pkgs.awesomeNeovimPlugins.overseer-nvim;
-    plenary = pkgs.awesomeNeovimPlugins.plenary-nvim;
+    plenary = pkgs.vimPlugins.plenary-nvim;
     pqf = pkgs.awesomeNeovimPlugins.nvim-pqf;
     rosePine = pkgs.awesomeNeovimPlugins.rose-pine-neovim;
     mTaskwarriorD = pkgs.vimPlugins.m_taskwarriror_d;
