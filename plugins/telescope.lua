@@ -132,14 +132,14 @@ return {
 			-- 	["<leader>f"] = { name = "+file" },
 			-- })
 			{
-				"<leader>wK",
+				"<leader>kK",
 				function()
 					vim.cmd("WhichKey")
 				end,
 				desc = "Which-key all keymaps",
 			},
 			{
-				"<leader>wk",
+				"<leader>kk",
 				function()
 					local input = vim.fn.input("WhichKey: ")
 					vim.cmd("WhichKey " .. input)

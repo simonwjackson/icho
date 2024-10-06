@@ -63,8 +63,10 @@ return {
 					end
 
 					-- Navigation through hunks
-					wk.register({
-						["<Down>"] = {
+					wk.add({
+						{
+							"<Down>",
+							desc = "Jump to next hunk",
 							function()
 								if vim.wo.diff then
 									return "]c"
@@ -74,11 +76,9 @@ return {
 								end)
 								return "<Ignore>"
 							end,
-							"Jump to next hunk",
-							opts = { expr = true },
 						},
-
-						["<Up>"] = {
+						{
+							"<Up>",
 							function()
 								if vim.wo.diff then
 									return "[c"
@@ -88,34 +88,45 @@ return {
 								end)
 								return "<Ignore>"
 							end,
-							"Jump to prev hunk",
-							opts = { expr = true },
+							desc = "Jump to prev hunk",
 						},
-
-						["<leader>h"] = {
-							name = "+gitsigns",
-							s = { gs.stage_hunk, "Stage Hunk" },
-							r = { gs.reset_hunk, "Reset Hunk" },
-							S = { gs.stage_buffer, "Stage Buffer" },
-							u = { gs.undo_stage_hunk, "Undo Stage Hunk" },
-							R = { gs.reset_buffer, "Reset Buffer" },
-							p = { gs.preview_hunk, "Preview Hunk" },
-							b = {
-								function()
-									gs.blame_line({ full = true })
-								end,
-								"Blame Line",
-							},
-							d = { gs.diffthis, "Diff This" },
-							D = {
-								function()
-									gs.diffthis("~")
-								end,
-								"Diff This (~)",
-							},
-							t = { gs.toggle_deleted, "Toggle Deleted" },
+						{
+							"<leader>h",
+							group = "git hunk",
 						},
-					}, { mode = "n" })
+						{
+							"<leader>hs",
+							gs.stage_hunk,
+							desc = "Stage Hunk",
+						},
+						{
+							"<leader>hr",
+							gs.reset_hunk,
+							desc = "Reset Hunk",
+						},
+					})
+					-- 		s = { gs.stage_hunk, "Stage Hunk" },
+					-- 		r = { gs.reset_hunk, "Reset Hunk" },
+					-- 		S = { gs.stage_buffer, "Stage Buffer" },
+					-- 		u = { gs.undo_stage_hunk, "Undo Stage Hunk" },
+					-- 		R = { gs.reset_buffer, "Reset Buffer" },
+					-- 		p = { gs.preview_hunk, "Preview Hunk" },
+					-- 		b = {
+					-- 			function()
+					-- 				gs.blame_line({ full = true })
+					-- 			end,
+					-- 			"Blame Line",
+					-- 		},
+					-- 		d = { gs.diffthis, "Diff This" },
+					-- 		D = {
+					-- 			function()
+					-- 				gs.diffthis("~")
+					-- 			end,
+					-- 			"Diff This (~)",
+					-- 		},
+					-- 		t = { gs.toggle_deleted, "Toggle Deleted" },
+					-- 	},
+					-- }, { mode = "n" })
 
 					wk.register({
 						["<leader>h"] = {
