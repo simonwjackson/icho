@@ -5,17 +5,20 @@ return {
 		config = function()
 			require("codecompanion").setup({
 				strategies = {
-					chat = "anthropic",
-					inline = "anthropic",
+					chat = {
+						adapter = "anthropic",
+					},
+					inline = {
+						adapter = "anthropic",
+					},
+					agent = {
+						adapter = "anthropic",
+					},
 				},
 				adapters = {
-					anthropic = require("codecompanion.adapters").use("anthropic", {
-						schema = {
-							model = {
-								default = "claude-3-opus-20240229",
-							},
-						},
-					}),
+					anthropic = function()
+						return require("codecompanion.adapters").extend("anthropic", {})
+					end,
 				},
 			})
 		end,

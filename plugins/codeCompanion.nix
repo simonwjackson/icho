@@ -5,7 +5,7 @@
   environment = {
   };
   replace = {
-    codeCompanion = pkgs.awesomeNeovimPlugins.codecompanion-nvim;
+    codeCompanion = pkgs.vimPlugins.codecompanion-nvim;
     plenary = pkgs.vimPlugins.plenary-nvim;
     dressing = pkgs.awesomeNeovimPlugins.dressing-nvim;
     telescope = pkgs.awesomeNeovimPlugins.telescope-nvim;

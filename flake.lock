@@ -212,6 +212,22 @@
         "type": "github"
       }
     },
+    "codecompanion-nvim": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1728086054,
+        "narHash": "sha256-rZDuqI50CUi81/6qDWlYE0gBx/3ieb/ejTp47yxmGUU=",
+        "owner": "olimorris",
+        "repo": "codecompanion.nvim",
+        "rev": "d32227333c7ec48c0fe9e8281ef33f88c4715192",
+        "type": "github"
+      },
+      "original": {
+        "owner": "olimorris",
+        "repo": "codecompanion.nvim",
+        "type": "github"
+      }
+    },
     "detour": {
       "flake": false,
       "locked": {
@@ -575,6 +591,7 @@
         "cmp-spell": "cmp-spell",
         "cmp-treesitter": "cmp-treesitter",
         "cmp_luasnip": "cmp_luasnip",
+        "codecompanion-nvim": "codecompanion-nvim",
         "detour": "detour",
         "edgy-nvim": "edgy-nvim",
         "fd": "fd",

@@ -1,4 +1,5 @@
 {
+  codecompanion-nvim,
   channels,
   cmp-buffer,
   cmp-calc,
@@ -34,6 +35,11 @@
       m_taskwarriror_d = prev.vimUtils.buildVimPlugin {
         name = baseNameOf m_taskwarriror_d;
         src = m_taskwarriror_d;
+      };
+
+      codecompanion-nvim = prev.vimUtils.buildVimPlugin {
+        name = baseNameOf codecompanion-nvim;
+        src = codecompanion-nvim;
       };
 
       detour = prev.vimUtils.buildVimPlugin {

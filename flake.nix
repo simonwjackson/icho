@@ -14,6 +14,10 @@
     };
 
     # Neovim plugins
+    codecompanion-nvim = {
+      url = "github:olimorris/codecompanion.nvim";
+      flake = false;
+    };
 
     awesome-neovim-plugins.url = "github:m15a/flake-awesome-neovim-plugins";
 
