@@ -15,8 +15,10 @@
   cmp_luasnip,
   detour,
   git-worktree-nvim,
+  hmts-nvim,
   lspkind-nvim,
   m_taskwarriror_d,
+  mdx-nvim,
   middleclass,
   nvim-osc52,
   ripgrep,
@@ -35,6 +37,16 @@
       m_taskwarriror_d = prev.vimUtils.buildVimPlugin {
         name = baseNameOf m_taskwarriror_d;
         src = m_taskwarriror_d;
+      };
+
+      hmts-nvim = prev.vimUtils.buildVimPlugin {
+        name = baseNameOf hmts-nvim;
+        src = hmts-nvim;
+      };
+
+      mdx-nvim = prev.vimUtils.buildVimPlugin {
+        name = baseNameOf mdx-nvim;
+        src = mdx-nvim;
       };
 
       codecompanion-nvim = prev.vimUtils.buildVimPlugin {

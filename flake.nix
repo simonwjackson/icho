@@ -14,6 +14,17 @@
     };
 
     # Neovim plugins
+
+    hmts-nvim = {
+      url = "github:calops/hmts.nvim";
+      flake = false;
+    };
+
+    mdx-nvim = {
+      url = "github:davidmh/mdx.nvim";
+      flake = false;
+    };
+
     codecompanion-nvim = {
       url = "github:olimorris/codecompanion.nvim";
       flake = false;

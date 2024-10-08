@@ -17,6 +17,7 @@
       (pkgs.vimPlugins.nvim-treesitter.withPlugins (p: [p.json])).dependencies
       (pkgs.vimPlugins.nvim-treesitter.withPlugins (p: [p.lua])).dependencies
       (pkgs.vimPlugins.nvim-treesitter.withPlugins (p: [p.markdown])).dependencies
+      (pkgs.vimPlugins.nvim-treesitter.withPlugins (p: [p.markdown_inline])).dependencies
       (pkgs.vimPlugins.nvim-treesitter.withPlugins (p: [p.nix])).dependencies
       (pkgs.vimPlugins.nvim-treesitter.withPlugins (p: [p.python])).dependencies
       (pkgs.vimPlugins.nvim-treesitter.withPlugins (p: [p.regex])).dependencies

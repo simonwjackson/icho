@@ -3,10 +3,12 @@
     pkgs.ripgrep
   ];
 
-  environment = {
-  };
+  environment = {};
 
   replace = {
+    hmtsNvim = pkgs.vimPlugins.hmts-nvim;
+    mdxNvim = pkgs.vimPlugins.mdx-nvim;
+    otter = pkgs.awesomeNeovimPlugins.otter-nvim;
     animation = pkgs.awesomeNeovimPlugins.animation-nvim;
     betterEscape = pkgs.awesomeNeovimPlugins.better-escape-nvim;
     boole = pkgs.awesomeNeovimPlugins.boole-nvim;

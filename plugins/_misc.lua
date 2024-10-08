@@ -3,6 +3,12 @@ local g = vim.g
 local api = vim.api
 local cmd = vim.api.nvim_command
 
+vim.filetype.add({
+	extension = {
+		mdx = "markdown",
+	},
+})
+
 -- This automated keypress skips for you the "[Process exited 0]" message
 -- that the embedded terminal shows.
 vim.api.nvim_create_autocmd({ "TermClose" }, {
@@ -37,6 +43,47 @@ end
 local path = get_notes_dir()
 
 return {
+	{
+		name = "mdx.nvim",
+		dir = "@mdxNvim@",
+		ft = "markdown",
+		dependencies = {
+			{
+				name = "nvim-treesitter",
+				dir = "@nvimTreesitter@",
+				init = function()
+					require("nvim-treesitter.configs").setup({
+						highlight = {
+							enable = true,
+							additional_vim_regex_highlighting = false,
+						},
+					})
+				end,
+			},
+		},
+	},
+	{
+		name = "hmts.nvim",
+		dir = "@hmtsNvim@",
+		dependencies = {
+			{
+				name = "nvim-treesitter",
+				dir = "@nvimTreesitter@",
+			},
+		},
+	},
+	-- {
+	-- 	name = "otter",
+	-- 	dir = "@otter@",
+	-- 	lazy = false,
+	-- 	opts = {},
+	-- 	dependencies = {
+	-- 		{
+	-- 			name = "nvim-treesitter",
+	-- 			dir = "@nvimTreesitter@",
+	-- 		},
+	-- 	},
+	-- },
 	{
 		name = "detour",
 		dir = "@detour@",
