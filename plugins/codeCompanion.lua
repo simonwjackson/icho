@@ -6,16 +6,30 @@ return {
 			require("codecompanion").setup({
 				strategies = {
 					chat = {
-						adapter = "anthropic",
+						adapter = "deepseek",
 					},
 					inline = {
-						adapter = "anthropic",
+						adapter = "deepseek",
 					},
 					agent = {
-						adapter = "anthropic",
+						adapter = "deepseek",
 					},
 				},
 				adapters = {
+					deepseek = function()
+						return require("codecompanion.adapters").extend("openai", {
+							name = "deepseek",
+							schema = {
+								model = {
+									default = "deepseek-chat",
+								},
+							},
+							url = "https://api.deepseek.com/v1/chat/completions",
+							env = {
+								api_key = "DEEPSEEK_API_KEY",
+							},
+						})
+					end,
 					anthropic = function()
 						return require("codecompanion.adapters").extend("anthropic", {})
 					end,
