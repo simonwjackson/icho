@@ -92,6 +92,22 @@ return {
 	--   "direnv/direnv.vim",
 	--   lazy=false
 	-- },
+	-- {
+	-- 	dir = "@nvimNu@",
+	-- 	name = "nvim-nu",
+	-- 	ft = "nu",
+	-- 	dependencies = {
+	-- 		{
+	-- 			dir = "@plenary@",
+	-- 			name = "plenary",
+	-- 		},
+	-- 	},
+	-- 	config = function()
+	-- 		require("nu").setup({
+	-- 			use_lsp_features = false,
+	-- 		})
+	-- 	end,
+	-- },
 	{
 		dir = "@just@",
 		name = "just-syntax",

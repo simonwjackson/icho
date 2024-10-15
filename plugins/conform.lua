@@ -29,6 +29,7 @@ return {
 				yaml = { "yq" },
 				-- markdown = { "prettierd" },
 				just = { "just" },
+				python = { "isort", "black" },
 				-- # TODO: Add tailwind
 				-- rustywind
 			},

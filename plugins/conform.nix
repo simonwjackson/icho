@@ -1,16 +1,18 @@
 {pkgs}: {
   packages = [
     pkgs.alejandra
-    pkgs.prettierd
-    pkgs.stylua
+    pkgs.black
+    pkgs.elmPackages.elm-format
     pkgs.eslint_d
-    pkgs.nodejs
     pkgs.gawk
+    pkgs.isort
     pkgs.jq
     pkgs.just
-    pkgs.yq-go
+    pkgs.nodejs
+    pkgs.prettierd
     pkgs.shfmt
-    pkgs.elmPackages.elm-format
+    pkgs.stylua
+    pkgs.yq-go
   ];
 
   environment = {

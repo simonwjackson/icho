@@ -11,18 +11,22 @@
     name = "treesitter-parsers";
     # Todo: move into nix plugin file as `runtimes`
     paths = [
-      (pkgs.vimPlugins.nvim-treesitter.withPlugins (p: [p.bash])).dependencies
-      (pkgs.vimPlugins.nvim-treesitter.withPlugins (p: [p.just])).dependencies
-      (pkgs.vimPlugins.nvim-treesitter.withPlugins (p: [p.javascript])).dependencies
-      (pkgs.vimPlugins.nvim-treesitter.withPlugins (p: [p.json])).dependencies
-      (pkgs.vimPlugins.nvim-treesitter.withPlugins (p: [p.lua])).dependencies
-      (pkgs.vimPlugins.nvim-treesitter.withPlugins (p: [p.markdown])).dependencies
-      (pkgs.vimPlugins.nvim-treesitter.withPlugins (p: [p.nix])).dependencies
-      (pkgs.vimPlugins.nvim-treesitter.withPlugins (p: [p.python])).dependencies
-      (pkgs.vimPlugins.nvim-treesitter.withPlugins (p: [p.regex])).dependencies
-      (pkgs.vimPlugins.nvim-treesitter.withPlugins (p: [p.typescript])).dependencies
-      (pkgs.vimPlugins.nvim-treesitter.withPlugins (p: [p.vim])).dependencies
-      (pkgs.vimPlugins.nvim-treesitter.withPlugins (p: [p.vimdoc])).dependencies
+      (pkgs.vimPlugins.nvim-treesitter.withPlugins (p: [
+        p.bash
+        p.just
+        p.javascript
+        p.json
+        p.lua
+        p.markdown
+        p.markdown_inline
+        p.nix
+        p.python
+        p.regex
+        p.typescript
+        p.vim
+        p.vimdoc
+      ]))
+      .dependencies
     ];
   };
   snippets = pkgs.stdenv.mkDerivation {

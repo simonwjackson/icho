@@ -1,6 +1,7 @@
 {pkgs}: {
   packages = [
     pkgs.ripgrep
+    # pkgs.nushell
   ];
 
   environment = {
@@ -18,24 +19,28 @@
     dressing = pkgs.awesomeNeovimPlugins.dressing-nvim;
     gitBlame = pkgs.awesomeNeovimPlugins.git-blame-nvim;
     gitDev = pkgs.awesomeNeovimPlugins.git-dev-nvim;
+    # hmtsNvim = pkgs.vimPlugins.hmts-nvim;
     isVim = pkgs.vimPlugins.is-vim;
     just = pkgs.vimPlugins.tree-sitter-just;
     lspSignature = pkgs.awesomeNeovimPlugins.lsp-signature-nvim;
+    mTaskwarriorD = pkgs.vimPlugins.m_taskwarriror_d;
+    # mdxNvim = pkgs.vimPlugins.mdx-nvim;
     middleclass = pkgs.vimPlugins.middleclass;
     mkdir = pkgs.awesomeNeovimPlugins.mkdir-nvim;
     neodim = pkgs.awesomeNeovimPlugins.neodim;
     nui = pkgs.awesomeNeovimPlugins.nui-nvim;
     numb = pkgs.awesomeNeovimPlugins.numb-nvim;
+    # nvimNu = pkgs.vimPlugins.nvim-nu;
     nvimScrollbar = pkgs.awesomeNeovimPlugins.nvim-scrollbar;
     nvimSpectre = pkgs.awesomeNeovimPlugins.nvim-spectre;
     nvimTreesitter = pkgs.vimPlugins.nvim-treesitter;
     obsidian = pkgs.awesomeNeovimPlugins.obsidian-nvim;
     oneDark = pkgs.awesomeNeovimPlugins.onedark-nvim;
+    # otter = pkgs.awesomeNeovimPlugins.otter-nvim;
     overseer = pkgs.awesomeNeovimPlugins.overseer-nvim;
     plenary = pkgs.vimPlugins.plenary-nvim;
     pqf = pkgs.awesomeNeovimPlugins.nvim-pqf;
     rosePine = pkgs.awesomeNeovimPlugins.rose-pine-neovim;
-    mTaskwarriorD = pkgs.vimPlugins.m_taskwarriror_d;
     sentiment = pkgs.awesomeNeovimPlugins.sentiment-nvim;
     smartSplits = pkgs.awesomeNeovimPlugins.smart-splits-nvim;
     surround = pkgs.awesomeNeovimPlugins.nvim-surround;
