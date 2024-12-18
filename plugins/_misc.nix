@@ -12,6 +12,7 @@
     betterEscape = pkgs.awesomeNeovimPlugins.better-escape-nvim;
     boole = pkgs.awesomeNeovimPlugins.boole-nvim;
     buffDelete = pkgs.awesomeNeovimPlugins.bufdelete-nvim;
+    catppuccin = pkgs.vimPlugins.catppuccin-nvim;
     chainsaw = pkgs.awesomeNeovimPlugins.nvim-chainsaw;
     cutlass = pkgs.awesomeNeovimPlugins.cutlass-nvim;
     detour = pkgs.vimPlugins.detour;

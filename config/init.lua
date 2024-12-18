@@ -74,7 +74,6 @@ opt.splitkeep = "screen" -- keeps the same screen screen lines in all split wind
 
 vim.g.mapleader = " " -- Make sure to set `mapleader` before lazy so your mappings are correct
 
--- vim.cmd([[ colorscheme onedark ]])
 vim.cmd([[ autocmd FocusGained,BufEnter,CursorHold,CursorHoldI * if mode() != 'c' | checktime | endif ]])
 
 -- vim.cmd([[
