@@ -9,4 +9,12 @@
     ./supermaven.nix
     ./avante.nix
   ];
+
+  colorschemes.catppuccin = {
+    enable = true;
+    autoLoad = true;
+    settings = {
+      flavour = "frappe";
+    };
+  };
 }
