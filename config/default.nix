@@ -1,8 +1,12 @@
 {
   # Import all your configuration modules here
   imports = [
+    # UI
+    ./markview.nix
     ./bufferline.nix
-    ./supermaven.nix
     ./dadbod.nix
+
+    ./supermaven.nix
+    ./avante.nix
   ];
 }
