@@ -1,13 +1,14 @@
 {
   # Import all your configuration modules here
   imports = [
-    # UI
+    ./ai
+
     ./markview.nix
     ./bufferline.nix
     ./dadbod.nix
-
-    ./supermaven.nix
-    ./avante.nix
+    ./which-key.nix
+    ./toggleterm.nix
+    ./telescope.nix
   ];
 
   colorschemes.catppuccin = {
