@@ -8,7 +8,8 @@
 
   extraConfigLua = ''
     require('markview').setup({
-      filetypes = { "markdown", "norg", "rmd", "org", "vimwiki", "Avante" },
+      filetypes = { "markdown", "norg", "rmd", "org", "vimwiki" },
+      -- filetypes = { "markdown", "norg", "rmd", "org", "vimwiki", "Avante" },
       buf_ignore = {},
       max_length = 99999,
       max_file_length = 99999;

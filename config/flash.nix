@@ -1,7 +1,4 @@
 {lib, ...}: {
-  plugins.dropbar = {
-    enable = true;
-  };
   plugins.fidget = {
     enable = true;
     settings = {

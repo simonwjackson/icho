@@ -1,77 +1,27 @@
-{
-  pkgs,
-  lib,
-  ...
-}: {
-  imports = [
-    ./ai
-
-    ./color.nix
-    ./conform.nix
-    ./dadbod.nix
-    ./flash.nix
-    ./lualine.nix
-    ./markview.nix
-    ./telescope.nix
-    ./toggleterm.nix
-    ./treesitter.nix
-    ./which-key.nix
-  ];
-
-  keymaps = [
-    {
-      key = "<c-s>";
-      action = "<cmd>update<CR>";
-      options = {
-        desc = "Save File";
-      };
-    }
-
-    {
-      key = "<leader>gg";
-      action = "<cmd>LazyGitCurrentFile<CR>";
-      options = {
-        desc = "Lazy Git";
-      };
-    }
-
-    {
-      key = "<leader>gw";
-      action = "<cmd>lua require('telescope').extensions.git_worktree.git_worktrees()<CR>";
-      options = {
-        desc = "Git Worktrees";
-      };
-    }
-
-    {
-      key = "<leader>S";
-      action = "<cmd>lua Search_And_Replace()<CR>";
-      options = {
-        desc = "Serch and Replace";
-      };
-    }
-  ];
-
-  extraConfigLua = ''
-    function Search_And_Replace()
-      if vim.fn.mode() == 'v' or vim.fn.mode() == 'V' then
-        require('grug-far').with_visual_selection({ transient = true })
-      else
-        require('grug-far').open({
-          transient = true,
-          prefills = { search = vim.fn.expand('<cword>') }
-        })
-      end
-    end
-  '';
-
-  highlight = {
-    LazyGitBorder = {
-      link = "FloatBorder";
-    };
-  };
-
+{lib, ...}: {
   plugins = {
+    lspsaga.enable = true;
+    noice = {
+      enable = true;
+      settings = {
+        cmdline = {
+          enabled = true;
+        };
+        health.chcker = false;
+        messages.enabled = false;
+        notify.enabled = false;
+        popupmenu.enabled = true;
+        smart_move.enabled = true;
+      };
+    };
+    marks.enable = true;
+    navbuddy = {
+      enable = true;
+      lsp = {
+        autoAttach = true;
+      };
+    };
+
     kulala = {
       enable = true;
       settings = {
@@ -82,11 +32,11 @@
         environment_scope = "b";
         icons = {
           inlay = {
-            done = "✅";
-            error = "❌";
-            loading = "⏳";
+            done = "";
+            error = "";
+            loading = "";
           };
-          lualine = "🐼";
+          lualine = "";
         };
       };
     };
@@ -167,6 +117,76 @@
           };
         };
       };
+    };
+  };
+
+  imports = [
+    ./ai
+
+    ./color.nix
+    ./lsp.nix
+    ./conform.nix
+    ./dadbod.nix
+    ./flash.nix
+    ./lualine.nix
+    ./markview.nix
+    ./telescope.nix
+    ./toggleterm.nix
+    ./treesitter.nix
+    ./which-key.nix
+    ./osc52.nix
+  ];
+
+  keymaps = [
+    {
+      key = "<c-s>";
+      action = "<cmd>update<CR>";
+      options = {
+        desc = "Save File";
+      };
+    }
+
+    {
+      key = "<leader>gg";
+      action = "<cmd>LazyGitCurrentFile<CR>";
+      options = {
+        desc = "Lazy Git";
+      };
+    }
+
+    {
+      key = "<leader>gw";
+      action = "<cmd>lua require('telescope').extensions.git_worktree.git_worktrees()<CR>";
+      options = {
+        desc = "Git Worktrees";
+      };
+    }
+
+    {
+      key = "<leader>S";
+      action = "<cmd>lua Search_And_Replace()<CR>";
+      options = {
+        desc = "Serch and Replace";
+      };
+    }
+  ];
+
+  extraConfigLua = ''
+    function Search_And_Replace()
+      if vim.fn.mode() == 'v' or vim.fn.mode() == 'V' then
+        require('grug-far').with_visual_selection({ transient = true })
+      else
+        require('grug-far').open({
+          transient = true,
+          prefills = { search = vim.fn.expand('<cword>') }
+        })
+      end
+    end
+  '';
+
+  highlight = {
+    LazyGitBorder = {
+      link = "FloatBorder";
     };
   };
 }
