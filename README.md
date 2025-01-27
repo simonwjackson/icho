@@ -22,10 +22,13 @@
 
 ## Features
 
-* 🌿 ...
-* 🦥 ...
-* 🏃 ...
-*   ...
+* 🌿 **AI-Powered Assistance**: Intelligent code completion, AI-driven chat, and context-aware prompts to enhance productivity.
+* 🦥 **Enhanced Editing**: Advanced text manipulation, code refactoring tools, and improved syntax highlighting for a smoother editing experience.
+* 🏃 **Navigation**: Seamless navigation with LSP integration, bookmark management, and powerful fuzzy finding capabilities.
+* 🎨 **Customizable UI**: Distraction-free writing modes, enhanced input dialogs, and improved notifications for a polished user interface.
+* 🔧 **Quality of Life**: Utilities for session management, file saving with elevated privileges, and streamlined Git workflows.
+* 🛠️ **Language Support**: Comprehensive support for a wide range of programming languages and tools, ensuring a tailored experience for developers.
+* 🧩 **Modular Configuration**: A flexible and modular setup, allowing easy customization and extension of the editor to fit individual workflows.
 
 Welcome to my Neovim configuration crafted for Nix.
 Feel free to use it as is or extract pieces to help construct your own unique setup.
@@ -55,9 +58,64 @@ nix run github:simonwjackson/icho
 
 ## Plugins
 
-This configuration includes a variety of plugins.
+This configuration includes a variety of plugins:
 
-<!-- TODO: Add all plugins -->
+### AI
+
+- **supermaven-nvim**: AI code completion with customizable keymaps and conditions.
+- **avante**: AI-powered plugin (specific functionality not detailed in the config).
+
+### Keyboard
+
+- **better-escape**: Improved escape key mappings with customizable timeout and mappings.
+
+### HTTP
+
+- **kulala**: HTTP client with debug options, environment scoping, and custom icons.
+- **rest**: REST client for Neovim.
+
+### UI
+
+- **otter**: UI plugin (specific functionality not detailed in the config).
+- **dressing**: Enhanced UI for input and select dialogs.
+- **zen-mode**: Distraction-free writing mode with customizable window settings.
+- **noice**: Improved UI for notifications, messages, and popup menus.
+
+### Quality of Life
+
+- **vim-suda**: Allows saving files with sudo privileges.
+
+### Editing
+- **vim-matchup**: Enhanced match-up functionality with Treesitter support.
+- **repeat**: Repeat plugin commands with `.`.
+
+### Syntax
+- **todo-comments**: Highlight and manage TODO comments.
+- **typescript-tools**: TypeScript language support.
+- **tailwind-tools**: Tailwind CSS utilities.
+- **scope**: Scope management for syntax highlighting.
+- **smear-cursor**: Smooth cursor animations.
+- **refactoring**: Code refactoring tools with Telescope integration.
+- **qmk**: QMK firmware configuration support.
+- **lspsaga**: Enhanced LSP UI.
+- **nvim-surround**: Surround text with brackets, quotes, etc.
+
+### Navigation
+- **marks**: Manage and navigate marks.
+- **navbuddy**: Navigation sidebar with LSP integration.
+- **lazydev**: Lazy development tools with custom runtime settings.
+
+### Utilities
+- **helpview**: Enhanced help viewer.
+- **direnv**: Environment variable management.
+- **git-worktree**: Git worktree management.
+- **glance**: Quick navigation and preview.
+- **improved-search**: Enhanced search functionality.
+- **auto-session**: Automatic session management.
+- **comment**: Comment toggling and management.
+- **firenvim**: Embed Neovim in the browser.
+- **lazygit**: Git integration with LazyGit.
+- **grug-far**: Search and replace functionality.
 
 ## Plugin Updates
 
@@ -69,9 +127,62 @@ nix flake update
 
 ## Repository Structure
 
-<!-- TODO: Add repo structure -->
+The repository is organized into a modular structure for managing Neovim configurations using Nix. Key components include:
+
+- **config/**: Contains modular configuration files for Neovim plugins, LSP, UI, and utilities. Each file is dedicated to a specific plugin or feature, making it easy to customize or extend.
+- **flake.nix**: The main Nix flake configuration, defining the Neovim environment and its dependencies.
+- **flake.lock**: Ensures reproducible builds by locking dependency versions.
+- **README.md**: Documentation for the repository, including setup instructions and plugin details.
+
+This structure is designed for flexibility, allowing users to pick and choose components for their own Neovim setups.
 
 ## Language Support
+
+The repository includes support for the following programming languages and tools:
+
+- Bash
+- C
+- C++
+- CSS
+- Dart
+- Dockerfile
+- Elixir
+- Elm
+- Erlang
+- Fish
+- Go
+- GraphQL
+- Haskell
+- HTML
+- INI
+- Java
+- JavaScript
+- JSON
+- Just
+- LaTeX
+- Lua
+- Make
+- Markdown
+- Nix
+- PHP
+- Protocol Buffers (Proto)
+- Python
+- Regular Expressions (Regex)
+- Ruby
+- Rust
+- SCSS
+- SQL
+- Svelte
+- TOML
+- TSX
+- TypeScript
+- Typst
+- Vim
+- Vimdoc
+- Vue
+- XML
+- YAML
+- Zig
 
 ## License
 
