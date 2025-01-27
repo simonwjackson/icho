@@ -1,4 +1,55 @@
-{lib, ...}: {
+{
+  pkgs,
+  lib,
+  ...
+}: {
+  extraPlugins = [
+    (pkgs.vimUtils.buildVimPlugin {
+      name = "detour";
+      src = pkgs.fetchFromGitHub {
+        owner = "carbon-steel";
+        repo = "detour.nvim";
+        rev = "5647e8ce16e53e42734244c56a8d3ecb3f214f0d";
+        hash = "sha256-SbEEFL2Zfmb+ERDaAVuXeLWpSdDQdEj5WHwSAjdvuYI=";
+      };
+    })
+    pkgs.vimPlugins.middleclass
+    pkgs.vimPlugins.windows-nvim
+  ];
+
+  extraConfigLua = ''
+    vim.o.winwidth = 20
+    vim.o.winminwidth = 20
+    vim.o.equalalways = false
+
+    require("windows").setup({
+      animation = {
+        enable = true,
+        duration = 60,
+        fps = 60,
+        easing = "in_out_sine",
+      },
+      autowidth = {
+        enable = true,
+        winwidth = 0.6, -- This sets your "master" window to 60% of screen
+        filetype = { -- Opt-out for specific filetypes
+          help = false,
+          qf = false,
+          startuptime = false,
+        },
+      }
+    })
+
+    require("detour").setup({
+        width = 0.75,    -- Width as a percentage of screen width (0.0 - 1.0)
+        height = 0.75,   -- Height as a percentage of screen height (0.0 - 1.0)
+    })
+  '';
+
+  plugins.smart-splits = {
+    enable = true;
+  };
+
   plugins.mini = {
     enable = true;
     modules.diff.options.view.style = "sign";

@@ -18,133 +18,7 @@
   ];
 
   plugins = {
-    dressing = {
-      enable = true;
-      settings = {
-        input = {
-          enabled = true;
-        };
-        select = {
-          enabled = true;
-        };
-      };
-    };
-    zen-mode = {
-      enable = true;
-      settings = {
-        window = {
-          backdrop = 0.95;
-          width = 120;
-          height = 1;
-        };
-      };
-    };
-    vim-suda = {
-      enable = true;
-    };
-    vim-matchup = {
-      enable = true;
-      treesitter.enable = true;
-    };
-    typescript-tools.enable = true;
-    todo-comments.enable = true;
-    tailwind-tools.enable = true;
-    scope.enable = true;
-    smear-cursor = {
-      enable = true;
-      settings = {
-        stiffness = 0.8;
-        trailing_stiffness = 0.5;
-        distance_stop_animating = 0.5;
-        hide_target_hack = false;
-        legacy_computing_symbols_support = true;
-      };
-    };
-    rest.enable = true;
-    refactoring = {
-      enable = true;
-      enableTelescope = true;
-    };
-    repeat.enable = true;
-    qmk.enable = true;
-    qmk.settings.name = "zmk";
-    qmk.settings.layout = [
-      "x x"
-      "x^x"
-    ];
-    lspsaga.enable = true;
-    nvim-surround.enable = true;
-    # obsidian.enable = true;
-    otter.enable = true;
-    noice = {
-      enable = true;
-      settings = {
-        cmdline = {
-          enabled = true;
-        };
-        health.chcker = false;
-        messages.enabled = false;
-        notify.enabled = false;
-        popupmenu.enabled = true;
-        smart_move.enabled = true;
-      };
-    };
-    marks.enable = true;
-    navbuddy = {
-      enable = true;
-      lsp = {
-        autoAttach = true;
-      };
-    };
-
-    kulala = {
-      enable = true;
-      settings = {
-        additional_curl_options = {};
-        debug = false;
-        default_env = "dev";
-        default_view = "body";
-        environment_scope = "b";
-        icons = {
-          inlay = {
-            done = "";
-            error = "";
-            loading = "";
-          };
-          lualine = "";
-        };
-      };
-    };
-
-    lazydev = {
-      enable = true;
-      settings = {
-        enabled = lib.nixvim.mkRaw "function(root_dir)\n  return vim.g.lazydev_enabled == nil and true or vim.g.lazydev_enabled\nend\n";
-        library = [
-          "lazy.nvim"
-          "LazyVim"
-          {
-            path = "LazyVim";
-            words = [
-              "LazyVim"
-            ];
-          }
-        ];
-        runtime = lib.nixvim.mkRaw "vim.env.VIMRUNTIME";
-      };
-    };
-
-    helpview.enable = true;
-    direnv.enable = true;
-    git-worktree.enable = true;
-    glance.enable = true;
-    improved-search.enable = true;
-    auto-session.enable = true;
-    comment.enable = true;
-    firenvim.enable = true;
-    lazygit.enable = true;
-    gitsigns.enable = true;
-    grug-far.enable = true;
+    # Keyboard
     better-escape = {
       enable = true;
       settings = {
@@ -193,9 +67,166 @@
         };
       };
     };
+
+    # HTTP
+    kulala = {
+      enable = true;
+      settings = {
+        additional_curl_options = {};
+        debug = false;
+        default_env = "dev";
+        default_view = "body";
+        environment_scope = "b";
+        icons = {
+          inlay = {
+            done = "";
+            error = "";
+            loading = "";
+          };
+          lualine = "";
+        };
+      };
+    };
+    rest.enable = true;
+
+    # UI
+    otter.enable = true;
+    dressing = {
+      enable = true;
+      settings = {
+        input = {
+          enabled = true;
+        };
+        select = {
+          enabled = true;
+        };
+      };
+    };
+    zen-mode = {
+      enable = true;
+      settings = {
+        window = {
+          backdrop = 0.95;
+          width = 120;
+          height = 1;
+        };
+      };
+    };
+    noice = {
+      enable = true;
+      settings = {
+        cmdline = {
+          enabled = true;
+        };
+        health.chcker = false;
+        messages.enabled = false;
+        notify.enabled = false;
+        popupmenu.enabled = true;
+        smart_move.enabled = true;
+      };
+    };
+
+    # QOL
+    vim-suda = {
+      enable = true;
+    };
+
+    # Editing
+    vim-matchup = {
+      enable = true;
+      treesitter.enable = true;
+    };
+    repeat.enable = true;
+
+    # Syntax
+    todo-comments.enable = true;
+    typescript-tools.enable = true;
+    tailwind-tools.enable = true;
+    scope.enable = true;
+    smear-cursor = {
+      enable = true;
+      settings = {
+        stiffness = 0.8;
+        trailing_stiffness = 0.5;
+        distance_stop_animating = 0.5;
+        hide_target_hack = false;
+        legacy_computing_symbols_support = true;
+      };
+    };
+    refactoring = {
+      enable = true;
+      enableTelescope = true;
+    };
+    qmk = {
+      enable = true;
+      settings = {
+        name = "zmk";
+        layout = [
+          "x x"
+          "x^x"
+        ];
+      };
+    };
+    lspsaga.enable = true;
+    nvim-surround.enable = true;
+    # obsidian.enable = true;
+
+    marks.enable = true;
+    navbuddy = {
+      enable = true;
+      lsp = {
+        autoAttach = true;
+      };
+    };
+
+    lazydev = {
+      enable = true;
+      settings = {
+        enabled = lib.nixvim.mkRaw "function(root_dir)\n  return vim.g.lazydev_enabled == nil and true or vim.g.lazydev_enabled\nend\n";
+        library = [
+          "lazy.nvim"
+          "LazyVim"
+          {
+            path = "LazyVim";
+            words = [
+              "LazyVim"
+            ];
+          }
+        ];
+        runtime = lib.nixvim.mkRaw "vim.env.VIMRUNTIME";
+      };
+    };
+
+    helpview.enable = true;
+    direnv.enable = true;
+    git-worktree.enable = true;
+    glance.enable = true;
+    improved-search.enable = true;
+    auto-session.enable = true;
+    comment.enable = true;
+    firenvim.enable = true;
+    lazygit.enable = true;
+    gitsigns.enable = true;
+    grug-far.enable = true;
   };
 
   keymaps = [
+    {
+      key = "<A-h>";
+      action = "<Cmd>wincmd h<CR>";
+    }
+    {
+      key = "<A-j>";
+      action = "<Cmd>wincmd j<CR>";
+    }
+    {
+      key = "<A-k>";
+      action = "<Cmd>wincmd k<CR>";
+    }
+    {
+      key = "<A-l>";
+      action = "<Cmd>wincmd l<CR>";
+    }
     {
       key = "<A-m>";
       action = "<cmd>ZenMode<cr>";
@@ -236,22 +267,20 @@
     }
   ];
 
-  extraConfigLua =
-    # Lua
-    ''
-      function Search_And_Replace()
-        if vim.fn.mode() == 'v' or vim.fn.mode() == 'V' then
-          require('grug-far').with_visual_selection({ transient = true })
-        else
-          require('grug-far').open({
-            transient = true,
-            prefills = { search = vim.fn.expand('<cword>') }
-          })
-        end
+  extraConfigLua = ''
+    function Search_And_Replace()
+      if vim.fn.mode() == 'v' or vim.fn.mode() == 'V' then
+        require('grug-far').with_visual_selection({ transient = true })
+      else
+        require('grug-far').open({
+          transient = true,
+          prefills = { search = vim.fn.expand('<cword>') }
+        })
       end
+    end
 
-      vim.opt.signcolumn = "yes";
-    '';
+    vim.opt.signcolumn = "yes";
+  '';
 
   highlight = {
     LazyGitBorder = {
