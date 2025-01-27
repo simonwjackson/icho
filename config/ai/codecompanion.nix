@@ -50,11 +50,6 @@
     enable = true;
   };
 
-  plugins.mini = {
-    enable = true;
-    modules.diff.options.view.style = "sign";
-  };
-
   plugins.blink-cmp = {
     enable = true;
     settings = {

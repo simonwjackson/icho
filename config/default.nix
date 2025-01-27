@@ -4,6 +4,7 @@
 
     ./clipboard.nix
     ./color.nix
+    ./mini.nix
     ./conform.nix
     ./dadbod.nix
     ./flash.nix
@@ -269,6 +270,8 @@
 
   extraConfigLua = ''
     local opt = vim.opt
+
+    opt.shortmess:append('I')
 
     -- Persist undo history between sessions
     opt.undofile = true;
