@@ -1,13 +1,9 @@
 {lib, ...}: {
-  plugins.mini.modules = {
+  plugins.mini = {
     enable = true;
-    diff = {
-      view = {
-        style = "sign";
-      };
-    };
+    modules.diff.options.view.style = "sign";
   };
-  /**/
+
   plugins.blink-cmp = {
     enable = true;
     settings = {
@@ -129,6 +125,10 @@
         };
       };
       display = {
+        diff = {
+          enabled = true;
+          provider = "mini_diff";
+        };
         chat = {
           diff = {
             enabled = true;

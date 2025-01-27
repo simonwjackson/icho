@@ -143,7 +143,7 @@
     comment.enable = true;
     firenvim.enable = true;
     lazygit.enable = true;
-    # gitsigns.enable = true;
+    gitsigns.enable = true;
     grug-far.enable = true;
     better-escape = {
       enable = true;
