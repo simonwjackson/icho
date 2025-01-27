@@ -2,7 +2,7 @@
   imports = [
     ./ai
 
-    # ./clipboard.nix
+    ./clipboard.nix
     ./color.nix
     ./conform.nix
     ./dadbod.nix
@@ -206,7 +206,7 @@
     comment.enable = true;
     firenvim.enable = true;
     lazygit.enable = true;
-    gitsigns.enable = true;
+    # gitsigns.enable = true;
     grug-far.enable = true;
   };
 
@@ -268,6 +268,39 @@
   ];
 
   extraConfigLua = ''
+    local opt = vim.opt
+
+    -- Persist undo history between sessions
+    opt.undofile = true;
+
+    --- CUSTOM ---
+    opt.splitkeep = "screen" -- keeps the same screen screen lines in all split windows
+    opt.signcolumn = "yes"
+
+    opt.splitbelow = true
+    opt.splitright = true
+    opt.termguicolors = true
+    opt.timeoutlen = 400
+    opt.undofile = true
+    opt.scrollback = 100000
+
+    -- Indenting
+    opt.expandtab = true
+    opt.shiftwidth = 2
+    opt.smartindent = true
+    opt.tabstop = 2
+    opt.softtabstop = 2
+
+    opt.fillchars = { eob = " " }
+    opt.ignorecase = true
+    opt.smartcase = true
+    opt.mouse = "a"
+
+    -- Numbers
+    opt.number = false
+    opt.numberwidth = 2
+    opt.ruler = false
+
     function Search_And_Replace()
       if vim.fn.mode() == 'v' or vim.fn.mode() == 'V' then
         require('grug-far').with_visual_selection({ transient = true })
@@ -278,8 +311,6 @@
         })
       end
     end
-
-    vim.opt.signcolumn = "yes";
   '';
 
   highlight = {
