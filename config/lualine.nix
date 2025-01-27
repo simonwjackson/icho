@@ -38,31 +38,6 @@
         ];
         lualine_x = [
           "diagnostics"
-          {
-            __unkeyed-1 = {
-              __raw = ''
-                function()
-                    local msg = ""
-                    local buf_ft = vim.api.nvim_buf_get_option(0, 'filetype')
-                    local clients = vim.lsp.get_active_clients()
-                    if next(clients) == nil then
-                        return msg
-                    end
-                    for _, client in ipairs(clients) do
-                        local filetypes = client.config.filetypes
-                        if filetypes and vim.fn.index(filetypes, buf_ft) ~= -1 then
-                            return client.name
-                        end
-                    end
-                    return msg
-                end
-              '';
-            };
-            color = {
-              fg = "#ffffff";
-            };
-            icon = "";
-          }
         ];
         lualine_y = [
           {
@@ -155,13 +130,18 @@
             __unkeyed-1 = {
               __raw = ''
                 function()
-                  local current_tab = vim.api.nvim_get_current_tabpage()
-                  local tab_name = vim.t[current_tab].name
-                  if tab_name then
-                    return tab_name
-                  else
-                    return vim.api.nvim_tabpage_get_number(current_tab)
+                  local tabs = {}
+                  for _, tabpage in ipairs(vim.api.nvim_list_tabpages()) do
+                    local tab_num = vim.api.nvim_tabpage_get_number(tabpage)
+                    local tab_name = vim.t[tabpage].name
+                    local is_current = tabpage == vim.api.nvim_get_current_tabpage()
+                    local display = tab_name and string.format("%d:%s", tab_num, tab_name) or tostring(tab_num)
+                    if is_current then
+                      display = "[" .. display .. "]"
+                    end
+                    table.insert(tabs, display)
                   end
+                return table.concat(tabs, " ")
                 end
               '';
             };

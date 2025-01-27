@@ -51,7 +51,10 @@
 
   plugins.telescope = {
     enable = true;
-    settings = {
+    extensions = {
+      ui-select = {
+        enable = true;
+      };
     };
   };
 }

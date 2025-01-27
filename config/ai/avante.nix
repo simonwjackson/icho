@@ -1,14 +1,3 @@
-{pkgs, ...}: {
-  plugins = {
-    avante = {
-      enable = true;
-      autoLoad = true;
-    };
-  };
-
-  extraPlugins = with pkgs; [
-  ];
-
-  extraConfigLua = ''
-  '';
+{
+  plugins.avante.enable = true;
 }

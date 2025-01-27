@@ -46,7 +46,7 @@
         enable = true;
       };
       nixd = {
-        enable = true;
+        enable = false; # INFO: using nil-ls instead
       };
       eslint = {
         enable = true;

@@ -1,6 +1,81 @@
 {lib, ...}: {
+  imports = [
+    ./ai
+
+    # ./clipboard.nix
+    ./color.nix
+    ./conform.nix
+    ./dadbod.nix
+    ./flash.nix
+    ./lsp.nix
+    ./lualine.nix
+    ./markview.nix
+    ./overseer.nix
+    ./telescope.nix
+    ./toggleterm.nix
+    ./treesitter.nix
+    ./which-key.nix
+  ];
+
   plugins = {
+    dressing = {
+      enable = true;
+      settings = {
+        input = {
+          enabled = true;
+        };
+        select = {
+          enabled = true;
+        };
+      };
+    };
+    zen-mode = {
+      enable = true;
+      settings = {
+        window = {
+          backdrop = 0.95;
+          width = 120;
+          height = 1;
+        };
+      };
+    };
+    vim-suda = {
+      enable = true;
+    };
+    vim-matchup = {
+      enable = true;
+      treesitter.enable = true;
+    };
+    typescript-tools.enable = true;
+    todo-comments.enable = true;
+    tailwind-tools.enable = true;
+    scope.enable = true;
+    smear-cursor = {
+      enable = true;
+      settings = {
+        stiffness = 0.8;
+        trailing_stiffness = 0.5;
+        distance_stop_animating = 0.5;
+        hide_target_hack = false;
+        legacy_computing_symbols_support = true;
+      };
+    };
+    rest.enable = true;
+    refactoring = {
+      enable = true;
+      enableTelescope = true;
+    };
+    repeat.enable = true;
+    qmk.enable = true;
+    qmk.settings.name = "zmk";
+    qmk.settings.layout = [
+      "x x"
+      "x^x"
+    ];
     lspsaga.enable = true;
+    nvim-surround.enable = true;
+    # obsidian.enable = true;
+    otter.enable = true;
     noice = {
       enable = true;
       settings = {
@@ -68,7 +143,7 @@
     comment.enable = true;
     firenvim.enable = true;
     lazygit.enable = true;
-    gitsigns.enable = true;
+    # gitsigns.enable = true;
     grug-far.enable = true;
     better-escape = {
       enable = true;
@@ -120,24 +195,14 @@
     };
   };
 
-  imports = [
-    ./ai
-
-    ./color.nix
-    ./lsp.nix
-    ./conform.nix
-    ./dadbod.nix
-    ./flash.nix
-    ./lualine.nix
-    ./markview.nix
-    ./telescope.nix
-    ./toggleterm.nix
-    ./treesitter.nix
-    ./which-key.nix
-    ./osc52.nix
-  ];
-
   keymaps = [
+    {
+      key = "<A-m>";
+      action = "<cmd>ZenMode<cr>";
+      options = {
+        desc = "Toggle zen mode";
+      };
+    }
     {
       key = "<c-s>";
       action = "<cmd>update<CR>";
@@ -171,18 +236,22 @@
     }
   ];
 
-  extraConfigLua = ''
-    function Search_And_Replace()
-      if vim.fn.mode() == 'v' or vim.fn.mode() == 'V' then
-        require('grug-far').with_visual_selection({ transient = true })
-      else
-        require('grug-far').open({
-          transient = true,
-          prefills = { search = vim.fn.expand('<cword>') }
-        })
+  extraConfigLua =
+    # Lua
+    ''
+      function Search_And_Replace()
+        if vim.fn.mode() == 'v' or vim.fn.mode() == 'V' then
+          require('grug-far').with_visual_selection({ transient = true })
+        else
+          require('grug-far').open({
+            transient = true,
+            prefills = { search = vim.fn.expand('<cword>') }
+          })
+        end
       end
-    end
-  '';
+
+      vim.opt.signcolumn = "yes";
+    '';
 
   highlight = {
     LazyGitBorder = {
