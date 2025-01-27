@@ -3,6 +3,7 @@
     wl-clipboard
   ];
 
+  # NOTE: Incase this plugin gets removed:
   # extraPlugins = [
   #   (pkgs.vimUtils.buildVimPlugin {
   #     name = "my-plugin";
