@@ -33,9 +33,9 @@
         ];
         lualine_b = [
           "branch"
+          "overseer"
         ];
-        lualine_c = [
-        ];
+        lualine_c = [];
         lualine_x = [
           "diagnostics"
         ];
