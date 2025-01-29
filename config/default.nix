@@ -1,4 +1,12 @@
-{lib, ...}: {
+{
+  pkgs,
+  lib,
+  ...
+}: {
+  extraPlugins = [
+    pkgs.vimPlugins.tmux-session-switcher
+  ];
+
   imports = [
     ./ai
 
@@ -314,6 +322,22 @@
         })
       end
     end
+
+    require('tmux-session-switcher').setup({
+      paths = { '/snowscape/code' },
+    })
+
+    vim.api.nvim_create_autocmd({'UIEnter'}, {
+      callback = function(event)
+        local client = vim.api.nvim_get_chan_info(vim.v.event.chan).client
+        if client ~= nil and client.name == "Firenvim" then
+          vim.o.laststatus = 0
+          vim.opt.showtabline = 0
+          vim.api.nvim_set_keymap('n', '<C-s>', ':wq<CR>', { noremap = true, silent = true })
+          vim.api.nvim_set_keymap('i', '<C-s>', '<Esc>:wq<CR>', { noremap = true, silent = true })
+        end
+      end
+    })
   '';
 
   highlight = {
