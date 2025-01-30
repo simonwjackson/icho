@@ -194,7 +194,7 @@
       };
       strategies = {
         chat = {
-          adapter = "deepseek";
+          adapter = "anthropic";
           slash_commands = {
             help = {
               opts = {
@@ -228,10 +228,10 @@
           };
         };
         inline = {
-          adapter = "deepseek";
+          adapter = "anthropic";
         };
         agent = {
-          adapter = "deepseek";
+          adapter = "anthropic";
         };
       };
       adapters = {
