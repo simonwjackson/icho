@@ -219,7 +219,28 @@
     grug-far.enable = true;
   };
 
+  autoCmd = [
+    {
+      event = "TermClose";
+      pattern = "*";
+      command =
+        # vim
+        ''
+          if !v:event.status && bufname('%') == "" && tabpagewinnr(tabpagenr()) == 1
+            quit!
+          endif
+        '';
+    }
+  ];
+
   keymaps = [
+    {
+      key = "<C-S-t>";
+      action = ":tabnew<CR>:terminal<CR>:startinsert<CR>";
+      options = {
+        desc = "Open new tab with terminal in insert mode (nobuflisted)";
+      };
+    }
     {
       key = "<A-h>";
       action = "<Cmd>wincmd h<CR>";
