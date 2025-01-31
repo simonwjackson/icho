@@ -236,7 +236,7 @@
   keymaps = [
     {
       key = "<leader>p";
-      action = "<CMD>TmuxSelect<CR>";
+      action = "<CMD>TmuxSessionSwitch<CR>";
       options = {
         desc = "Open new tab with terminal in insert mode (nobuflisted)";
       };

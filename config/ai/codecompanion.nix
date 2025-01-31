@@ -375,43 +375,6 @@ in {
           adapter = "antropic";
         };
       };
-      adapters = {
-        deepseek = {
-          __raw =
-            unDerscore
-            # lua
-            ''
-              function _()
-                return require("codecompanion.adapters").extend("openai", {
-                  name = "deepseek",
-                    schema = {
-                      model = {
-                        default = "deepseek-chat",
-                          choices = {
-                            "deepseek-chat",
-                            "deepseek-reasoner",
-                          },
-                      },
-                   },
-                   url = "https://api.deepseek.com/v1/chat/completions",
-                   env = {
-                     api_key = "DEEPSEEK_API_KEY",
-                   },
-                 })
-              end
-            '';
-        };
-        anthropic = {
-          __raw =
-            unDerscore
-            # lua
-            ''
-              function _()
-                return require("codecompanion.adapters").extend("anthropic", {})
-              end
-            '';
-        };
-      };
     };
   };
 }
