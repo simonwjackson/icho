@@ -9,7 +9,6 @@
 
   imports = [
     ./ai
-
     ./clipboard.nix
     ./color.nix
     ./mini.nix
@@ -234,6 +233,34 @@
   ];
 
   keymaps = [
+    {
+      key = "<A-C-l>";
+      action = "<cmd>tabnext<CR>";
+      options = {
+        desc = "Next Tab";
+      };
+    }
+    {
+      key = "<A-C-h>";
+      action = "<cmd>tabprevious<CR>";
+      options = {
+        desc = "Previous Tab";
+      };
+    }
+    {
+      key = "<A-C-j>";
+      action = "<cmd>bnext<CR>";
+      options = {
+        desc = "Next buffer";
+      };
+    }
+    {
+      key = "<A-C-k>";
+      action = "<cmd>bprevious<CR>";
+      options = {
+        desc = "Previous buffer";
+      };
+    }
     {
       key = "<leader>p";
       action = "<CMD>TmuxSessionSwitch<CR>";
