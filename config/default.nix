@@ -242,7 +242,7 @@
       };
     }
     {
-      key = "<C-S-t>";
+      key = "<C-t>";
       action = ":tabnew<CR>:terminal<CR>:startinsert<CR>";
       options = {
         desc = "Open new tab with terminal in insert mode (nobuflisted)";
