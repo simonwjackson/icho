@@ -2,6 +2,49 @@
   plugins.ts-context-commentstring.enable = true;
   plugins.ts-autotag.enable = true;
   plugins.ts-comments.enable = true;
+  plugins.treesitter-textobjects = {
+    enable = true;
+    move = {
+      enable = true;
+      setJumps = true;
+      gotoNextStart = {
+        "]f" = {query = "@function.outer";};
+        "]c" = {query = "@conditional.outer";};
+        "]l" = {query = "@loop.outer";};
+        "]o" = {query = "@class.outer";};
+      };
+      gotoNextEnd = {
+        "]F" = {query = "@function.outer";};
+        "]C" = {query = "@conditional.outer";};
+        "]L" = {query = "@loop.outer";};
+        "]O" = {query = "@class.outer";};
+      };
+      gotoPreviousStart = {
+        "[f" = {query = "@function.outer";};
+        "[c" = {query = "@conditional.outer";};
+        "[l" = {query = "@loop.outer";};
+        "[o" = {query = "@class.outer";};
+      };
+      gotoPreviousEnd = {
+        "[F" = {query = "@function.outer";};
+        "[C" = {query = "@conditional.outer";};
+        "[L" = {query = "@loop.outer";};
+        "[O" = {query = "@class.outer";};
+      };
+    };
+    select = {
+      enable = true;
+      lookahead = true;
+      keymaps = {
+        "af" = {query = "@function.outer";};
+        "if" = {query = "@function.inner";};
+        "ac" = {query = "@conditional.outer";};
+        "ic" = {query = "@conditional.inner";};
+        "al" = {query = "@loop.outer";};
+        "il" = {query = "@loop.inner";};
+      };
+    };
+  };
   plugins.treesitter-refactor = {
     enable = true;
     # smartRename.enable = true;
