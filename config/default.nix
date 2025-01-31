@@ -215,7 +215,6 @@
     comment.enable = true;
     firenvim.enable = true;
     lazygit.enable = true;
-    # gitsigns.enable = true;
     grug-far.enable = true;
   };
 
@@ -223,6 +222,7 @@
     {
       event = "TermClose";
       pattern = "*";
+      # Close the tab if there are no other splits
       command =
         # vim
         ''
@@ -234,6 +234,13 @@
   ];
 
   keymaps = [
+    {
+      key = "<leader>p";
+      action = "<CMD>TmuxSelect<CR>";
+      options = {
+        desc = "Open new tab with terminal in insert mode (nobuflisted)";
+      };
+    }
     {
       key = "<C-S-t>";
       action = ":tabnew<CR>:terminal<CR>:startinsert<CR>";
