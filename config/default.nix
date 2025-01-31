@@ -15,6 +15,7 @@
     ./conform.nix
     ./dadbod.nix
     ./flash.nix
+    ./fidget.nix
     ./lsp.nix
     ./lualine.nix
     ./markview.nix

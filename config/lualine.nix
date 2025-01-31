@@ -38,6 +38,32 @@
         lualine_c = [];
         lualine_x = [
           "diagnostics"
+          {
+            __unkeyed-1 = {
+              __raw = ''
+                  function()
+                  vim.api.nvim_create_autocmd("User", {
+                    pattern = "CodeCompanionChatModel",
+                    callback = function(args)
+                      if args.data.model == nil or vim.tbl_isempty(args.data) then
+                        return
+                      end
+
+                      vim.g.llm_name = args.data.model
+                    end,
+                  })
+                  if vim.g.llm_name == nil then
+                    return ""
+                  end
+                  if vim.bo.filetype == "codecompanion" then
+                    return string.format("%%#StatusLineLSP#[%s]", vim.g.llm_name)
+                  else
+                    return ""
+                  end
+                end
+              '';
+            };
+          }
         ];
         lualine_y = [
           {
