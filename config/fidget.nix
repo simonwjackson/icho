@@ -2,6 +2,12 @@
   # HACK: There is an issue with the LSP server and embedded lua code
   unDerscore = str: builtins.replaceStrings ["_("] ["("] str;
 in {
+  filetype = {
+    extension = {
+      mdx = "markdown";
+    };
+  };
+
   plugins.fidget = {
     enable = true;
     settings = {

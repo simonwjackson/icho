@@ -2,6 +2,7 @@
   plugins.ts-context-commentstring.enable = true;
   plugins.ts-autotag.enable = true;
   plugins.ts-comments.enable = true;
+
   plugins.treesitter-textobjects = {
     enable = true;
     move = {
@@ -45,6 +46,7 @@
       };
     };
   };
+
   plugins.treesitter-refactor = {
     enable = true;
     # smartRename.enable = true;
@@ -52,6 +54,7 @@
     highlightCurrentScope.enable = true;
     highlightDefinitions.enable = true;
   };
+
   plugins.treesitter = {
     enable = true;
     settings.highlight.enable = true;
