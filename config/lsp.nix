@@ -32,6 +32,20 @@
       };
       lua_ls = {
         enable = true;
+        settings = {
+          diagnostics.globals = ["vim"];
+          workspace = {
+            library = [
+              {
+                __raw = ''vim.fn.expand "$VIMRUNTIME"'';
+              }
+              {
+                __raw = ''vim.fn.expand "$VIMRUNTIME/lua/vim/lsp"'';
+              }
+              "\${3rd}/luv/library"
+            ];
+          };
+        };
       };
       ts_ls = {
         enable = true;
