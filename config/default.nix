@@ -3,6 +3,12 @@
   lib,
   ...
 }: {
+  # filetype = {
+  #   extension = {
+  #     astro = "astro";
+  #   };
+  # };
+
   extraPlugins = [
     pkgs.vimPlugins.tmux-session-switcher
   ];

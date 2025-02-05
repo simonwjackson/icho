@@ -61,6 +61,7 @@
 
     grammarPackages = with pkgs.vimPlugins.nvim-treesitter.builtGrammars; [
       astro
+      jsonc
       bash
       c
       cpp
