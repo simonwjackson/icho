@@ -60,6 +60,7 @@
     settings.highlight.enable = true;
 
     grammarPackages = with pkgs.vimPlugins.nvim-treesitter.builtGrammars; [
+      astro
       bash
       c
       cpp
