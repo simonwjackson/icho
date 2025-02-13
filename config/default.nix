@@ -386,7 +386,11 @@
     end
 
     require('tmux-session-switcher').setup({
-      paths = { '/snowscape/code' },
+      paths = {
+        -- HACK: Remove this so it so its useful for other people
+        '/snowscape/code',
+        '/snowscape/notes'
+      },
     })
 
     vim.api.nvim_create_autocmd({'UIEnter'}, {
