@@ -87,6 +87,20 @@ in {
 
   keymaps = [
     {
+      key = "<leader>af";
+      action = ":CodeCompanion ";
+      options = {
+        desc = "AI Actions: Fix";
+      };
+    }
+    {
+      key = "<leader>ag";
+      action = ":CodeCompanion /commit<CR>";
+      options = {
+        desc = "AI Actions: Git Commit Message";
+      };
+    }
+    {
       key = "<leader>ac";
       action = ":CodeCompanionCmd ";
       options = {
@@ -147,19 +161,21 @@ in {
   plugins.codecompanion = {
     enable = true;
     settings = {
+      adapters = {};
       prompt_library = {
         "Generate a Commit Message" = {
           strategy = "inline";
           description = "Generate git commit message for current staged changes";
           opts = {
             index = 10;
-            mapping = "<leader>acm";
+            mapping = "<LocalLeader>ag";
             placement = "before|false";
             short_name = "commit";
             is_default = true;
             is_slash_cmd = true;
             auto_submit = false;
           };
+
           prompts = [
             {
               role = "user";
@@ -177,7 +193,7 @@ in {
                       ```
                       <type>[optional scope]: <description>
                       <BLANK LINE>
-                      <pithy bullet points. 3 max>
+                      <pithy bullet points. total bullets must reflect the number of lines in the diff>
                       ```
 
                       Return the code only and no markdown codeblocks.
