@@ -1,3 +1,0 @@
-{
-  plugins.avante.enable = true;
-}

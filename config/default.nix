@@ -14,18 +14,19 @@
   ];
 
   imports = [
-    ./ai
+    ./claude-code.nix
     ./clipboard.nix
     ./color.nix
-    ./mini.nix
     ./conform.nix
     ./dadbod.nix
-    ./flash.nix
     ./fidget.nix
+    ./flash.nix
     ./lsp.nix
     ./lualine.nix
     ./markview.nix
+    ./mini.nix
     ./overseer.nix
+    ./supermaven.nix
     ./telescope.nix
     ./toggleterm.nix
     ./treesitter.nix
@@ -158,16 +159,16 @@
     typescript-tools.enable = true;
     tailwind-tools.enable = true;
     scope.enable = true;
-    smear-cursor = {
-      enable = true;
-      settings = {
-        stiffness = 0.8;
-        trailing_stiffness = 0.5;
-        distance_stop_animating = 0.5;
-        hide_target_hack = false;
-        legacy_computing_symbols_support = true;
-      };
-    };
+    # smear-cursor = {
+    #   enable = true;
+    #   settings = {
+    #     stiffness = 0.8;
+    #     trailing_stiffness = 0.5;
+    #     distance_stop_animating = 0.5;
+    #     hide_target_hack = false;
+    #     legacy_computing_symbols_support = true;
+    #   };
+    # };
     refactoring = {
       enable = true;
       enableTelescope = true;
