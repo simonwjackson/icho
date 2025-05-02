@@ -26,6 +26,13 @@
       perSystem = {system, ...}: let
         pkgs = import nixpkgs {
           inherit system;
+          # Allow unfree packages, specifically Claude Code
+          config = {
+            allowUnfreePredicate = pkg:
+              builtins.elem (nixpkgs.lib.getName pkg) [
+                "claude-code"
+              ];
+          };
           overlays = [
             (final: prev: {
               vimPlugins =
@@ -43,7 +50,7 @@
           inherit pkgs; # Now using our modified pkgs
           module = import ./config;
           extraSpecialArgs = {
-            # inherit (inputs) foo;
+            inherit inputs;
           };
         };
         nvim = nixvim'.makeNixvimWithModule nixvimModule;
