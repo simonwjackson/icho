@@ -14,7 +14,7 @@
   ];
 
   imports = [
-    ./claude-code.nix
+    ./claude-code
     ./clipboard.nix
     ./color.nix
     ./conform.nix
