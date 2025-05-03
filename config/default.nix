@@ -21,6 +21,7 @@
     ./dadbod.nix
     ./fidget.nix
     ./flash.nix
+    ./fugit.nix
     ./lsp.nix
     ./lualine.nix
     # ./markview.nix
@@ -33,21 +34,6 @@
   ];
 
   plugins = {
-    # Git
-    fugit2 = {
-      enable = true;
-      settings = {
-        width = 100;
-        max_width = "80%";
-        height = "60%";
-        show_patch = false;
-        external_diffview = false;
-        blame_priority = 1;
-        blame_info_width = 60;
-        blame_info_height = 10;
-      };
-    };
-
     # Keyboard
     better-escape = {
       enable = true;
@@ -232,7 +218,6 @@
     auto-session.enable = true;
     comment.enable = true;
     firenvim.enable = true;
-    lazygit.enable = true;
     grug-far.enable = true;
   };
 
@@ -326,53 +311,12 @@
     }
 
     {
-      key = "<leader>gg";
-      action = "<cmd>LazyGitCurrentFile<CR>";
-      options = {
-        desc = "Lazy Git";
-      };
-    }
-
-    {
       key = "<leader>gw";
       action = "<cmd>lua require('telescope').extensions.git_worktree.git_worktrees()<CR>";
       options = {
         desc = "Git Worktrees";
       };
     }
-
-    {
-      key = "<leader>gf";
-      action = "<cmd>Fugit2<CR>";
-      options = {
-        desc = "Fugit2 Main";
-      };
-    }
-
-    {
-      key = "<leader>gd";
-      action = "<cmd>Fugit2Diff<CR>";
-      options = {
-        desc = "Fugit2 Diff";
-      };
-    }
-
-    {
-      key = "<leader>gb";
-      action = "<cmd>Fugit2Blame<CR>";
-      options = {
-        desc = "Fugit2 Blame";
-      };
-    }
-
-    {
-      key = "<leader>gu";
-      action = "<cmd>Fugit2Graph<CR>";
-      options = {
-        desc = "Fugit2 Graph";
-      };
-    }
-
     {
       key = "<leader>S";
       action = "<cmd>lua Search_And_Replace()<CR>";
@@ -408,7 +352,19 @@
     opt.tabstop = 2
     opt.softtabstop = 2
 
-    opt.fillchars = { eob = " " }
+    opt.fillchars = {
+      eob = " ",
+      -- fold = ' ',
+      diff = '╱',
+      -- wbr = '─',
+      -- msgsep = '─',
+      -- horiz = ' ',
+      -- horizup = '│',
+      -- horizdown = '│',
+      -- vertright = '│',
+      -- vertleft = '│',
+      -- verthoriz = '│',
+    }
     opt.ignorecase = true
     opt.smartcase = true
     opt.mouse = "a"
@@ -451,6 +407,8 @@
         end
       end
     })
+
+    vim.api.nvim_set_hl(0, 'DiffDelete', { bg = 'NONE', fg = '#2F4146' })
   '';
 
   highlight = {

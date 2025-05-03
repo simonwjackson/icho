@@ -104,15 +104,6 @@ TODO
 | `<leader>ta` | Overseer: Task Actions |
 | `<leader>tc` | Overseer: Run arbitrary command |
 
-## Git Operations
-
-| Keybinding | Description |
-|------------|-------------|
-| `<leader>gg` | LazyGit |
-| `<leader>gw` | Git Worktrees |
-| `<leader>gc` | Git commits |
-| `<leader>gs` | Git status |
-
 ## UI Control
 
 | Keybinding | Description |

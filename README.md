@@ -232,7 +232,6 @@ This configuration includes a variety of plugins:
 - **auto-session**: Automatic session management.
 - **comment**: Comment toggling and management.
 - **firenvim**: Embed Neovim in the browser.
-- **lazygit**: Git integration with LazyGit.
 - **grug-far**: Search and replace functionality.
 
 ## Plugin Updates

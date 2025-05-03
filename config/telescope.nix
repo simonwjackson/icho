@@ -9,7 +9,7 @@
     }
 
     {
-      key = "<leader>fg";
+      key = "<leader>fF";
       action = "<cmd> Telescope find_files follow=true no_ignore=true hidden=true <CR>";
       options = {
         desc = "Find all files";
@@ -37,14 +37,6 @@
       action = "<cmd> Telescope git_commits <CR>";
       options = {
         desc = "Git commits";
-      };
-    }
-
-    {
-      key = "<leader>gs";
-      action = "<cmd> Telescope git_status <CR>";
-      options = {
-        desc = "Git status";
       };
     }
   ];
