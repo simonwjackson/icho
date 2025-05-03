@@ -23,8 +23,7 @@
     ./flash.nix
     ./lsp.nix
     ./lualine.nix
-    ./markview.nix
-    ./mini.nix
+    # ./markview.nix
     ./overseer.nix
     ./supermaven.nix
     ./telescope.nix
@@ -34,6 +33,21 @@
   ];
 
   plugins = {
+    # Git
+    fugit2 = {
+      enable = true;
+      settings = {
+        width = 100;
+        max_width = "80%";
+        height = "60%";
+        show_patch = false;
+        external_diffview = false;
+        blame_priority = 1;
+        blame_info_width = 60;
+        blame_info_height = 10;
+      };
+    };
+
     # Keyboard
     better-escape = {
       enable = true;
@@ -134,8 +148,15 @@
         cmdline = {
           enabled = true;
         };
-        health.chcker = false;
-        messages.enabled = false;
+        health.checker = false;
+        messages = {
+          enabled = false;
+          view = "notify";
+          view_error = "notify";
+          view_warn = "notify";
+          view_history = "messages";
+          view_search = "virtualtext";
+        };
         notify.enabled = false;
         popupmenu.enabled = true;
         smart_move.enabled = true;
@@ -159,16 +180,6 @@
     typescript-tools.enable = true;
     tailwind-tools.enable = true;
     scope.enable = true;
-    # smear-cursor = {
-    #   enable = true;
-    #   settings = {
-    #     stiffness = 0.8;
-    #     trailing_stiffness = 0.5;
-    #     distance_stop_animating = 0.5;
-    #     hide_target_hack = false;
-    #     legacy_computing_symbols_support = true;
-    #   };
-    # };
     refactoring = {
       enable = true;
       enableTelescope = true;
@@ -331,6 +342,38 @@
     }
 
     {
+      key = "<leader>gf";
+      action = "<cmd>Fugit2<CR>";
+      options = {
+        desc = "Fugit2 Main";
+      };
+    }
+
+    {
+      key = "<leader>gd";
+      action = "<cmd>Fugit2Diff<CR>";
+      options = {
+        desc = "Fugit2 Diff";
+      };
+    }
+
+    {
+      key = "<leader>gb";
+      action = "<cmd>Fugit2Blame<CR>";
+      options = {
+        desc = "Fugit2 Blame";
+      };
+    }
+
+    {
+      key = "<leader>gu";
+      action = "<cmd>Fugit2Graph<CR>";
+      options = {
+        desc = "Fugit2 Graph";
+      };
+    }
+
+    {
       key = "<leader>S";
       action = "<cmd>lua Search_And_Replace()<CR>";
       options = {
@@ -342,7 +385,7 @@
   extraConfigLua = ''
     local opt = vim.opt
 
-    opt.shortmess:append('I')
+    opt.shortmess:append('filnxtToOCcIF')
 
     -- Persist undo history between sessions
     opt.undofile = true;
@@ -374,6 +417,9 @@
     opt.number = false
     opt.numberwidth = 2
     opt.ruler = false
+
+    -- Command line
+    opt.cmdheight = 0
 
     function Search_And_Replace()
       if vim.fn.mode() == 'v' or vim.fn.mode() == 'V' then
