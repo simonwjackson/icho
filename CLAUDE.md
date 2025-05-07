@@ -6,6 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Test configuration: `nix flake check`
 - Run Neovim with this config: `nix run`
 - Update all plugins: `nix flake update`
+- Never run `nix run` for this project
 
 ## Code Style
 - Nix files: Format with Alejandra (`alejandra <file>`)

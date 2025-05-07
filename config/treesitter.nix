@@ -51,8 +51,8 @@
     enable = true;
     # smartRename.enable = true;
     navigation.enable = true;
-    highlightCurrentScope.enable = true;
-    highlightDefinitions.enable = true;
+    highlightCurrentScope.enable = false;
+    highlightDefinitions.enable = false;
   };
 
   plugins.treesitter = {

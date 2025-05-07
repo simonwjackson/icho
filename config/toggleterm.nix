@@ -1,47 +1,6 @@
 {pkgs, ...}: {
   extraPackages = [
     pkgs.neovim-remote
-    pkgs.lf
-  ];
-
-  keymaps = [
-    {
-      key = "<leader>fe";
-      action = let
-        nvimLfConfig = pkgs.writeTextFile {
-          name = "nvim-lfrc";
-          text = ''
-            # Basic settings
-            set drawbox
-            set icons
-            set incsearch
-
-            # Custom mappings for Neovim integration
-            map <enter> open
-            map <esc> quit
-            map q quit
-            map <c-x> $nvr --remote-silent -o "$f"
-            map <c-v> $nvr --remote-silent -O "$f"
-            map <c-t> $nvr --remote-tab-silent "$f"
-
-            # Override default commands for Neovim context
-            cmd open ''${{
-              case $(file --mime-type "$f" -bL) in
-                text/*|application/json) nvr --remote-tab-silent "$f" ;;
-                *) xdg-open "$f" ;;
-              esac
-            }}
-          '';
-        };
-      in ''
-        <cmd>TermExec cmd="LF_CONFIG=/dev/null LF_LEVEL=0 ${pkgs.lib.getExe pkgs.lf} -config=${nvimLfConfig} %; exit" direction=float<cr>
-      '';
-      options = {
-        desc = "Open lf file manager";
-        silent = true;
-        noremap = true;
-      };
-    }
   ];
 
   extraConfigLua = ''

@@ -20,8 +20,9 @@
     ./conform.nix
     ./dadbod.nix
     ./fidget.nix
+    ./files.nix
     ./flash.nix
-    ./fugit.nix
+    ./git
     ./lsp.nix
     ./lualine.nix
     # ./markview.nix
@@ -310,13 +311,13 @@
       };
     }
 
-    {
-      key = "<leader>gw";
-      action = "<cmd>lua require('telescope').extensions.git_worktree.git_worktrees()<CR>";
-      options = {
-        desc = "Git Worktrees";
-      };
-    }
+    # {
+    #   key = "<leader>gw";
+    #   action = "<cmd>lua require('telescope').extensions.git_worktree.git_worktrees()<CR>";
+    #   options = {
+    #     desc = "Git Worktrees";
+    #   };
+    # }
     {
       key = "<leader>S";
       action = "<cmd>lua Search_And_Replace()<CR>";
