@@ -14,6 +14,7 @@
   ];
 
   imports = [
+    # ./markview.nix
     ./claude-code
     ./clipboard.nix
     ./color.nix
@@ -25,7 +26,7 @@
     ./git
     ./lsp.nix
     ./lualine.nix
-    # ./markview.nix
+    ./mini.nix
     ./overseer.nix
     ./supermaven.nix
     ./telescope.nix

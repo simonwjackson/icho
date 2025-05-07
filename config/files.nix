@@ -44,7 +44,12 @@
       escape_quit = true, -- map escape to the quit command (so it doesn't go into a meta normal mode)
       focus_on_open = true, -- focus the current file when opening Lf (experimental)
       mappings = true, -- whether terminal buffer mapping is enabled
-      default_file_manager = true, -- make lf default file manager
+      -- default_file_manager = false, -- make lf default file manager
+      --
+      -- -- Disable specific keys to prevent conflicts with other plugins
+      -- disable_netrw_mappings = {
+      --   ['<A-.>'] = true, -- Ensure <A-.> is not captured by lf
+      -- },
 
 
       -- -- Layout configurations
