@@ -145,7 +145,7 @@
       key = "<leader>ai";
       action = "<cmd>ClaudeCodeInput<CR>";
       options = {
-        desc = "Claude Code: Open Input Buffer";
+        desc = "Claude Code: Toggle Input Buffer";
       };
     }
   ];

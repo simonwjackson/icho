@@ -673,12 +673,60 @@ vim.api.nvim_create_user_command("ClaudeCodeFiles", function()
 	})
 end, {})
 
--- Define a custom command to just open the agent-input buffer
+-- Define a custom command to toggle the agent-input buffer
 vim.api.nvim_create_user_command("ClaudeCodeInput", function()
 	-- Check if the Claude Code buffer exists
 	local claude_code = require("claude-code")
 	local bufnr = claude_code.claude_code.bufnr
 
+	-- Check if agent-input buffer already exists
+	local agent_buf = nil
+	for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+		if vim.api.nvim_buf_get_name(buf):match("agent%-input$") then
+			agent_buf = buf
+			break
+		end
+	end
+
+	-- Find agent-input window if it exists
+	local agent_win = nil
+	if agent_buf and vim.api.nvim_buf_is_valid(agent_buf) then
+		for _, win in ipairs(vim.api.nvim_list_wins()) do
+			if vim.api.nvim_win_get_buf(win) == agent_buf then
+				agent_win = win
+				break
+			end
+		end
+	end
+	
+	-- Find Claude Code window if it exists
+	local claude_win = nil
+	if bufnr and vim.api.nvim_buf_is_valid(bufnr) then
+		local win_ids = vim.fn.win_findbuf(bufnr)
+		if #win_ids > 0 then
+			claude_win = win_ids[1]
+		end
+	end
+
+	-- If both windows are visible, close them (toggle off)
+	if agent_win and claude_win then
+		-- Close agent-input window
+		vim.api.nvim_win_close(agent_win, true)
+		
+		-- Remove buffer
+		if agent_buf and vim.api.nvim_buf_is_valid(agent_buf) then
+			vim.api.nvim_buf_delete(agent_buf, { force = true })
+		end
+		
+		-- Close Claude Code
+		claude_code.toggle()
+		
+		vim.notify("Closed Claude Code and agent-input buffer", vim.log.levels.INFO)
+		return
+	end
+
+	-- Otherwise, open or ensure they're both visible (toggle on)
+	
 	-- Open Claude Code if not already open
 	if not bufnr or not vim.api.nvim_buf_is_valid(bufnr) then
 		claude_code.toggle()
@@ -691,15 +739,6 @@ vim.api.nvim_create_user_command("ClaudeCodeInput", function()
 		else
 			-- Open Claude Code window if not visible
 			claude_code.toggle()
-		end
-	end
-
-	-- Check if agent-input buffer already exists
-	local agent_buf = nil
-	for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-		if vim.api.nvim_buf_get_name(buf):match("agent%-input$") then
-			agent_buf = buf
-			break
 		end
 	end
 
@@ -717,16 +756,7 @@ vim.api.nvim_create_user_command("ClaudeCodeInput", function()
 		vim.bo[agent_buf].modifiable = true
 	end
 
-	-- Find agent-input window if it exists
-	local agent_win = nil
-	for _, win in ipairs(vim.api.nvim_list_wins()) do
-		if vim.api.nvim_win_get_buf(win) == agent_buf then
-			agent_win = win
-			break
-		end
-	end
-
-	-- Create new window below Claude if agent window doesn't exist
+	-- Find or create agent-input window
 	if not agent_win then
 		-- Split below current Claude window
 		vim.cmd("split")
