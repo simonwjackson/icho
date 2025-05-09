@@ -109,10 +109,15 @@ require("tabby").setup({
 			end),
 			line.tabs().foreach(function(tab)
 				local hl = tab.is_current() and "TabLineSel" or "TabLine"
-				-- Use a custom method to display the tab name without [1+]
-				local tab_display_name = tab.name() or ""
-				-- Remove the [n+] pattern if it exists
-				tab_display_name = tab_display_name:gsub("%[%d+%+?%]", "")
+				-- Always start with an empty tab name
+				local tab_display_name = ""
+
+				-- Let's use a simple solution - only display custom tab names
+				-- Use a naming convention where custom names start with 'custom:'
+				-- For now, we just don't show any name regardless of what it is
+
+				-- Later, when you want to show a custom tab name, you can use:
+				-- :lua require("tabby.feature.tab_name").set(vim.api.nvim_get_current_tabpage(), "custom:MY_TAB_NAME")
 
 				-- Display jump key if in jump mode, otherwise tab number
 				local tab_indicator = tab.in_jump_mode() and tab.jump_key() or tab.number()

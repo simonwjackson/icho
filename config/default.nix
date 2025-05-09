@@ -12,6 +12,7 @@
     ./agents
     ./clipboard.nix
     ./color.nix
+    ./completion.nix
     ./database.nix
     ./fidget.nix
     ./files.nix
