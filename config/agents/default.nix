@@ -66,8 +66,7 @@
       -- }
     })
 
-    ${builtins.readFile ./lua/file_command.lua}
-    ${builtins.readFile ./lua/selection_command.lua}
+    ${builtins.readFile ./lua/agent-command.lua}
     ${builtins.readFile ./lua/files_command.lua}
     ${builtins.readFile ./lua/directories_command.lua}
   '';
@@ -99,10 +98,17 @@
 
     # Context: Selection
     {
-      key = "<leader>as";
+      key = "<leader>av";
       action = "<cmd>ClaudeCodeSelection<CR>";
       options = {
         desc = "Claude Code: Selection (add)";
+      };
+    }
+    {
+      key = "<leader>ax";
+      action = "<cmd>ClaudeCodeSend<CR>";
+      options = {
+        desc = "Claude Code: Send agent-input";
       };
     }
 
