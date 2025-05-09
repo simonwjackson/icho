@@ -66,7 +66,7 @@
       -- }
     })
 
-    ${builtins.readFile ./agent-command.lua}
+    ${builtins.readFile ./agent-commands.lua}
   '';
 
   # Add convenient keymaps for Claude AI actions
@@ -116,6 +116,14 @@
       action = "<cmd>ClaudeCodeDirectories<CR>";
       options = {
         desc = "Claude Code: Directories";
+      };
+    }
+
+    {
+      key = "<leader>ap";
+      action = "<cmd>ClaudeCodePrompt<CR>";
+      options = {
+        desc = "Claude Code: Prompts";
       };
     }
 
