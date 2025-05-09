@@ -1,5 +1,5 @@
 {...}: {
-  plugins.dadbod.enable = true;
-  plugins.dadbod-completion.enable = true;
-  plugins.dadbod-ui.enable = true;
+  plugins.vim-dadbod.enable = true;
+  plugins.vim-dadbod-completion.enable = true;
+  plugins.vim-dadbod-ui.enable = true;
 }
