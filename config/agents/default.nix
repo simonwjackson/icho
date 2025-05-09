@@ -66,7 +66,7 @@
       -- }
     })
 
-    ${builtins.readFile ./lua/agent-command.lua}
+    ${builtins.readFile ./agent-command.lua}
   '';
 
   # Add convenient keymaps for Claude AI actions
@@ -139,6 +139,13 @@
       action = "<cmd>ClaudeCodeCommit<CR>";
       options = {
         desc = "Claude Code: Git Commit";
+      };
+    }
+    {
+      key = "<leader>ai";
+      action = "<cmd>ClaudeCodeInput<CR>";
+      options = {
+        desc = "Claude Code: Open Input Buffer";
       };
     }
   ];
