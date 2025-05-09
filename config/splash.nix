@@ -1,7 +1,6 @@
 {
   plugins.mini = {
     enable = true;
-    modules.diff.options.view.style = "sign";
     modules.starter = {
       content_hooks = {
         "__unkeyed-1.adding_bullet" = {

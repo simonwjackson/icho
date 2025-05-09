@@ -3,90 +3,33 @@
   lib,
   ...
 }: {
-  # filetype = {
-  #   extension = {
-  #     astro = "astro";
-  #   };
-  # };
-
   extraPlugins = [
     pkgs.vimPlugins.tmux-session-switcher
   ];
 
   imports = [
     # ./markview.nix
-    ./claude-code
+    ./agents
     ./clipboard.nix
     ./color.nix
-    ./conform.nix
-    ./dadbod.nix
+    ./database.nix
     ./fidget.nix
     ./files.nix
-    ./flash.nix
-    ./git
+    ./formatting.nix
+    ./git.nix
+    ./gutter.nix
     ./lsp.nix
-    ./lualine.nix
-    ./mini.nix
-    ./overseer.nix
-    ./supermaven.nix
+    ./movements.nix
+    ./splash.nix
+    ./status.nix
     ./tabs
+    ./tasks.nix
     ./telescope.nix
     ./toggleterm.nix
     ./treesitter.nix
-    ./which-key.nix
   ];
 
   plugins = {
-    # Keyboard
-    better-escape = {
-      enable = true;
-      settings = {
-        timeout = 100;
-        mappings = {
-          c = {
-            j = {
-              k = "<CR>";
-            };
-            k = {
-              l = "<Esc>";
-            };
-          };
-          i = {
-            j = {
-              k = "<CR>";
-            };
-            k = {
-              l = "<Esc>";
-            };
-          };
-          s = {
-            j = {
-              k = "<CR>";
-            };
-            k = {
-              l = "<Esc>";
-            };
-          };
-          t = {
-            j = {
-              k = "<CR>";
-            };
-            k = {
-              l = "<Esc>";
-            };
-          };
-          v = {
-            j = {
-              k = "<CR>";
-            };
-            k = {
-              l = "<Esc>";
-            };
-          };
-        };
-      };
-    };
-
     # HTTP
     kulala = {
       enable = true;

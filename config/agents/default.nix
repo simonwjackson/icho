@@ -1,31 +1,52 @@
 {pkgs, ...}: {
   extraPackages = [
-    # pkgs.claude-code
+    pkgs.claude-code
+    # pkgs.nodejs_latest
   ];
 
   # Create plugin from GitHub source
-  extraPlugins = [
-    (pkgs.vimUtils.buildVimPlugin {
+  extraPlugins = with pkgs; [
+    vimPlugins.supermaven-nvim # AI code completion
+    (vimUtils.buildVimPlugin {
       name = "claude-code-nvim";
-      src = pkgs.fetchFromGitHub {
+      src = fetchFromGitHub {
         owner = "greggh";
         repo = "claude-code.nvim";
         rev = "main";
         sha256 = "sha256-4H6zu5+iDPnCY+ISsxuL9gtAZ5lJhVvtOscc8jUsAY8=";
       };
     })
-    pkgs.vimPlugins.plenary-nvim # Required dependency
-    pkgs.vimPlugins.telescope-nvim # For file selection
+    vimPlugins.plenary-nvim # Required dependency
+    vimPlugins.telescope-nvim # For file selection
   ];
 
-  # Configure the plugin
   extraConfigLua = ''
+    -- Workaround for supermaven initialization issues
+    local ok, supermaven = pcall(require, "supermaven-nvim")
+    if ok then
+      supermaven.setup({
+        keymaps = {
+          accept_suggestion = "<Tab>",
+          clear_suggestion = "<C-]>",
+          accept_word = "<C-j>",
+        },
+        ignore_filetypes = { cpp = true }, -- or { "cpp", }
+        log_level = "off", -- set to "off" to disable logging completely
+        disable_inline_completion = false, -- disables inline completion for use with cmp
+        disable_keymaps = false, -- disables built in keymaps for more manual control
+        condition = function()
+          return false
+        end -- condition to check for stopping supermaven, `true` means to stop supermaven when the condition is true.
+      })
+    end
+
     require("claude-code").setup({
       window = {
         split_ratio = 0.381,
         position = "vsplit", -- Changed from "vertical" to "vsplit"
       },
       command = "${pkgs.claude-code}/bin/claude --dangerously-skip-permissions",
+      -- command = "~/.claude/local/claude --dangerously-skip-permissions",
       command_variants = {
         -- Conversation management
         continue = "--continue", -- Resume the most recent conversation
