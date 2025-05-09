@@ -34,6 +34,30 @@ require("tabby").setup({
 			table.insert(header, line.sep(right_sep, "TabLine", "TabLineFill"))
 		end
 
+		-- Add git branch if available (except default branches)
+		local git_branch = ""
+		local default_branches = { "main", "master" }
+		local git_handle = io.popen("git branch --show-current 2>/dev/null")
+		if git_handle then
+			git_branch = git_handle:read("*a"):gsub("^%s*(.-)%s*$", "%1") -- trim whitespace
+			git_handle:close()
+			
+			-- Check if branch should be displayed
+			local show_branch = git_branch ~= ""
+			for _, branch in ipairs(default_branches) do
+				if git_branch == branch then
+					show_branch = false
+					break
+				end
+			end
+			
+			if show_branch then
+				table.insert(header, line.sep(left_sep, "TabLine", "TabLineFill"))
+				table.insert(header, { " 󰘬  " .. git_branch .. " ", hl = "TabLine" })
+				table.insert(header, line.sep(right_sep, "TabLine", "TabLineFill"))
+			end
+		end
+
 		return {
 			header,
 			line.tabs().foreach(function(tab)
@@ -71,4 +95,3 @@ require("tabby").setup({
 		}
 	end,
 })
-
