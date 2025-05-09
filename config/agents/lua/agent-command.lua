@@ -369,3 +369,306 @@ vim.api.nvim_create_user_command("ClaudeCodeSelection", function()
 	local last_line = vim.api.nvim_buf_line_count(agent_buf)
 	vim.api.nvim_win_set_cursor(agent_win, { last_line, 0 })
 end, {})
+
+-- Define a custom command to select directories and send them to buffer below Claude Code
+vim.api.nvim_create_user_command("ClaudeCodeDirectories", function()
+	local telescope = require("telescope.builtin")
+	local actions = require("telescope.actions")
+	local action_state = require("telescope.actions.state")
+
+	-- Open Telescope directory picker with multi-select
+	telescope.find_files({
+		attach_mappings = function(prompt_bufnr, map)
+			-- Override the default enter action to send selected directories to Claude
+			actions.select_default:replace(function()
+				-- Get all selected entries
+				local picker = action_state.get_current_picker(prompt_bufnr)
+				local selections = picker:get_multi_selection()
+
+				-- If no selections, get current entry
+				if #selections == 0 then
+					local entry = action_state.get_selected_entry()
+					if entry then
+						selections = { entry }
+					end
+				end
+
+				-- Close telescope
+				actions.close(prompt_bufnr)
+
+				-- If no directories selected, exit
+				if #selections == 0 then
+					vim.notify("No directories selected for Claude", vim.log.levels.WARN)
+					return
+				end
+
+				-- Extract directory paths
+				local dirs_to_send = {}
+				for _, selection in ipairs(selections) do
+					table.insert(dirs_to_send, selection.value)
+				end
+
+				-- Check if the Claude Code buffer exists
+				local claude_code = require("claude-code")
+				local bufnr = claude_code.claude_code.bufnr
+
+				-- Open Claude Code if not already open
+				if not bufnr or not vim.api.nvim_buf_is_valid(bufnr) then
+					claude_code.toggle()
+					bufnr = claude_code.claude_code.bufnr
+				else
+					-- Find Claude window and focus it
+					local win_ids = vim.fn.win_findbuf(bufnr)
+					if #win_ids > 0 then
+						vim.api.nvim_set_current_win(win_ids[1])
+					else
+						-- Open Claude Code window if not visible
+						claude_code.toggle()
+					end
+				end
+
+				-- Check if agent-input buffer already exists
+				local agent_buf = nil
+				for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+					if vim.api.nvim_buf_get_name(buf):match("agent%-input$") then
+						agent_buf = buf
+						break
+					end
+				end
+
+				-- Create agent-input buffer if it doesn't exist
+				if not agent_buf or not vim.api.nvim_buf_is_valid(agent_buf) then
+					-- Create a new buffer for agent input
+					agent_buf = vim.api.nvim_create_buf(true, true)
+					vim.api.nvim_buf_set_name(agent_buf, "agent-input")
+
+					-- Set buffer options
+					vim.bo[agent_buf].buftype = "nofile"
+					vim.bo[agent_buf].filetype = "markdown"
+					vim.bo[agent_buf].swapfile = false
+					vim.bo[agent_buf].modified = false
+					vim.bo[agent_buf].modifiable = true
+				end
+
+				-- Find agent-input window if it exists
+				local agent_win = nil
+				for _, win in ipairs(vim.api.nvim_list_wins()) do
+					if vim.api.nvim_win_get_buf(win) == agent_buf then
+						agent_win = win
+						break
+					end
+				end
+
+				-- Create new window below Claude if agent window doesn't exist
+				if not agent_win then
+					-- Split below current Claude window
+					vim.cmd("split")
+					vim.cmd("wincmd j") -- Move to the split window
+
+					-- Set the buffer in the new window
+					agent_win = vim.api.nvim_get_current_win()
+					vim.api.nvim_win_set_buf(agent_win, agent_buf)
+
+					-- Resize the window to a reasonable height
+					vim.api.nvim_win_set_height(agent_win, 10)
+				else
+					-- Focus the existing agent window
+					vim.api.nvim_set_current_win(agent_win)
+				end
+
+				-- Create command text for all directories
+				local command_text = ""
+				for _, dir in ipairs(dirs_to_send) do
+					local cwd = vim.fn.getcwd()
+					local rel_path = dir
+					-- Try to get relative path if directory is under cwd
+					if dir:sub(1, #cwd) == cwd then
+						rel_path = dir:sub(#cwd + 2) -- +2 to skip the slash after cwd
+					end
+					command_text = command_text .. "LS " .. rel_path .. "\n"
+				end
+				command_text = command_text .. "\n"
+
+				-- If buffer is not empty, append to it; otherwise set the initial content
+				if vim.api.nvim_buf_line_count(agent_buf) > 1 then
+					-- Append command text to the end of the buffer
+					local end_line = vim.api.nvim_buf_line_count(agent_buf)
+					-- Add a separator line if the buffer doesn't end with empty lines
+					local last_line = vim.api.nvim_buf_get_lines(agent_buf, end_line - 1, end_line, false)[1]
+					if last_line and last_line ~= "" then
+						vim.api.nvim_buf_set_lines(agent_buf, end_line, end_line, false, { "" })
+						end_line = end_line + 1
+					end
+					vim.api.nvim_buf_set_lines(agent_buf, end_line, end_line, false, vim.split(command_text, "\n"))
+				else
+					-- Clear buffer and set the command text at the start (initial case)
+					vim.api.nvim_buf_set_lines(agent_buf, 0, -1, false, vim.split(command_text, "\n"))
+				end
+
+				-- Mark the buffer as not modified to prevent "unsaved changes" prompts
+				vim.bo[agent_buf].modified = false
+
+				-- Move cursor to the end of the appended command
+				local last_line = vim.api.nvim_buf_line_count(agent_buf)
+				vim.api.nvim_win_set_cursor(agent_win, { last_line, 0 })
+
+				vim.notify("Added " .. #dirs_to_send .. " directories to agent-input buffer", vim.log.levels.INFO)
+			end)
+
+			return true
+		end,
+		find_command = { "find", ".", "-type", "d", "-not", "-path", "*/\\.*" },
+		prompt_title = "Select Directories for Claude Code (Tab to select multiple, Enter to confirm)",
+	})
+end, {})
+
+-- Define a custom command to select multiple files and send them to buffer below Claude Code
+vim.api.nvim_create_user_command("ClaudeCodeFiles", function()
+	local telescope = require("telescope.builtin")
+	local actions = require("telescope.actions")
+	local action_state = require("telescope.actions.state")
+
+	-- Open Telescope file picker with multi-select
+	telescope.find_files({
+		attach_mappings = function(prompt_bufnr, map)
+			-- Override the default enter action to send selected files to Claude
+			actions.select_default:replace(function()
+				-- Get all selected entries
+				local picker = action_state.get_current_picker(prompt_bufnr)
+				local selections = picker:get_multi_selection()
+
+				-- If no selections, get current entry
+				if #selections == 0 then
+					local entry = action_state.get_selected_entry()
+					if entry then
+						selections = { entry }
+					end
+				end
+
+				-- Close telescope
+				actions.close(prompt_bufnr)
+
+				-- If no files selected, exit
+				if #selections == 0 then
+					vim.notify("No files selected for Claude", vim.log.levels.WARN)
+					return
+				end
+
+				-- Extract file paths
+				local files_to_send = {}
+				for _, selection in ipairs(selections) do
+					table.insert(files_to_send, selection.value)
+				end
+
+				-- Check if the Claude Code buffer exists
+				local claude_code = require("claude-code")
+				local bufnr = claude_code.claude_code.bufnr
+
+				-- Open Claude Code if not already open
+				if not bufnr or not vim.api.nvim_buf_is_valid(bufnr) then
+					claude_code.toggle()
+					bufnr = claude_code.claude_code.bufnr
+				else
+					-- Find Claude window and focus it
+					local win_ids = vim.fn.win_findbuf(bufnr)
+					if #win_ids > 0 then
+						vim.api.nvim_set_current_win(win_ids[1])
+					else
+						-- Open Claude Code window if not visible
+						claude_code.toggle()
+					end
+				end
+
+				-- Check if agent-input buffer already exists
+				local agent_buf = nil
+				for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+					if vim.api.nvim_buf_get_name(buf):match("agent%-input$") then
+						agent_buf = buf
+						break
+					end
+				end
+
+				-- Create agent-input buffer if it doesn't exist
+				if not agent_buf or not vim.api.nvim_buf_is_valid(agent_buf) then
+					-- Create a new buffer for agent input
+					agent_buf = vim.api.nvim_create_buf(true, true)
+					vim.api.nvim_buf_set_name(agent_buf, "agent-input")
+
+					-- Set buffer options
+					vim.bo[agent_buf].buftype = "nofile"
+					vim.bo[agent_buf].filetype = "markdown"
+					vim.bo[agent_buf].swapfile = false
+					vim.bo[agent_buf].modified = false
+					vim.bo[agent_buf].modifiable = true
+				end
+
+				-- Find agent-input window if it exists
+				local agent_win = nil
+				for _, win in ipairs(vim.api.nvim_list_wins()) do
+					if vim.api.nvim_win_get_buf(win) == agent_buf then
+						agent_win = win
+						break
+					end
+				end
+
+				-- Create new window below Claude if agent window doesn't exist
+				if not agent_win then
+					-- Split below current Claude window
+					vim.cmd("split")
+					vim.cmd("wincmd j") -- Move to the split window
+
+					-- Set the buffer in the new window
+					agent_win = vim.api.nvim_get_current_win()
+					vim.api.nvim_win_set_buf(agent_win, agent_buf)
+
+					-- Resize the window to a reasonable height
+					vim.api.nvim_win_set_height(agent_win, 10)
+				else
+					-- Focus the existing agent window
+					vim.api.nvim_set_current_win(agent_win)
+				end
+
+				-- Create command text for all files
+				local command_text = ""
+				for _, file in ipairs(files_to_send) do
+					local cwd = vim.fn.getcwd()
+					local rel_path = file
+					-- Try to get relative path if file is under cwd
+					if file:sub(1, #cwd) == cwd then
+						rel_path = file:sub(#cwd + 2) -- +2 to skip the slash after cwd
+					end
+					command_text = command_text .. "READ " .. rel_path .. "\n"
+				end
+				command_text = command_text .. "\n"
+
+				-- If buffer is not empty, append to it; otherwise set the initial content
+				if vim.api.nvim_buf_line_count(agent_buf) > 1 then
+					-- Append command text to the end of the buffer
+					local end_line = vim.api.nvim_buf_line_count(agent_buf)
+					-- Add a separator line if the buffer doesn't end with empty lines
+					local last_line = vim.api.nvim_buf_get_lines(agent_buf, end_line - 1, end_line, false)[1]
+					if last_line and last_line ~= "" then
+						vim.api.nvim_buf_set_lines(agent_buf, end_line, end_line, false, { "" })
+						end_line = end_line + 1
+					end
+					vim.api.nvim_buf_set_lines(agent_buf, end_line, end_line, false, vim.split(command_text, "\n"))
+				else
+					-- Clear buffer and set the command text at the start (initial case)
+					vim.api.nvim_buf_set_lines(agent_buf, 0, -1, false, vim.split(command_text, "\n"))
+				end
+
+				-- Mark the buffer as not modified to prevent "unsaved changes" prompts
+				vim.bo[agent_buf].modified = false
+
+				-- Move cursor to the end of the appended command
+				local last_line = vim.api.nvim_buf_line_count(agent_buf)
+				vim.api.nvim_win_set_cursor(agent_win, { last_line, 0 })
+
+				vim.notify("Added " .. #files_to_send .. " files to agent-input buffer", vim.log.levels.INFO)
+			end)
+
+			return true
+		end,
+		prompt_title = "Select Files for Claude Code (Tab to select multiple, Enter to confirm)",
+	})
+end, {})

@@ -67,8 +67,6 @@
     })
 
     ${builtins.readFile ./lua/agent-command.lua}
-    ${builtins.readFile ./lua/files_command.lua}
-    ${builtins.readFile ./lua/directories_command.lua}
   '';
 
   # Add convenient keymaps for Claude AI actions
@@ -105,7 +103,7 @@
       };
     }
     {
-      key = "<leader>ax";
+      key = "<leader>as";
       action = "<cmd>ClaudeCodeSend<CR>";
       options = {
         desc = "Claude Code: Send agent-input";
