@@ -89,7 +89,7 @@
       };
     }
     {
-      key = "<leader>as";
+      key = "<leader>ag";
       action = "<cmd>ClaudeCodeSend<CR>";
       options = {
         desc = "Claude Code: Send agent-input";
@@ -121,7 +121,7 @@
 
     # Misc
     {
-      key = "<leader>ag";
+      key = "<leader>aG";
       action = "<cmd>ClaudeCodeCommit<CR>";
       options = {
         desc = "Claude Code: Git Commit";

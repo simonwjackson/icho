@@ -93,8 +93,18 @@ require("tabby").setup({
 			end
 		end
 
+		-- Get current position info for line:col display
+		local line_col_info = {}
+		local cur_line = vim.fn.line(".")
+		local cur_col = vim.fn.col(".")
+
+		table.insert(line_col_info, line.sep(left_sep, "TabLine", "TabLineFill"))
+		table.insert(line_col_info, { " " .. cur_line .. ":" .. cur_col .. " ", hl = "TabLine" })
+		table.insert(line_col_info, line.sep(right_sep, "TabLine", "TabLineFill"))
+
 		return {
 			header,
+			line_col_info,
 			hl = "TabLineFill",
 			line.spacer(),
 			line.wins_in_tab(line.api.get_current_tab()).foreach(function(win)
@@ -111,13 +121,6 @@ require("tabby").setup({
 				local hl = tab.is_current() and "TabLineSel" or "TabLine"
 				-- Always start with an empty tab name
 				local tab_display_name = ""
-
-				-- Let's use a simple solution - only display custom tab names
-				-- Use a naming convention where custom names start with 'custom:'
-				-- For now, we just don't show any name regardless of what it is
-
-				-- Later, when you want to show a custom tab name, you can use:
-				-- :lua require("tabby.feature.tab_name").set(vim.api.nvim_get_current_tabpage(), "custom:MY_TAB_NAME")
 
 				-- Display jump key if in jump mode, otherwise tab number
 				local tab_indicator = tab.in_jump_mode() and tab.jump_key() or tab.number()
@@ -136,3 +139,4 @@ require("tabby").setup({
 		}
 	end,
 })
+
