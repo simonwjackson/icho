@@ -29,6 +29,7 @@
     ./mini.nix
     ./overseer.nix
     ./supermaven.nix
+    ./tabs
     ./telescope.nix
     ./toggleterm.nix
     ./treesitter.nix
@@ -240,43 +241,8 @@
 
   keymaps = [
     {
-      key = "<A-C-l>";
-      action = "<cmd>tabnext<CR>";
-      options = {
-        desc = "Next Tab";
-      };
-    }
-    {
-      key = "<A-C-h>";
-      action = "<cmd>tabprevious<CR>";
-      options = {
-        desc = "Previous Tab";
-      };
-    }
-    {
-      key = "<A-C-j>";
-      action = "<cmd>bnext<CR>";
-      options = {
-        desc = "Next buffer";
-      };
-    }
-    {
-      key = "<A-C-k>";
-      action = "<cmd>bprevious<CR>";
-      options = {
-        desc = "Previous buffer";
-      };
-    }
-    {
       key = "<leader>p";
       action = "<CMD>TmuxSessionSwitch<CR>";
-      options = {
-        desc = "Open new tab with terminal in insert mode (nobuflisted)";
-      };
-    }
-    {
-      key = "<C-t>";
-      action = ":tabnew<CR>:terminal<CR>:startinsert<CR>";
       options = {
         desc = "Open new tab with terminal in insert mode (nobuflisted)";
       };

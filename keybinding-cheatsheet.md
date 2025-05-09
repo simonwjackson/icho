@@ -17,6 +17,22 @@ This cheatsheet provides a comprehensive reference for all keybindings in icho. 
 | `<leader>w` | Window commands (prefixes with `<C-w>`) |
 | `s` | Flash (jump to location) |
 
+### Tab Management (Tabby)
+
+| Keybinding | Description |
+|------------|-------------|
+| `<leader>ta` | Create a new tab (at end) |
+| `<leader>tc` | Close current tab |
+| `<leader>tt` | Create a new tab |
+| `<leader>tn` | Go to next tab |
+| `<leader>tp` | Go to previous tab |
+| `<leader>tr` | Rename current tab |
+| `<leader>tw` | Pick window (for tab) |
+| `<leader>tj` | Jump to specific tab |
+| `gt` | Next tab (native vim) |
+| `gT` | Previous tab (native vim) |
+| `{count}gt` | Go to tab number {count} (native vim) |
+
 ### Telescope (File Finding & Search)
 
 | Keybinding | Description |

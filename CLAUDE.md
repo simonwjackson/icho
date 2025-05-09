@@ -19,3 +19,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Functions should be added to extraConfigLua with clear documentation
 - Keymaps should include a descriptive 'desc' field
 - Plugin settings should match standard Nixvim structure
+
+## Git Workflow
+- Always `git add` new files
