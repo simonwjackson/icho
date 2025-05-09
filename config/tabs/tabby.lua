@@ -4,6 +4,20 @@ vim.o.showtabline = 2
 -- Set session options to include tabpages
 vim.opt.sessionoptions = "curdir,folds,globals,help,tabpages,terminal,winsize"
 
+-- Setup autocmds to update tabline on mode change
+vim.api.nvim_create_autocmd({ "ModeChanged", "InsertEnter", "InsertLeave", "CmdlineEnter", "CmdlineLeave" }, {
+	callback = function()
+		vim.cmd("redrawtabline")
+	end,
+})
+
+-- Force tabline update more frequently
+vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI", "TextChanged", "TextChangedI" }, {
+	callback = function()
+		vim.cmd("silent! redrawtabline")
+	end,
+})
+
 -- Setup tabby
 require("tabby").setup({
 	line = function(line)
@@ -16,8 +30,29 @@ require("tabby").setup({
 		-- Create the header section
 		local header = {}
 
-		-- Always add hostname
-		table.insert(header, { "   " .. hostname .. " ", hl = "TabLine" })
+		-- Define mode colors
+		local mode_colors = {
+			["n"] = "TabLine", -- Normal mode
+			["i"] = "DiagnosticError", -- Insert mode
+			["v"] = "DiagnosticWarn", -- Visual mode
+			["V"] = "DiagnosticWarn", -- Visual Line mode
+			[""] = "DiagnosticWarn", -- Visual Block mode
+			["c"] = "DiagnosticInfo", -- Command mode
+			["s"] = "DiagnosticHint", -- Select mode
+			["S"] = "DiagnosticHint", -- Select Line mode
+			[""] = "DiagnosticHint", -- Select Block mode
+			["R"] = "DiagnosticError", -- Replace mode
+			["t"] = "Directory", -- Terminal mode
+			-- Default for other modes
+			["default"] = "TabLine",
+		}
+
+		-- Get current mode
+		local mode = vim.api.nvim_get_mode().mode
+		local mode_hl = mode_colors[mode] or mode_colors["default"]
+
+		-- Always add hostname with mode-based highlighting
+		table.insert(header, { "   " .. hostname .. " ", hl = mode_hl })
 		table.insert(header, line.sep(right_sep, "TabLine", "TabLineFill"))
 
 		-- Only add the tmux session name if we're in a tmux session
@@ -41,7 +76,7 @@ require("tabby").setup({
 		if git_handle then
 			git_branch = git_handle:read("*a"):gsub("^%s*(.-)%s*$", "%1") -- trim whitespace
 			git_handle:close()
-			
+
 			-- Check if branch should be displayed
 			local show_branch = git_branch ~= ""
 			for _, branch in ipairs(default_branches) do
@@ -50,7 +85,7 @@ require("tabby").setup({
 					break
 				end
 			end
-			
+
 			if show_branch then
 				table.insert(header, line.sep(left_sep, "TabLine", "TabLineFill"))
 				table.insert(header, { " 󰘬  " .. git_branch .. " ", hl = "TabLine" })
@@ -60,6 +95,18 @@ require("tabby").setup({
 
 		return {
 			header,
+			hl = "TabLineFill",
+			line.spacer(),
+			line.wins_in_tab(line.api.get_current_tab()).foreach(function(win)
+				return {
+					line.sep(left_sep, "TabLine", "TabLineFill"),
+					win.is_current() and "" or "",
+					win.buf_name(),
+					line.sep(right_sep, "TabLine", "TabLineFill"),
+					hl = "TabLine",
+					margin = " ",
+				}
+			end),
 			line.tabs().foreach(function(tab)
 				local hl = tab.is_current() and "TabLineSel" or "TabLine"
 				-- Use a custom method to display the tab name without [1+]
@@ -81,17 +128,6 @@ require("tabby").setup({
 					margin = " ",
 				}
 			end),
-			line.wins_in_tab(line.api.get_current_tab()).foreach(function(win)
-				return {
-					line.sep(left_sep, "TabLine", "TabLineFill"),
-					win.is_current() and "" or "",
-					win.buf_name(),
-					line.sep(right_sep, "TabLine", "TabLineFill"),
-					hl = "TabLine",
-					margin = " ",
-				}
-			end),
-			hl = "TabLineFill",
 		}
 	end,
 })

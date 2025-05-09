@@ -30,6 +30,13 @@
 
   keymaps = [
     {
+      key = "<leader>gc";
+      action = "<cmd> Telescope git_commits <CR>";
+      options = {
+        desc = "Git: commits";
+      };
+    }
+    {
       key = "<leader>gg";
       action = "<cmd>LazyGit<CR>";
       options = {

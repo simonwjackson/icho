@@ -7,7 +7,10 @@
     };
   };
 
-  plugins.lualine.settings = {
-    colorscheme = "catppuccin";
+  plugins.lualine = {
+    enable = false;
+    settings = {
+      colorscheme = "catppuccin";
+    };
   };
 }

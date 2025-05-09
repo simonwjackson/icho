@@ -1,5 +1,4 @@
 {...}: {
-  # plugins.lsp-lines.enable = true;
   plugins.lspkind.enable = true;
   plugins.lsp = {
     enable = true;

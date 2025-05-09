@@ -21,7 +21,6 @@
     ./lsp.nix
     ./movements.nix
     ./splash.nix
-    ./status.nix
     ./tabs
     ./tasks.nix
     ./telescope.nix
@@ -30,6 +29,8 @@
   ];
 
   plugins = {
+    web-devicons.enable = true;
+
     # HTTP
     kulala = {
       enable = true;
@@ -107,7 +108,7 @@
     };
     repeat.enable = true;
 
-    # Syntax
+    # # Syntax
     todo-comments.enable = true;
     typescript-tools.enable = true;
     tailwind-tools.enable = true;
@@ -126,7 +127,6 @@
         ];
       };
     };
-    lspsaga.enable = true;
     nvim-surround.enable = true;
     # obsidian.enable = true;
 
@@ -287,6 +287,9 @@
 
     -- Command line
     opt.cmdheight = 0
+
+    -- Disable status line
+    opt.laststatus = 0
 
     function Search_And_Replace()
       if vim.fn.mode() == 'v' or vim.fn.mode() == 'V' then

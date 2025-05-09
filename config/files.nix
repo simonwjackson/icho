@@ -1,4 +1,8 @@
 {pkgs, ...}: {
+  plugins.telescope = {
+    enable = true;
+  };
+
   extraPackages = [
     pkgs.neovim-remote
     pkgs.lf
@@ -74,6 +78,37 @@
         desc = "Open lf file manager";
         silent = true;
         noremap = true;
+      };
+    }
+    {
+      key = "<leader>ff";
+      action = "<cmd> Telescope find_files <CR>";
+      options = {
+        desc = "Find files";
+      };
+    }
+
+    {
+      key = "<leader>fF";
+      action = "<cmd> Telescope find_files follow=true no_ignore=true hidden=true <CR>";
+      options = {
+        desc = "Find all files";
+      };
+    }
+
+    {
+      key = "<leader>fw";
+      action = "<cmd> Telescope live_grep <CR>";
+      options = {
+        desc = "Live grep";
+      };
+    }
+
+    {
+      key = "<leader>fo";
+      action = "<cmd> Telescope oldfiles <CR>";
+      options = {
+        desc = "Find oldfiles";
       };
     }
   ];
