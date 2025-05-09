@@ -11,12 +11,31 @@ require("tabby").setup({
 		-- Define separators (these are from tabline.lua)
 		local left_sep = ""
 		local right_sep = ""
+		local in_tmux = os.getenv("TMUX_PANE") ~= nil
+
+		-- Create the header section
+		local header = {}
+
+		-- Always add hostname
+		table.insert(header, { "   " .. hostname .. " ", hl = "TabLine" })
+		table.insert(header, line.sep(right_sep, "TabLine", "TabLineFill"))
+
+		-- Only add the tmux session name if we're in a tmux session
+		if in_tmux then
+			-- Get tmux session name using tmux display-message
+			local handle = io.popen("tmux display-message -p '#S'")
+			local session_name = "tmux"
+			if handle then
+				session_name = handle:read("*a"):gsub("^%s*(.-)%s*$", "%1") -- trim whitespace
+				handle:close()
+			end
+			table.insert(header, line.sep(left_sep, "TabLine", "TabLineFill"))
+			table.insert(header, { "   " .. session_name .. " ", hl = "TabLine" })
+			table.insert(header, line.sep(right_sep, "TabLine", "TabLineFill"))
+		end
 
 		return {
-			{
-				{ "   " .. hostname .. " ", hl = "TabLine" },
-				line.sep(right_sep, "TabLine", "TabLineFill"),
-			},
+			header,
 			line.tabs().foreach(function(tab)
 				local hl = tab.is_current() and "TabLineSel" or "TabLine"
 				-- Use a custom method to display the tab name without [1+]
@@ -52,3 +71,4 @@ require("tabby").setup({
 		}
 	end,
 })
+
