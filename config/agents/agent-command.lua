@@ -721,7 +721,7 @@ vim.api.nvim_create_user_command("ClaudeCodeInput", function()
 		-- Close Claude Code
 		claude_code.toggle()
 		
-		vim.notify("Closed Claude Code and agent-input buffer", vim.log.levels.INFO)
+		-- No notification when closing
 		return
 	end
 
@@ -776,6 +776,6 @@ vim.api.nvim_create_user_command("ClaudeCodeInput", function()
 	-- Move cursor to the end of the buffer
 	local last_line = vim.api.nvim_buf_line_count(agent_buf)
 	vim.api.nvim_win_set_cursor(agent_win, { last_line, 0 })
-
-	vim.notify("Opened agent-input buffer for Claude Code", vim.log.levels.INFO)
+	
+	-- No notification when opening
 end, {})

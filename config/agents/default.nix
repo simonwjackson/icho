@@ -73,24 +73,10 @@
   keymaps = [
     # Chats
     {
-      key = "<leader>ac";
-      action = "<cmd>ClaudeCode<CR>";
+      key = "<leader>ai";
+      action = "<cmd>ClaudeCodeInput<CR>";
       options = {
-        desc = "Claude Code: Toggle";
-      };
-    }
-    {
-      key = "<leader>aC";
-      action = "<cmd>ClaudeCodeContinue<CR>";
-      options = {
-        desc = "Claude Code: History";
-      };
-    }
-    {
-      key = "<leader>ah";
-      action = "<cmd>ClaudeCodeResume<CR>";
-      options = {
-        desc = "Claude Code: History";
+        desc = "Claude Code: Toggle Input Buffer";
       };
     }
 
@@ -139,13 +125,6 @@
       action = "<cmd>ClaudeCodeCommit<CR>";
       options = {
         desc = "Claude Code: Git Commit";
-      };
-    }
-    {
-      key = "<leader>ai";
-      action = "<cmd>ClaudeCodeInput<CR>";
-      options = {
-        desc = "Claude Code: Toggle Input Buffer";
       };
     }
   ];
