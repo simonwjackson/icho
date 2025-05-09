@@ -20,6 +20,7 @@
     ./gutter.nix
     ./lsp.nix
     ./movements.nix
+    ./snippets.nix
     ./splash.nix
     ./tabs
     ./tasks.nix
