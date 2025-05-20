@@ -1,7 +1,6 @@
 {pkgs, ...}: {
   extraPackages = [
     pkgs.claude-code
-    # pkgs.nodejs_latest
   ];
 
   # Create plugin from GitHub source
@@ -13,7 +12,7 @@
         owner = "greggh";
         repo = "claude-code.nvim";
         rev = "main";
-        sha256 = "sha256-4H6zu5+iDPnCY+ISsxuL9gtAZ5lJhVvtOscc8jUsAY8=";
+        sha256 = "sha256-W9tRrZRZsJiK3ROFF1UTKDS22CCFDu8hlMptT46SRLA=";
       };
     })
     vimPlugins.plenary-nvim # Required dependency
@@ -124,6 +123,13 @@
       action = "<cmd>ClaudeCodePrompt<CR>";
       options = {
         desc = "Claude Code: Prompts";
+      };
+    }
+    {
+      key = "<leader>aP";
+      action = "<cmd>Explore ~/.claude/commands<CR>";
+      options = {
+        desc = "Open netrw to prompt directory";
       };
     }
 

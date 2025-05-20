@@ -8,7 +8,6 @@
   ];
 
   imports = [
-    # ./markview.nix
     ./agents
     ./clipboard.nix
     ./color.nix
@@ -26,11 +25,55 @@
     ./tabs
     ./tasks.nix
     ./telescope.nix
-    ./toggleterm.nix
     ./treesitter.nix
   ];
 
   plugins = {
+    markdown-preview.enable = true;
+    edgy = {
+      enable = false;
+      settings = {
+        animate = {
+          enabled = true;
+        };
+        bottom = [
+          # {
+          #   filter = ''
+          #     function(buf, win)
+          #       return vim.api.nvim_win_get_config(win).relative == ""
+          #     end
+          #   '';
+          #   ft = "toggleterm";
+          #   size = lib.nixvim.mkRaw "{ height = 0.3 }";
+          # }
+        ];
+        right = [
+          {
+            filter = ''
+              function(buf)
+                return vim.bo[buf].buftype == "help"
+              end
+            '';
+            ft = "help";
+            size = 20;
+          }
+          # {
+          #   size = lib.nixvim.mkRaw "{ width = 0.3 }";
+          #   title = "claude-code";
+          #   ft = "claude-code";
+          # }
+        ];
+        #   wo = {
+        #     signcolumn = "no";
+        #     spell = false;
+        #     winbar = false;
+        #     winfixheight = false;
+        #     winfixwidth = false;
+        #     winhighlight = "";
+        #   };
+      };
+    };
+
     web-devicons.enable = true;
 
     # HTTP
@@ -191,22 +234,6 @@
       options = {
         desc = "Open new tab with terminal in insert mode (nobuflisted)";
       };
-    }
-    {
-      key = "<A-h>";
-      action = "<Cmd>wincmd h<CR>";
-    }
-    {
-      key = "<A-j>";
-      action = "<Cmd>wincmd j<CR>";
-    }
-    {
-      key = "<A-k>";
-      action = "<Cmd>wincmd k<CR>";
-    }
-    {
-      key = "<A-l>";
-      action = "<Cmd>wincmd l<CR>";
     }
     {
       key = "<A-m>";

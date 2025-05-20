@@ -64,8 +64,8 @@ local function send_to_claude(content)
 			local lines = vim.api.nvim_buf_get_lines(term_buf, 0, -1, false)
 			local term_text = table.concat(lines, "\n")
 
-			-- Check if "-- INSERT --" or "MCP server failed to connect" appears in the terminal
-			if term_text:match("-- INSERT --") or term_text:match("MCP server failed to connect") then
+			-- Check if "-- INSERT --" or "failed to connect" appears in the terminal
+			if term_text:match("-- INSERT --") or term_text:match("failed to connect") then
 				in_insert_mode = true
 			end
 
@@ -119,6 +119,25 @@ local function get_agent_buffer()
 end
 
 -- Window management functions
+-- Function to resize agent window based on focus
+local function resize_agent_window(win_id)
+	if not vim.api.nvim_win_is_valid(win_id) then
+		return
+	end
+
+	local is_current = (vim.api.nvim_get_current_win() == win_id)
+
+	if is_current then
+		-- If agent window is active, set to 38% of screen height
+		local screen_height = vim.api.nvim_get_option("lines")
+		local height = math.floor(screen_height * 0.38)
+		vim.api.nvim_win_set_height(win_id, height)
+	else
+		-- If agent window is inactive, set to 10 rows
+		vim.api.nvim_win_set_height(win_id, 10)
+	end
+end
+
 local function get_agent_window(agent_buf)
 	agent_buf = agent_buf or get_agent_buffer()
 
@@ -141,11 +160,27 @@ local function get_agent_window(agent_buf)
 		agent_win = vim.api.nvim_get_current_win()
 		vim.api.nvim_win_set_buf(agent_win, agent_buf)
 
-		-- Resize the window to a reasonable height
-		vim.api.nvim_win_set_height(agent_win, 10)
+		-- Create autocommands to resize the window when it gains or loses focus
+		local agent_augroup = vim.api.nvim_create_augroup("AgentWindowResize", { clear = true })
+
+		vim.api.nvim_create_autocmd({ "WinEnter", "WinLeave" }, {
+			group = agent_augroup,
+			callback = function()
+				-- Only resize if the agent window still exists
+				if vim.api.nvim_win_is_valid(agent_win) then
+					resize_agent_window(agent_win)
+				end
+			end,
+		})
+
+		-- Initial resize based on current focus
+		resize_agent_window(agent_win)
 	else
 		-- Focus the existing agent window
 		vim.api.nvim_set_current_win(agent_win)
+
+		-- Resize based on focus
+		resize_agent_window(agent_win)
 	end
 
 	return agent_win
@@ -207,6 +242,11 @@ local function cleanup_agent_ui()
 	if not agent_buf or not vim.api.nvim_buf_is_valid(agent_buf) then
 		return
 	end
+
+	-- Clean up the autocommand group
+	pcall(function()
+		vim.api.nvim_del_augroup_by_name("AgentWindowResize")
+	end)
 
 	-- Close agent-input window
 	for _, win in ipairs(vim.api.nvim_list_wins()) do
@@ -632,62 +672,64 @@ vim.api.nvim_create_user_command("ClaudeCodePrompt", function()
 	end
 
 	-- Create a custom picker for prompt files with preview
-	pickers.new({
-		layout_strategy = "vertical",
-		layout_config = {
-			width = 0.7,  -- 70% of screen width
-			height = 0.8, -- 80% of screen height
-			prompt_position = "top",
-			preview_height = 0.6, -- 60% of picker height
-		},
-	}, {
-		prompt_title = "Select a prompt template",
-		finder = finders.new_table({
-			results = entries,
-			entry_maker = function(entry)
-				return {
-					value = entry.value,
-					display = entry.display,
-					ordinal = entry.ordinal,
-					preview_command = function(entry, bufnr)
-						-- Read file content
-						local content = read_file_content(entry.value)
-						
-						-- Set content and filetype for syntax highlighting
-						vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, vim.split(content, "\n"))
-						vim.api.nvim_buf_set_option(bufnr, "filetype", "markdown")
-					end,
-				}
+	pickers
+		.new({
+			layout_strategy = "vertical",
+			layout_config = {
+				width = 0.7, -- 70% of screen width
+				height = 0.8, -- 80% of screen height
+				prompt_position = "top",
+				preview_height = 0.6, -- 60% of picker height
+			},
+		}, {
+			prompt_title = "Select a prompt template",
+			finder = finders.new_table({
+				results = entries,
+				entry_maker = function(entry)
+					return {
+						value = entry.value,
+						display = entry.display,
+						ordinal = entry.ordinal,
+						preview_command = function(entry, bufnr)
+							-- Read file content
+							local content = read_file_content(entry.value)
+
+							-- Set content and filetype for syntax highlighting
+							vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, vim.split(content, "\n"))
+							vim.api.nvim_buf_set_option(bufnr, "filetype", "markdown")
+						end,
+					}
+				end,
+			}),
+			sorter = conf.generic_sorter({}),
+			previewer = conf.file_previewer({}),
+			attach_mappings = function(prompt_bufnr, map)
+				-- When a selection is made
+				actions.select_default:replace(function()
+					local selection = action_state.get_selected_entry()
+					actions.close(prompt_bufnr)
+
+					if not selection then
+						return
+					end
+
+					-- Read the selected prompt file content
+					local content = read_file_content(selection.value)
+
+					-- Setup agent UI
+					local agent_buf, agent_win = setup_agent_ui()
+
+					-- Update buffer with prompt content
+					update_agent_buffer(agent_buf, content)
+
+					-- Focus end of buffer
+					focus_end_of_buffer(agent_win, agent_buf)
+
+					vim.notify("Loaded prompt: " .. selection.display, vim.log.levels.INFO)
+				end)
+
+				return true
 			end,
-		}),
-		sorter = conf.generic_sorter({}),
-		previewer = conf.file_previewer({}),
-		attach_mappings = function(prompt_bufnr, map)
-			-- When a selection is made
-			actions.select_default:replace(function()
-				local selection = action_state.get_selected_entry()
-				actions.close(prompt_bufnr)
-
-				if not selection then
-					return
-				end
-
-				-- Read the selected prompt file content
-				local content = read_file_content(selection.value)
-				
-				-- Setup agent UI
-				local agent_buf, agent_win = setup_agent_ui()
-
-				-- Update buffer with prompt content
-				update_agent_buffer(agent_buf, content)
-
-				-- Focus end of buffer
-				focus_end_of_buffer(agent_win, agent_buf)
-
-				vim.notify("Loaded prompt: " .. selection.display, vim.log.levels.INFO)
-			end)
-
-			return true
-		end,
-	}):find()
+		})
+		:find()
 end, {})
