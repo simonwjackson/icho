@@ -17,7 +17,7 @@
 
   keymaps = [
     {
-      key = "<leader>to";
+      key = "<leader>tt";
       action = "<cmd>OverseerToggle<CR>";
       options = {
         desc = "Overseer: Task Overview";
@@ -31,7 +31,7 @@
       };
     }
     {
-      key = "<leader>tq";
+      key = "<leader>ta";
       action = "<cmd>OverseerQuickAction<CR>";
       options = {
         desc = "Overseer: Previous Task Action";
@@ -45,24 +45,10 @@
       };
     }
     {
-      key = "<leader>tp";
-      action = "<cmd>OverseerQuickAction open float<CR>";
-      options = {
-        desc = "Overseer: Preview Last Action";
-      };
-    }
-    {
-      key = "<leader>ta";
+      key = "<leader>tA";
       action = "<cmd>OverseerTaskAction<CR>";
       options = {
         desc = "Overseer: Task Actions";
-      };
-    }
-    {
-      key = "<leader>tc";
-      action = "<cmd>:OverseerRunCmd <CR>";
-      options = {
-        desc = "Overseer: Run arbitrary command";
       };
     }
   ];
