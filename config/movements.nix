@@ -45,6 +45,32 @@
       key = "<A-l>";
       action = "<Cmd>wincmd l<CR>";
     }
+    
+    # Swap j/k with gj/gk
+    {
+      key = "j";
+      mode = ["n" "v"];
+      action = "gj";
+      options.desc = "Move down by visual line";
+    }
+    {
+      key = "k";
+      mode = ["n" "v"];
+      action = "gk";
+      options.desc = "Move up by visual line";
+    }
+    {
+      key = "gj";
+      mode = ["n" "v"];
+      action = "j";
+      options.desc = "Move down by logical line";
+    }
+    {
+      key = "gk";
+      mode = ["n" "v"];
+      action = "k";
+      options.desc = "Move up by logical line";
+    }
   ];
 
   plugins.better-escape = {
