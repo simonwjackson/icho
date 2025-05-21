@@ -38,6 +38,7 @@
   ];
 
   plugins = {
+    trouble.enable = true;
     markdown-preview.enable = true;
     neo-tree = {
       enable = true;
@@ -184,7 +185,9 @@
     git-worktree.enable = true;
     glance.enable = true;
     improved-search.enable = true;
-    auto-session.enable = true;
+    auto-session = {
+      enable = true;
+    };
     comment.enable = true;
     firenvim.enable = true;
     grug-far.enable = true;
@@ -237,7 +240,7 @@
     # }
     {
       key = "<leader>S";
-      action = "<cmd>lua Search_And_Replace()<CR>";
+      action = "<cmd>lua require('grug-far').toggle_instance({ instanceName = 'main' })<CR>";
       options = {
         desc = "Serch and Replace";
       };
@@ -250,12 +253,19 @@
     require("edgy").setup({
       -- close_when_all_hidden = false,
       options = {
-        right = { size = 0.4 },
+        right = { size = 0.381 },
+        left = { size = 0.234 }, -- or 0.144
+        bottom = { size = 0.381 },
       },
       animate = {
        enabled = false,
       },
       right = {
+        {
+          ft = "grug-far",
+          title = "Find & Replace",
+          size = { width = 0.3 },
+        },
         {
           title = "Claude Code",
           ft = "claude-code",
@@ -277,26 +287,60 @@
           collapsed = false, -- show window as closed/collapsed on start
           open = "Neotree position=left git_status",
         },
+
+        {
+          ft = "trouble",
+          filter = function(buf, win)
+            return vim.w[win].trouble and vim.w[win].trouble.mode == "symbols"
+          end,
+          title = "Symbols",
+          size = { width = 30 },
+        },
       },
       bottom = {
-        -- toggleterm at the bottom with a height of 40% of the screen
+        {
+          ft = "OverseerList",
+          title = "Overseer",
+          size = { width = 0.381 },
+          filter = function(buf)
+            return vim.bo[buf].filetype == "OverseerList"
+          end,
+        },
+        {
+          ft = "OverseerOutput",
+          title = "Task Output",
+          size = { width = 0.616 },
+          filter = function(buf)
+            return vim.bo[buf].filetype == "OverseerOutput"
+          end,
+        },
         {
           ft = "toggleterm",
-          size = { height = 0.4 },
+          size = { height = 0.616 },
           -- exclude floating windows
           filter = function(buf, win)
             return vim.api.nvim_win_get_config(win).relative == ""
           end,
         },
+        {
+          ft = "trouble",
+          filter = function(buf, win)
+            return vim.w[win].trouble and vim.w[win].trouble.mode == "diagnostics"
+          end,
+          title = "Diagnostics",
+          size = { height = 0.381 },
+        },
+        {
+          ft = "trouble",
+          filter = function(buf, win)
+            return vim.w[win].trouble and vim.w[win].trouble.mode == "todo"
+          end,
+          title = "Todo",
+          size = { height = 0.381 },
+        },
+        { ft = "qf", title = "QuickFix" },
       },
     })
-
-    local original_toggle = require("edgy").toggle
-    require("edgy").toggle = function(pos)
-      local result = original_toggle(pos)
-      -- vim.cmd("FocusAutoresize")
-      return result
-    end
 
     local opt = vim.opt
 
