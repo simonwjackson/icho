@@ -3,8 +3,28 @@
   lib,
   ...
 }: {
-  extraPlugins = [
-    pkgs.vimPlugins.tmux-session-switcher
+  extraPlugins = with pkgs; [
+    vimPlugins.tmux-session-switcher
+    # https://github.com/nvim-focus/focus.nvim
+    (vimUtils.buildVimPlugin {
+      name = "nvim-focus";
+      src = fetchFromGitHub {
+        owner = "nvim-focus";
+        repo = "focus.nvim";
+        rev = "master";
+        sha256 = "sha256-B786yg7FfiCmzUrM1yG6tH9xawlOAhtWo7V31lzHalY=";
+      };
+    })
+
+    (vimUtils.buildVimPlugin {
+      name = "edgy-nvim";
+      src = fetchFromGitHub {
+        owner = "folke";
+        repo = "edgy.nvim";
+        rev = "main";
+        sha256 = "sha256-KP8lA+HU3xtX5gOigROva65bf7YH+12EVPM185riJTk=";
+      };
+    })
   ];
 
   imports = [
@@ -30,11 +50,35 @@
 
   plugins = {
     markdown-preview.enable = true;
-    edgy = {
-      enable = false;
-      settings = {
+    neo-tree = {
+      enable = true;
+      filesystem = {
+        hijackNetrwBehavior = "disabled";
       };
     };
+    toggleterm = {
+      enable = true;
+      settings = {
+        open_mapping = "[[<a-.>]]";
+        direction = "horizontal";
+      };
+    };
+
+    # edgy = {
+    #   enable = true;
+    #   settings = {
+    #     animate = {
+    #       enabled = true;
+    #     };
+    #     left = [
+    #       {
+    #         ft = "NvimTree";
+    #         size = 130;
+    #         title = "nvimtree";
+    #       }
+    #     ];
+    #   };
+    # };
 
     web-devicons.enable = true;
 
@@ -229,6 +273,87 @@
   ];
 
   extraConfigLua = ''
+    require("focus").setup({
+      autoresize = {
+        minwidth = 40, -- Force minimum width for the unfocused window
+        minheight = 20, -- Force minimum height for the unfocused window
+      }
+    })
+
+    require("edgy").setup({
+      -- close_when_all_hidden = false,
+      animate = {
+       enabled = false,
+      },
+      right = {
+        {
+          title = "Claude Code",
+          ft = "claude-code",
+        },
+      },
+      left = {
+        -- Neo-tree filesystem always takes half the screen height
+        -- {
+        --   title = "Neo-Tree",
+        --   ft = "neo-tree",
+        --   filter = function(buf)
+        --     return vim.b[buf].neo_tree_source == "filesystem"
+        --   end,
+        --   size = { height = 0.5 },
+        -- },
+        {
+          title = "Neo-Tree Git",
+          ft = "neo-tree",
+          filter = function(buf)
+            return vim.b[buf].neo_tree_source == "git_status"
+          end,
+          pinned = true,
+          collapsed = false, -- show window as closed/collapsed on start
+          open = "Neotree position=left git_status",
+        },
+        -- {
+        --   title = "Neo-Tree Buffers",
+        --   ft = "neo-tree",
+        --   filter = function(buf)
+        --     return vim.b[buf].neo_tree_source == "buffers"
+        --   end,
+        --   pinned = true,
+        --   collapsed = false, -- show window as closed/collapsed on start
+        --   open = "Neotree position=left buffers",
+        -- },
+        -- {
+        --   title = function()
+        --     local buf_name = vim.api.nvim_buf_get_name(0) or "[No Name]"
+        --     return vim.fn.fnamemodify(buf_name, ":t")
+        --   end,
+        --   ft = "Outline",
+        --   pinned = true,
+        --   open = "SymbolsOutlineOpen",
+        --
+        -- },
+        -- any other neo-tree windows
+        "neo-tree",
+      },
+      bottom = {
+        -- toggleterm at the bottom with a height of 40% of the screen
+        {
+          ft = "toggleterm",
+          size = { height = 0.4 },
+          -- exclude floating windows
+          filter = function(buf, win)
+            return vim.api.nvim_win_get_config(win).relative == ""
+          end,
+        },
+      },
+    })
+
+    local original_toggle = require("edgy").toggle
+    require("edgy").toggle = function(pos)
+      local result = original_toggle(pos)
+      vim.cmd("FocusAutoresize")
+      return result
+    end
+
     local opt = vim.opt
 
     opt.shortmess:append('filnxtToOCcIF')
