@@ -248,13 +248,11 @@
   ];
 
   extraConfigLua = ''
-
-
     require("edgy").setup({
       -- close_when_all_hidden = false,
       options = {
         right = { size = 0.381 },
-        left = { size = 0.234 }, -- or 0.144
+        -- left = { size = 0.234 }, -- or 0.144
         bottom = { size = 0.381 },
       },
       animate = {
@@ -280,6 +278,10 @@
         {
           title = "Neo-Tree Git",
           ft = "neo-tree",
+          size = {
+            height = 0.616,
+            width = 0.144
+          },
           filter = function(buf)
             return vim.b[buf].neo_tree_source == "git_status"
           end,
@@ -294,7 +296,7 @@
             return vim.w[win].trouble and vim.w[win].trouble.mode == "symbols"
           end,
           title = "Symbols",
-          size = { width = 30 },
+          size = { width = 0.381 },
         },
       },
       bottom = {
