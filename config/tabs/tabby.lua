@@ -108,10 +108,15 @@ require("tabby").setup({
 			hl = "TabLineFill",
 			line.spacer(),
 			line.wins_in_tab(line.api.get_current_tab()).foreach(function(win)
+				-- Check if buffer is modified
+				local buf_id = win.buf().id
+				local modified = vim.bo[buf_id].modified
+				local modified_indicator = modified and " " or ""
+
 				return {
 					line.sep(left_sep, "TabLine", "TabLineFill"),
 					win.is_current() and "" or "",
-					win.buf_name(),
+					modified_indicator .. win.buf_name(),
 					line.sep(right_sep, "TabLine", "TabLineFill"),
 					hl = "TabLine",
 					margin = " ",
@@ -139,4 +144,3 @@ require("tabby").setup({
 		}
 	end,
 })
-
