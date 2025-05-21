@@ -102,9 +102,42 @@ require("tabby").setup({
 		table.insert(line_col_info, { " " .. cur_line .. ":" .. cur_col .. " ", hl = "TabLine" })
 		table.insert(line_col_info, line.sep(right_sep, "TabLine", "TabLineFill"))
 
+		-- Overseer tasks integration
+		local overseer_info = {}
+		if package.loaded.overseer then
+			local tasks = require("overseer.task_list").list_tasks({ unique = true })
+			local tasks_by_status = require("overseer.util").tbl_group_by(tasks, "status")
+
+			-- Define status symbols (using Nerd Font icons)
+			local symbols = {
+				["CANCELED"] = " ",
+				["FAILURE"] = "󰅚 ",
+				["SUCCESS"] = "󰄴 ",
+				["RUNNING"] = "󰑮 ",
+			}
+
+			-- Add tasks for each status if they exist
+			for _, status in ipairs({ "RUNNING", "SUCCESS", "FAILURE", "CANCELED" }) do
+				if tasks_by_status[status] and #tasks_by_status[status] > 0 then
+					table.insert(overseer_info, line.sep(left_sep, "TabLine", "TabLineFill"))
+					local hl = "Overseer" .. status
+					-- Fallback to TabLine if highlight doesn't exist
+					if not pcall(vim.api.nvim_get_hl_id_by_name, hl) then
+						hl = "TabLine"
+					end
+					table.insert(overseer_info, {
+						symbols[status] .. #tasks_by_status[status] .. " ",
+						hl = hl,
+					})
+					table.insert(overseer_info, line.sep(right_sep, "TabLine", "TabLineFill"))
+				end
+			end
+		end
+
 		return {
 			header,
 			line_col_info,
+			overseer_info, -- Added overseer info here, right after line_col_info
 			hl = "TabLineFill",
 			line.spacer(),
 			line.wins_in_tab(line.api.get_current_tab()).foreach(function(win)
