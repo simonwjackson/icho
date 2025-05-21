@@ -162,8 +162,8 @@ local function get_agent_window(agent_buf)
 
 	-- Create new window if agent window doesn't exist
 	if not agent_win then
-		-- Set the buffer filetype so edgy can manage it
-		vim.api.nvim_buf_set_option(agent_buf, "filetype", "agent-input")
+		-- Buffer is already set to markdown filetype in get_agent_buffer()
+		-- Edgy will manage it based on buffer name using a filter function
 
 		-- Open the buffer in a new window - edgy will place it in the right pane
 		vim.cmd("new")

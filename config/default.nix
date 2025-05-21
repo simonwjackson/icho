@@ -270,8 +270,11 @@
         },
         {
           title = "Agent Input",
-          ft = "agent-input",
+          ft = "markdown",
           size = { height = 0.381 },
+          filter = function(buf)
+            return vim.api.nvim_buf_get_name(buf):match("agent%-input$") ~= nil
+          end,
         },
       },
       left = {
