@@ -123,6 +123,18 @@ local function get_agent_buffer()
 		vim.bo[agent_buf].swapfile = false
 		vim.bo[agent_buf].modified = false
 		vim.bo[agent_buf].modifiable = true
+
+		-- Set buffer-local keymap for Ctrl+Return to send to Claude
+		vim.api.nvim_buf_set_keymap(agent_buf, 'n', '<C-CR>', '<cmd>ClaudeCodeSend<CR>', {
+			noremap = true,
+			silent = true,
+			desc = "Send agent-input to Claude Code"
+		})
+		vim.api.nvim_buf_set_keymap(agent_buf, 'i', '<C-CR>', '<cmd>ClaudeCodeSend<CR>', {
+			noremap = true,
+			silent = true,
+			desc = "Send agent-input to Claude Code"
+		})
 	end
 
 	return agent_buf

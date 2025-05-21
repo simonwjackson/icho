@@ -82,13 +82,6 @@
         desc = "Claude Code: Selection (add)";
       };
     }
-    {
-      key = "<leader>ag";
-      action = "<cmd>ClaudeCodeSend<CR>";
-      options = {
-        desc = "Claude Code: Send agent-input";
-      };
-    }
 
     # Context: Paths
     {
