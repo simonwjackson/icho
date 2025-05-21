@@ -19,6 +19,11 @@ local function ensure_claude_open()
 	if not bufnr or not vim.api.nvim_buf_is_valid(bufnr) then
 		claude_code.toggle()
 		bufnr = claude_code.claude_code.bufnr
+
+		-- Set the buffer filetype to "claude-code" so edgy can manage it
+		if bufnr and vim.api.nvim_buf_is_valid(bufnr) then
+			vim.api.nvim_buf_set_option(bufnr, "filetype", "claude-code")
+		end
 	else
 		-- Find Claude window and focus it
 		local win_ids = vim.fn.win_findbuf(bufnr)
@@ -27,6 +32,11 @@ local function ensure_claude_open()
 		else
 			-- Open Claude Code window if not visible
 			claude_code.toggle()
+
+			-- Set the buffer filetype to "claude-code" so edgy can manage it
+			if bufnr and vim.api.nvim_buf_is_valid(bufnr) then
+				vim.api.nvim_buf_set_option(bufnr, "filetype", "claude-code")
+			end
 		end
 	end
 
@@ -150,13 +160,13 @@ local function get_agent_window(agent_buf)
 		end
 	end
 
-	-- Create new window below Claude if agent window doesn't exist
+	-- Create new window if agent window doesn't exist
 	if not agent_win then
-		-- Split below current Claude window
-		vim.cmd("split")
-		vim.cmd("wincmd j") -- Move to the split window
+		-- Set the buffer filetype so edgy can manage it
+		vim.api.nvim_buf_set_option(agent_buf, "filetype", "agent-input")
 
-		-- Set the buffer in the new window
+		-- Open the buffer in a new window - edgy will place it in the right pane
+		vim.cmd("new")
 		agent_win = vim.api.nvim_get_current_win()
 		vim.api.nvim_win_set_buf(agent_win, agent_buf)
 
@@ -319,8 +329,9 @@ vim.api.nvim_create_user_command("ClaudeCodeSend", function()
 	-- Send to Claude
 	send_to_claude(full_content)
 
-	-- Cleanup UI
-	cleanup_agent_ui()
+	-- Clear the agent-input buffer content but keep the window open
+	vim.api.nvim_buf_set_lines(agent_buf, 0, -1, false, {})
+	vim.bo[agent_buf].modified = false
 end, {})
 
 -- Define a custom command to send the current selection to a buffer below Claude Code
@@ -733,3 +744,38 @@ vim.api.nvim_create_user_command("ClaudeCodePrompt", function()
 		})
 		:find()
 end, {})
+
+-- Create autocommand to close agent-input buffer when claude-code buffer is closed
+vim.api.nvim_create_autocmd("BufDelete", {
+	pattern = "*",
+	callback = function(ev)
+		-- Check if the deleted buffer was a claude-code buffer
+		local bufname = vim.api.nvim_buf_get_name(ev.buf)
+		local buftype = vim.bo[ev.buf].buftype
+		local filetype = vim.bo[ev.buf].filetype
+		
+		-- Check if this is a claude-code buffer (terminal with claude-code filetype)
+		if buftype == "terminal" and filetype == "claude-code" then
+			-- Find and close the agent-input buffer
+			for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+				if vim.api.nvim_buf_is_valid(buf) and vim.api.nvim_buf_get_name(buf):match("agent%-input$") then
+					-- Save buffer content before closing
+					local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+					vim.g.agent_input_content = lines
+					
+					-- Close all windows associated with this buffer
+					local win_ids = vim.fn.win_findbuf(buf)
+					for _, win_id in ipairs(win_ids) do
+						if vim.api.nvim_win_is_valid(win_id) then
+							vim.api.nvim_win_close(win_id, true)
+						end
+					end
+					
+					-- Delete the buffer
+					vim.api.nvim_buf_delete(buf, { force = true })
+					break
+				end
+			end
+		end
+	end,
+})

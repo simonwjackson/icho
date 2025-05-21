@@ -30,6 +30,13 @@
 
   keymaps = [
     {
+      key = "<leader>gs";
+      action = "<cmd>lua require('edgy').toggle('left')<CR>";
+      options = {
+        desc = "Git: commits";
+      };
+    }
+    {
       key = "<leader>gc";
       action = "<cmd> Telescope git_commits <CR>";
       options = {

@@ -5,17 +5,6 @@
 }: {
   extraPlugins = with pkgs; [
     vimPlugins.tmux-session-switcher
-    # https://github.com/nvim-focus/focus.nvim
-    (vimUtils.buildVimPlugin {
-      name = "nvim-focus";
-      src = fetchFromGitHub {
-        owner = "nvim-focus";
-        repo = "focus.nvim";
-        rev = "master";
-        sha256 = "sha256-B786yg7FfiCmzUrM1yG6tH9xawlOAhtWo7V31lzHalY=";
-      };
-    })
-
     (vimUtils.buildVimPlugin {
       name = "edgy-nvim";
       src = fetchFromGitHub {
@@ -64,22 +53,6 @@
       };
     };
 
-    # edgy = {
-    #   enable = true;
-    #   settings = {
-    #     animate = {
-    #       enabled = true;
-    #     };
-    #     left = [
-    #       {
-    #         ft = "NvimTree";
-    #         size = 130;
-    #         title = "nvimtree";
-    #       }
-    #     ];
-    #   };
-    # };
-
     web-devicons.enable = true;
 
     # HTTP
@@ -104,7 +77,6 @@
     rest.enable = true;
 
     # UI
-    # Otter configuration is now in the otter block above
     dressing = {
       enable = true;
       settings = {
@@ -120,8 +92,8 @@
       enable = true;
       settings = {
         window = {
-          backdrop = 0.95;
-          width = 120;
+          backdrop = 1;
+          width = 1;
           height = 1;
         };
       };
@@ -273,15 +245,13 @@
   ];
 
   extraConfigLua = ''
-    require("focus").setup({
-      autoresize = {
-        minwidth = 40, -- Force minimum width for the unfocused window
-        minheight = 20, -- Force minimum height for the unfocused window
-      }
-    })
+
 
     require("edgy").setup({
       -- close_when_all_hidden = false,
+      options = {
+        right = { size = 0.4 },
+      },
       animate = {
        enabled = false,
       },
@@ -290,17 +260,13 @@
           title = "Claude Code",
           ft = "claude-code",
         },
+        {
+          title = "Agent Input",
+          ft = "agent-input",
+          size = { height = 0.381 },
+        },
       },
       left = {
-        -- Neo-tree filesystem always takes half the screen height
-        -- {
-        --   title = "Neo-Tree",
-        --   ft = "neo-tree",
-        --   filter = function(buf)
-        --     return vim.b[buf].neo_tree_source == "filesystem"
-        --   end,
-        --   size = { height = 0.5 },
-        -- },
         {
           title = "Neo-Tree Git",
           ft = "neo-tree",
@@ -311,28 +277,6 @@
           collapsed = false, -- show window as closed/collapsed on start
           open = "Neotree position=left git_status",
         },
-        -- {
-        --   title = "Neo-Tree Buffers",
-        --   ft = "neo-tree",
-        --   filter = function(buf)
-        --     return vim.b[buf].neo_tree_source == "buffers"
-        --   end,
-        --   pinned = true,
-        --   collapsed = false, -- show window as closed/collapsed on start
-        --   open = "Neotree position=left buffers",
-        -- },
-        -- {
-        --   title = function()
-        --     local buf_name = vim.api.nvim_buf_get_name(0) or "[No Name]"
-        --     return vim.fn.fnamemodify(buf_name, ":t")
-        --   end,
-        --   ft = "Outline",
-        --   pinned = true,
-        --   open = "SymbolsOutlineOpen",
-        --
-        -- },
-        -- any other neo-tree windows
-        "neo-tree",
       },
       bottom = {
         -- toggleterm at the bottom with a height of 40% of the screen
@@ -350,7 +294,7 @@
     local original_toggle = require("edgy").toggle
     require("edgy").toggle = function(pos)
       local result = original_toggle(pos)
-      vim.cmd("FocusAutoresize")
+      -- vim.cmd("FocusAutoresize")
       return result
     end
 

@@ -58,11 +58,6 @@
       keymaps = {
         window_navigation = false,
       },
-      -- terminal_opts = {
-      --   unique_name = true,
-      --   force_unique = true, -- Force a unique name even if a buffer with the same name exists
-      --   close_on_exit = true  -- Close the terminal buffer when the job exits
-      -- }
     })
 
     ${builtins.readFile ./agent-commands.lua}
