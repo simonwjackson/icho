@@ -10,12 +10,12 @@
       enable = true;
       settings.use_neovim_remote = 1;
     };
-    diffview = {
-      enable = true;
-    };
   };
 
   extraConfigLua = ''
+    -- MiniDiff highlight improvements for better contrast
+
+    vim.api.nvim_set_hl(0, 'DiffChange', { bg = '#4A4123', fg = '#F9E2AF' }) -- Dark yellow bg with yellow fg
     -- Advanced Git Search
     require('telescope').load_extension('advanced_git_search')
 
@@ -33,35 +33,21 @@
       key = "<leader>gs";
       action = "<cmd>lua require('edgy').toggle('left')<CR>";
       options = {
-        desc = "Git: commits";
-      };
-    }
-    {
-      key = "<leader>gc";
-      action = "<cmd> Telescope git_commits <CR>";
-      options = {
-        desc = "Git: commits";
+        desc = "Git: Status";
       };
     }
     {
       key = "<leader>gg";
       action = "<cmd>LazyGit<CR>";
       options = {
-        desc = "Git: Status";
+        desc = "Git: LazyGit";
       };
     }
     {
       key = "<leader>gd";
-      action = "<cmd>DiffviewFileHistory<CR>";
+      action = "<cmd>lua MiniDiff.toggle_overlay()<CR>";
       options = {
-        desc = "Git: Diff";
-      };
-    }
-    {
-      key = "<leader>gd";
-      action = "<cmd>DiffviewOpen<CR>";
-      options = {
-        desc = "Git: Diff";
+        desc = "Git: Search commit content";
       };
     }
     {
