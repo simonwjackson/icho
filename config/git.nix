@@ -30,18 +30,18 @@
     -- Navigation functions for git hunks and LSP diagnostics
     function NavigateNext()
       local mini_diff_available, mini_diff = pcall(require, 'mini.diff')
-      
+
       -- Try to navigate to next diagnostic first
       local diagnostics = vim.diagnostic.get(0)
       local current_line = vim.api.nvim_win_get_cursor(0)[1]
-      
+
       for _, diagnostic in ipairs(diagnostics) do
         if diagnostic.lnum + 1 > current_line then
           vim.api.nvim_win_set_cursor(0, {diagnostic.lnum + 1, diagnostic.col})
           return
         end
       end
-      
+
       -- If no more diagnostics, try git hunks
       if mini_diff_available then
         local hunks = mini_diff.get_buf_data().hunks
@@ -54,7 +54,7 @@
           end
         end
       end
-      
+
       -- If no hunks forward, wrap to first diagnostic or hunk
       if #diagnostics > 0 then
         local first_diagnostic = diagnostics[1]
@@ -69,11 +69,11 @@
 
     function NavigatePrev()
       local mini_diff_available, mini_diff = pcall(require, 'mini.diff')
-      
+
       -- Try to navigate to previous diagnostic first
       local diagnostics = vim.diagnostic.get(0)
       local current_line = vim.api.nvim_win_get_cursor(0)[1]
-      
+
       -- Reverse iterate through diagnostics
       for i = #diagnostics, 1, -1 do
         local diagnostic = diagnostics[i]
@@ -82,7 +82,7 @@
           return
         end
       end
-      
+
       -- If no more diagnostics, try git hunks
       if mini_diff_available then
         local hunks = mini_diff.get_buf_data().hunks
@@ -96,7 +96,7 @@
           end
         end
       end
-      
+
       -- If no hunks backward, wrap to last diagnostic or hunk
       if #diagnostics > 0 then
         local last_diagnostic = diagnostics[#diagnostics]
@@ -111,13 +111,6 @@
   '';
 
   keymaps = [
-    {
-      key = "<leader>gs";
-      action = "<cmd>lua require('edgy').toggle('left')<CR>";
-      options = {
-        desc = "Git: Status";
-      };
-    }
     {
       key = "<leader>gg";
       action = "<cmd>LazyGit<CR>";

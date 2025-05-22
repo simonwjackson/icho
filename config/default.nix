@@ -5,15 +5,6 @@
 }: {
   extraPlugins = with pkgs; [
     vimPlugins.tmux-session-switcher
-    (vimUtils.buildVimPlugin {
-      name = "edgy-nvim";
-      src = fetchFromGitHub {
-        owner = "folke";
-        repo = "edgy.nvim";
-        rev = "main";
-        sha256 = "sha256-KP8lA+HU3xtX5gOigROva65bf7YH+12EVPM185riJTk=";
-      };
-    })
   ];
 
   imports = [
@@ -30,6 +21,7 @@
     ./lsp.nix
     ./movements.nix
     ./snippets.nix
+    ./splits.nix
     ./splash.nix
     ./tabs
     ./tasks.nix
@@ -248,105 +240,6 @@
   ];
 
   extraConfigLua = ''
-    require("edgy").setup({
-      -- close_when_all_hidden = false,
-      options = {
-        right = { size = 0.381 },
-        -- left = { size = 0.234 }, -- or 0.144
-        bottom = { size = 0.381 },
-      },
-      animate = {
-       enabled = false,
-      },
-      right = {
-        {
-          ft = "grug-far",
-          title = "Find & Replace",
-          size = { width = 0.3 },
-        },
-        {
-          title = "Claude Code",
-          ft = "claude-code",
-        },
-        {
-          title = "Agent Input",
-          ft = "markdown",
-          size = { height = 0.381 },
-          filter = function(buf)
-            return vim.api.nvim_buf_get_name(buf):match("agent%-input$") ~= nil
-          end,
-        },
-      },
-      left = {
-        {
-          title = "Neo-Tree Git",
-          ft = "neo-tree",
-          size = {
-            height = 0.616,
-            width = 0.144
-          },
-          filter = function(buf)
-            return vim.b[buf].neo_tree_source == "git_status"
-          end,
-          pinned = true,
-          collapsed = false, -- show window as closed/collapsed on start
-          open = "Neotree position=left git_status",
-        },
-
-        {
-          ft = "trouble",
-          filter = function(buf, win)
-            return vim.w[win].trouble and vim.w[win].trouble.mode == "symbols"
-          end,
-          title = "Symbols",
-          size = { width = 0.381 },
-        },
-      },
-      bottom = {
-        {
-          ft = "OverseerList",
-          title = "Overseer",
-          size = { width = 0.381 },
-          filter = function(buf)
-            return vim.bo[buf].filetype == "OverseerList"
-          end,
-        },
-        {
-          ft = "OverseerOutput",
-          title = "Task Output",
-          size = { width = 0.616 },
-          filter = function(buf)
-            return vim.bo[buf].filetype == "OverseerOutput"
-          end,
-        },
-        {
-          ft = "toggleterm",
-          size = { height = 0.616 },
-          -- exclude floating windows
-          filter = function(buf, win)
-            return vim.api.nvim_win_get_config(win).relative == ""
-          end,
-        },
-        {
-          ft = "trouble",
-          filter = function(buf, win)
-            return vim.w[win].trouble and vim.w[win].trouble.mode == "diagnostics"
-          end,
-          title = "Diagnostics",
-          size = { height = 0.381 },
-        },
-        {
-          ft = "trouble",
-          filter = function(buf, win)
-            return vim.w[win].trouble and vim.w[win].trouble.mode == "todo"
-          end,
-          title = "Todo",
-          size = { height = 0.381 },
-        },
-        { ft = "qf", title = "QuickFix" },
-      },
-    })
-
     local opt = vim.opt
 
     opt.shortmess:append('filnxtToOCcIF')
@@ -374,16 +267,9 @@
 
     opt.fillchars = {
       eob = " ",
-      -- fold = ' ',
       diff = '╱',
-      -- wbr = '─',
-      -- msgsep = '─',
-      -- horiz = ' ',
-      -- horizup = '│',
-      -- horizdown = '│',
-      -- vertright = '│',
-      -- vertleft = '│',
-      -- verthoriz = '│',
+      stl = ' ',  -- statusline fill char (space to hide statuslines)
+      stlnc = ' ', -- non-current window statusline fill char
     }
     opt.ignorecase = true
     opt.smartcase = true
@@ -398,7 +284,7 @@
     opt.cmdheight = 0
 
     -- Disable status line
-    opt.laststatus = 0
+    opt.laststatus = 3
 
     function Search_And_Replace()
       if vim.fn.mode() == 'v' or vim.fn.mode() == 'V' then
@@ -423,7 +309,7 @@
       callback = function()
         local client = vim.api.nvim_get_chan_info(vim.v.event.chan).client
         if client ~= nil and client.name == "Firenvim" then
-          vim.o.laststatus = 0
+          vim.o.laststatus = 3
           vim.opt.showtabline = 0
           vim.api.nvim_set_keymap('n', '<C-s>', ':wq<CR>', { noremap = true, silent = true })
           vim.api.nvim_set_keymap('i', '<C-s>', '<Esc>:wq<CR>', { noremap = true, silent = true })
