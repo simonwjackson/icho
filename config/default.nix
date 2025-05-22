@@ -430,9 +430,6 @@
         end
       end
     })
-
-    -- MiniDiff highlight improvements for better contrast
-    vim.api.nvim_set_hl(0, 'DiffChange', { bg = '#4A4123', fg = '#F9E2AF' }) -- Dark yellow bg with yellow fg
   '';
 
   highlight = {
