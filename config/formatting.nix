@@ -20,7 +20,6 @@
         svelte = ["prettierd"];
         css = ["prettierd"];
         html = ["prettierd"];
-        json = ["jq"];
         yaml = ["yq"];
         # -- markdown = [ "prettierd" ];
         just = ["just"];
@@ -30,9 +29,22 @@
         cpp = ["clang_format"];
         elm = ["elm_format"];
         javascript = {
-          __unkeyed-1 = "prettierd";
-          __unkeyed-2 = "prettier";
+          __unkeyed-1 = "biome";
+          __unkeyed-2 = "prettierd";
+          __unkeyed-3 = "prettier";
           timeout_ms = 2000;
+          stop_after_first = true;
+        };
+        typescript = {
+          __unkeyed-1 = "biome";
+          __unkeyed-2 = "prettierd";
+          __unkeyed-3 = "prettier";
+          timeout_ms = 2000;
+          stop_after_first = true;
+        };
+        json = {
+          __unkeyed-1 = "biome";
+          __unkeyed-2 = "jq";
           stop_after_first = true;
         };
         lua = ["stylua"];
@@ -87,6 +99,9 @@
         };
         stylua = {
           command = lib.getExe pkgs.stylua;
+        };
+        biome = {
+          command = lib.getExe pkgs.biome;
         };
       };
     };
