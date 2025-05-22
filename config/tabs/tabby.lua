@@ -174,21 +174,6 @@ require("tabby").setup({
 					margin = " ",
 				}
 			end),
-			-- Show tmux windows as tabs if in tmux (always show them if in tmux)
-			in_tmux
-					and vim.tbl_map(function(window)
-						local hl = window.active and "TabLineSel" or "TabLine"
-						return {
-							line.sep(left_sep, hl, "TabLineFill"),
-							window.active and " " or " ",
-							window.index,
-							" " .. window.name,
-							line.sep(right_sep, hl, "TabLineFill"),
-							hl = hl,
-							margin = " ",
-						}
-					end, tmux_windows)
-				or {},
 			-- Always show regular vim tabs
 			line.tabs().foreach(function(tab)
 				local hl = tab.is_current() and "TabLineSel" or "TabLine"
@@ -209,6 +194,20 @@ require("tabby").setup({
 					margin = " ",
 				}
 			end),
+			-- Show tmux windows as tabs if in tmux (always show them if in tmux)
+			in_tmux
+					and vim.tbl_map(function(window)
+						local hl = window.active and "TabLineSel" or "TabLine"
+						local indicator = window.active and " " or "󰘬 "
+						return {
+							line.sep(left_sep, hl, "TabLineFill"),
+							" " .. indicator .. " " .. window.name,
+							line.sep(right_sep, hl, "TabLineFill"),
+							hl = hl,
+							margin = " ",
+						}
+					end, tmux_windows)
+				or {},
 		}
 	end,
 })
