@@ -174,8 +174,9 @@ require("tabby").setup({
 					margin = " ",
 				}
 			end),
-			-- Always show regular vim tabs
-			line.tabs().foreach(function(tab)
+			-- Show regular vim tabs only if more than one exists
+			vim.fn.tabpagenr('$') > 1
+				and line.tabs().foreach(function(tab)
 				local hl = tab.is_current() and "TabLineSel" or "TabLine"
 				-- Always start with an empty tab name
 				local tab_display_name = ""
@@ -193,8 +194,9 @@ require("tabby").setup({
 					hl = hl,
 					margin = " ",
 				}
-			end),
-			-- Show tmux windows as tabs if in tmux (always show them if in tmux)
+			end)
+		or {},
+		-- Show tmux windows as tabs if in tmux (always show them if in tmux)
 			in_tmux
 					and vim.tbl_map(function(window)
 						local hl = window.active and "TabLineSel" or "TabLine"
