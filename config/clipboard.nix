@@ -18,6 +18,17 @@
 
   # plugins.nvim-osc52.enable = true;
 
+  keymaps = [
+    {
+      key = "p";
+      action = ''"_dP'';
+      mode = "v";
+      options = {
+        desc = "Paste without losing yank buffer";
+      };
+    }
+  ];
+
   extraConfigLua = ''
     -- Configure native clipboard support
     vim.opt.clipboard = 'unnamedplus'
