@@ -27,6 +27,25 @@ require("tabby").setup({
 		local right_sep = ""
 		local in_tmux = os.getenv("TMUX_PANE") ~= nil
 
+		-- Get tmux windows if in tmux session
+		local tmux_windows = {}
+		if in_tmux then
+			local handle = io.popen("tmux list-windows -F '#{window_index} #{window_name} #{window_active}'")
+			if handle then
+				for line in handle:lines() do
+					local index, name, active = line:match("(%d+) ([^%s]+) (%d+)")
+					if index then
+						table.insert(tmux_windows, {
+							index = tonumber(index),
+							name = name,
+							active = active == "1",
+						})
+					end
+				end
+				handle:close()
+			end
+		end
+
 		-- Create the header section
 		local header = {}
 
@@ -155,6 +174,22 @@ require("tabby").setup({
 					margin = " ",
 				}
 			end),
+			-- Show tmux windows as tabs if in tmux (always show them if in tmux)
+			in_tmux
+					and vim.tbl_map(function(window)
+						local hl = window.active and "TabLineSel" or "TabLine"
+						return {
+							line.sep(left_sep, hl, "TabLineFill"),
+							window.active and " " or " ",
+							window.index,
+							" " .. window.name,
+							line.sep(right_sep, hl, "TabLineFill"),
+							hl = hl,
+							margin = " ",
+						}
+					end, tmux_windows)
+				or {},
+			-- Always show regular vim tabs
 			line.tabs().foreach(function(tab)
 				local hl = tab.is_current() and "TabLineSel" or "TabLine"
 				-- Always start with an empty tab name
