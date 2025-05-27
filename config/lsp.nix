@@ -1,4 +1,7 @@
-{...}: {
+{pkgs, ...}: {
+  extraPackages = [
+    pkgs.nodejs_latest
+  ];
   plugins.lspkind.enable = true;
   plugins.lsp = {
     enable = true;
