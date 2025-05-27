@@ -1,6 +1,7 @@
 {pkgs, ...}: {
   extraPackages = [
-    pkgs.claude-code
+    # pkgs.claude-code
+    pkgs.bun
   ];
 
   # Create plugin from GitHub source
@@ -44,7 +45,8 @@
         split_ratio = 0.381,
         position = "vsplit", -- Changed from "vertical" to "vsplit"
       },
-      command = "${pkgs.claude-code}/bin/claude --dangerously-skip-permissions",
+      command = "${pkgs.lib.getExe pkgs.bun} x @anthropic-ai/claude-code --dangerously-skip-permissions",
+      -- command = "${pkgs.claude-code}/bin/claude --dangerously-skip-permissions",
       -- command = "~/.claude/local/claude --dangerously-skip-permissions",
       command_variants = {
         -- Conversation management
