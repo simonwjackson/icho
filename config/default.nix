@@ -86,7 +86,7 @@
       settings = {
         window = {
           backdrop = 1;
-          width = 1;
+          width = 0.8;
           height = 1;
         };
       };
