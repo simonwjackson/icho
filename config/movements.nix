@@ -1,7 +1,26 @@
 {lib, ...}: {
   globals.mapleader = " ";
 
-  plugins.flash.enable = true;
+  plugins.flash = {
+    enable = true;
+    settings = {
+      jump = {
+        jumplist = true;
+        pos = "start";
+        history = true;
+        register = true;
+        nohlsearch = false;
+      };
+      char = {
+        enabled = true;
+      };
+      modes = {
+        char = {
+          jump_labels = true;
+        };
+      };
+    };
+  };
 
   plugins.telescope = {
     settings = {
@@ -90,26 +109,32 @@
         end,
       })
     end
+
+    -- Flash jump to beginning of words
+    function _G.flash_words()
+      require("flash").jump({
+        search = {
+          mode = function(str)
+            return "\\<" .. str
+          end,
+        },
+      })
+    end
   '';
 
   keymaps = [
-    {
-      key = "s";
-      mode = [
-        "n"
-        "x"
-        "o"
-      ];
-      action = lib.nixvim.mkRaw ''function() require("flash").jump() end'';
-      options.desc = "Flash";
-    }
     {
       key = "<leader>d";
       mode = ["n"];
       action = lib.nixvim.mkRaw ''function() _G.flash_diagnostics() end'';
       options.desc = "Flash diagnostics";
     }
-
+    {
+      key = "s";
+      mode = ["n" "x" "o"];
+      action = lib.nixvim.mkRaw ''function() _G.flash_words() end'';
+      options.desc = "Flash to word beginning";
+    }
     {
       key = "<A-h>";
       action = "<Cmd>wincmd h<CR>";
