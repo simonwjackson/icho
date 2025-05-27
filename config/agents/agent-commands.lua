@@ -125,15 +125,15 @@ local function get_agent_buffer()
 		vim.bo[agent_buf].modifiable = true
 
 		-- Set buffer-local keymap for Ctrl+Return to send to Claude
-		vim.api.nvim_buf_set_keymap(agent_buf, 'n', '<C-CR>', '<cmd>ClaudeCodeSend<CR>', {
+		vim.api.nvim_buf_set_keymap(agent_buf, "n", "<C-CR>", "<cmd>ClaudeCodeSend<CR>", {
 			noremap = true,
 			silent = true,
-			desc = "Send agent-input to Claude Code"
+			desc = "Send agent-input to Claude Code",
 		})
-		vim.api.nvim_buf_set_keymap(agent_buf, 'i', '<C-CR>', '<cmd>ClaudeCodeSend<CR>', {
+		vim.api.nvim_buf_set_keymap(agent_buf, "i", "<C-CR>", "<cmd>ClaudeCodeSend<CR>", {
 			noremap = true,
 			silent = true,
-			desc = "Send agent-input to Claude Code"
+			desc = "Send agent-input to Claude Code",
 		})
 	end
 
@@ -300,7 +300,7 @@ vim.api.nvim_create_user_command("ClaudeCodeFile", function()
 	end
 
 	-- Create command text
-	local command_text = "READ " .. rel_path .. "\n"
+	local command_text = "@" .. rel_path .. "\n"
 
 	-- Setup UI
 	local agent_buf, agent_win = setup_agent_ui()
@@ -466,7 +466,7 @@ vim.api.nvim_create_user_command("ClaudeCodeDirectories", function()
 				local command_text = ""
 				for _, dir in ipairs(dirs_to_send) do
 					local rel_path = get_relative_path(dir)
-					command_text = command_text .. "READ " .. rel_path .. "/**/*\n"
+					command_text = command_text .. "@" .. rel_path .. "/**/*\n"
 				end
 				command_text = command_text .. "\n"
 
@@ -531,7 +531,7 @@ vim.api.nvim_create_user_command("ClaudeCodeFiles", function()
 				local command_text = ""
 				for _, file in ipairs(files_to_send) do
 					local rel_path = get_relative_path(file)
-					command_text = command_text .. "READ " .. rel_path .. "\n"
+					command_text = command_text .. "@" .. rel_path .. "\n"
 				end
 				command_text = command_text .. "\n"
 
@@ -765,7 +765,7 @@ vim.api.nvim_create_autocmd("BufDelete", {
 		local bufname = vim.api.nvim_buf_get_name(ev.buf)
 		local buftype = vim.bo[ev.buf].buftype
 		local filetype = vim.bo[ev.buf].filetype
-		
+
 		-- Check if this is a claude-code buffer (terminal with claude-code filetype)
 		if buftype == "terminal" and filetype == "claude-code" then
 			-- Find and close the agent-input buffer
@@ -774,7 +774,7 @@ vim.api.nvim_create_autocmd("BufDelete", {
 					-- Save buffer content before closing
 					local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
 					vim.g.agent_input_content = lines
-					
+
 					-- Close all windows associated with this buffer
 					local win_ids = vim.fn.win_findbuf(buf)
 					for _, win_id in ipairs(win_ids) do
@@ -782,7 +782,7 @@ vim.api.nvim_create_autocmd("BufDelete", {
 							vim.api.nvim_win_close(win_id, true)
 						end
 					end
-					
+
 					-- Delete the buffer
 					vim.api.nvim_buf_delete(buf, { force = true })
 					break
