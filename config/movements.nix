@@ -15,6 +15,28 @@
     end
 
     vim.cmd("autocmd! TermOpen term://* lua set_terminal_keymaps()")
+
+    -- Flash jump to diagnostics
+    function _G.flash_diagnostics()
+      require("flash").jump({
+        matcher = function(win)
+          ---@param diag Diagnostic
+          return vim.tbl_map(function(diag)
+            return {
+              pos = { diag.lnum + 1, diag.col },
+              end_pos = { diag.end_lnum + 1, diag.end_col - 1 },
+            }
+          end, vim.diagnostic.get(vim.api.nvim_win_get_buf(win)))
+        end,
+        action = function(match, state)
+          vim.api.nvim_win_call(match.win, function()
+            vim.api.nvim_win_set_cursor(match.win, match.pos)
+            vim.diagnostic.open_float()
+          end)
+          state:restore()
+        end,
+      })
+    end
   '';
 
   keymaps = [
@@ -27,6 +49,12 @@
       ];
       action = lib.nixvim.mkRaw ''function() require("flash").jump() end'';
       options.desc = "Flash";
+    }
+    {
+      key = "<leader>d";
+      mode = ["n"];
+      action = lib.nixvim.mkRaw ''function() _G.flash_diagnostics() end'';
+      options.desc = "Flash diagnostics";
     }
 
     {
@@ -45,7 +73,7 @@
       key = "<A-l>";
       action = "<Cmd>wincmd l<CR>";
     }
-    
+
     # Swap j/k with gj/gk
     {
       key = "j";
