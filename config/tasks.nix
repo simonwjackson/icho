@@ -1,18 +1,15 @@
-{pkgs, ...}: {
+{
+  inputs,
+  pkgs,
+  ...
+}: {
   plugins.overseer = {
     enable = true;
-    package =
-      pkgs.vimUtils.buildVimPlugin
-      {
-        name = "overseer-nvim";
-        src = pkgs.fetchFromGitHub {
-          owner = "simonwjackson";
-          repo = "overseer.nvim";
-          rev = "custom";
-          sha256 = "sha256-6cFaN603Cq+1KBpasE1wSBYtkSItXnAgcHKZQDsuiDA=";
-        };
-        doCheck = false;
-      };
+    package = pkgs.vimUtils.buildVimPlugin {
+      name = "overseer-nvim";
+      src = inputs.vim-overseer;
+      doCheck = false;
+    };
   };
 
   keymaps = [

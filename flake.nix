@@ -2,10 +2,14 @@
   description = "A nixvim configuration";
 
   inputs = {
-    tmesh.url = "github:simonwjackson/tmesh";
+    flake-parts.url = "github:hercules-ci/flake-parts";
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     nixvim.url = "github:nix-community/nixvim";
-    flake-parts.url = "github:hercules-ci/flake-parts";
+    vim-overseer = {
+      url = "github:simonwjackson/overseer.nvim/custom";
+      flake = false;
+    };
+    tmesh.url = "github:simonwjackson/tmesh";
   };
 
   outputs = {

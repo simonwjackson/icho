@@ -334,7 +334,8 @@
         "flake-parts": "flake-parts",
         "nixpkgs": "nixpkgs",
         "nixvim": "nixvim",
-        "tmesh": "tmesh"
+        "tmesh": "tmesh",
+        "vim-overseer": "vim-overseer"
       }
     },
     "scss-reset": {
@@ -503,6 +504,23 @@
         "owner": "nixos",
         "ref": "nixos-unstable",
         "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "vim-overseer": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1748620485,
+        "narHash": "sha256-28rqYJ0bKAl0WCqzhoKtCt7+KaAUyvqWnVVl0fXIhAQ=",
+        "owner": "simonwjackson",
+        "repo": "overseer.nvim",
+        "rev": "1edf3c0ed3f231a611ed5af1f9357532ef67d6e2",
+        "type": "github"
+      },
+      "original": {
+        "owner": "simonwjackson",
+        "ref": "custom",
+        "repo": "overseer.nvim",
         "type": "github"
       }
     }
