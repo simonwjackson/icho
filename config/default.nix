@@ -220,6 +220,13 @@
 
   keymaps = [
     {
+      key = "<leader>m";
+      action = "<Plug>MarkdownPreview";
+      options = {
+        desc = "Markdown Preview";
+      };
+    }
+    {
       key = "<leader>p";
       action = "<CMD>TmuxSessionSwitch<CR>";
       options = {
