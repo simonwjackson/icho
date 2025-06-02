@@ -118,6 +118,13 @@
       };
     }
     {
+      key = "<leader>afw";
+      action = "<cmd>ClaudeCodeFilesWithContent<CR>";
+      options = {
+        desc = "Claude Code: Files by content search";
+      };
+    }
+    {
       key = "<leader>afd";
       action = "<cmd>ClaudeCodeDirectories<CR>";
       options = {

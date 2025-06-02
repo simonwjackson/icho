@@ -787,6 +787,75 @@ vim.api.nvim_create_user_command("ClaudeCodePrompt", function()
 		:find()
 end, {})
 
+-- Define a custom command to search files by content and send selected ones to agent-input
+vim.api.nvim_create_user_command("ClaudeCodeFilesWithContent", function()
+	local telescope = require("telescope.builtin")
+	local actions = require("telescope.actions")
+	local action_state = require("telescope.actions.state")
+
+	-- Open Telescope live_grep with multi-select
+	telescope.live_grep({
+		attach_mappings = function(prompt_bufnr, map)
+			-- Override the default enter action to send selected files to Claude
+			actions.select_default:replace(function()
+				-- Get all selected entries
+				local picker = action_state.get_current_picker(prompt_bufnr)
+				local selections = picker:get_multi_selection()
+
+				-- If no selections, get current entry
+				if #selections == 0 then
+					local entry = action_state.get_selected_entry()
+					if entry then
+						selections = { entry }
+					end
+				end
+
+				-- Close telescope
+				actions.close(prompt_bufnr)
+
+				-- If no files selected, exit
+				if #selections == 0 then
+					vim.notify("No files selected for Claude", vim.log.levels.WARN)
+					return
+				end
+
+				-- Extract file paths and ensure uniqueness
+				local files_to_send = {}
+				local seen_files = {}
+				for _, selection in ipairs(selections) do
+					-- For live_grep results, the filename is in the 'filename' field
+					if selection.filename and not seen_files[selection.filename] then
+						table.insert(files_to_send, selection.filename)
+						seen_files[selection.filename] = true
+					end
+				end
+
+				-- Setup UI
+				local agent_buf, agent_win = setup_agent_ui()
+
+				-- Create command text for all files
+				local command_text = ""
+				for _, file in ipairs(files_to_send) do
+					local rel_path = get_relative_path(file)
+					command_text = command_text .. "@" .. rel_path .. "\n"
+				end
+				command_text = command_text .. "\n"
+
+				-- Update buffer with command text
+				update_agent_buffer(agent_buf, command_text)
+
+				-- Focus end of buffer
+				focus_end_of_buffer(agent_win, agent_buf)
+
+				vim.notify("Added " .. #files_to_send .. " files to agent-input buffer", vim.log.levels.INFO)
+			end)
+
+			return true
+		end,
+		prompt_title = "Search Files by Content (Tab to select multiple, Enter to confirm)",
+	})
+end, {})
+
 -- Create autocommand to close agent-input buffer when claude-code buffer is closed
 vim.api.nvim_create_autocmd("BufDelete", {
 	pattern = "*",
