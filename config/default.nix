@@ -21,6 +21,7 @@
     ./lsp.nix
     ./movements.nix
     ./snippets.nix
+    ./sessions
     ./splits.nix
     ./splash.nix
     ./tabs
@@ -197,9 +198,6 @@
     git-worktree.enable = true;
     glance.enable = true;
     improved-search.enable = true;
-    auto-session = {
-      enable = true;
-    };
     comment.enable = true;
     firenvim.enable = true;
     grug-far.enable = true;
