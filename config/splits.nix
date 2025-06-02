@@ -94,14 +94,6 @@
           end,
         },
         {
-          ft = "toggleterm",
-          size = { height = 0.616 },
-          -- exclude floating windows
-          filter = function(buf, win)
-            return vim.api.nvim_win_get_config(win).relative == ""
-          end,
-        },
-        {
           ft = "trouble",
           filter = function(buf, win)
             return vim.w[win].trouble and vim.w[win].trouble.mode == "diagnostics"

@@ -42,7 +42,27 @@
       enable = true;
       settings = {
         open_mapping = "[[<a-.>]]";
-        direction = "horizontal";
+        direction = "float";
+        float_opts = {
+          border = "curved";
+          width.__raw = ''
+            function()
+              return math.floor(vim.o.columns * 0.618)
+            end
+          '';
+          height.__raw = ''
+            function()
+              return math.floor(vim.o.lines * 0.618)
+            end
+          '';
+          winblend = 0;
+        };
+        highlights = {
+          FloatBorder = {
+            guifg = "#7aa2f7";
+            guibg = "NONE";
+          };
+        };
       };
     };
 
@@ -321,6 +341,10 @@
   highlight = {
     LazyGitBorder = {
       link = "FloatBorder";
+    };
+    ToggleTermFloatBorder = {
+      fg = "#7aa2f7"; # Blue color, you can change this
+      bg = "NONE";
     };
   };
 }
