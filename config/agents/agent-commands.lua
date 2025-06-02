@@ -347,19 +347,35 @@ vim.api.nvim_create_user_command("ClaudeCodeSend", function()
 end, {})
 
 -- Define a custom command to send the current selection to a buffer below Claude Code
-vim.api.nvim_create_user_command("ClaudeCodeSelection", function()
-	-- Get the current visual selection
-	local mode = vim.api.nvim_get_mode().mode
-	if mode ~= "v" and mode ~= "V" and mode ~= "\22" then
-		vim.notify("This command requires a visual selection", vim.log.levels.ERROR)
-		return
-	end
+vim.api.nvim_create_user_command("ClaudeCodeSelection", function(opts)
+	local start_line, end_line, start_col, end_col
 
-	-- Get start and end positions of visual selection
-	local start_pos = vim.fn.getpos("'<")
-	local end_pos = vim.fn.getpos("'>")
-	local start_line, start_col = start_pos[2], start_pos[3]
-	local end_line, end_col = end_pos[2], end_pos[3]
+	-- Check if called with a range (from visual mode)
+	if opts.range > 0 then
+		start_line = opts.line1
+		end_line = opts.line2
+		-- For visual mode, we need to get the actual column positions
+		local start_pos = vim.fn.getpos("'<")
+		local end_pos = vim.fn.getpos("'>")
+		start_col = start_pos[3]
+		end_col = end_pos[3]
+	else
+		-- Try to use visual marks if available
+		local start_pos = vim.fn.getpos("'<")
+		local end_pos = vim.fn.getpos("'>")
+		start_line, start_col = start_pos[2], start_pos[3]
+		end_line, end_col = end_pos[2], end_pos[3]
+
+		-- Check if we have a valid selection
+		if start_line == 0 or end_line == 0 then
+			-- No selection, use current line
+			local cursor_pos = vim.api.nvim_win_get_cursor(0)
+			start_line = cursor_pos[1]
+			end_line = cursor_pos[1]
+			start_col = 1
+			end_col = -1  -- Will be handled as full line
+		end
+	end
 
 	-- Get current buffer
 	local buffer = vim.api.nvim_get_current_buf()
@@ -368,7 +384,15 @@ vim.api.nvim_create_user_command("ClaudeCodeSelection", function()
 
 	-- Get selected text
 	local selected_text = {}
-	if start_line == end_line then
+
+	-- Check if this is a line-wise selection (visual line mode 'V')
+	local is_linewise = vim.fn.visualmode() == "V" or (opts.range > 0 and start_col == 1 and end_col == 2147483647) or end_col == -1
+
+	if is_linewise then
+		-- For line-wise selection, get complete lines
+		selected_text = vim.api.nvim_buf_get_lines(buffer, start_line - 1, end_line, false)
+	elseif start_line == end_line then
+		-- Single line character-wise selection
 		local lines = vim.api.nvim_buf_get_lines(buffer, start_line - 1, start_line, false)
 		if lines and #lines > 0 then
 			local line = lines[1]
@@ -377,6 +401,7 @@ vim.api.nvim_create_user_command("ClaudeCodeSelection", function()
 			end
 		end
 	else
+		-- Multi-line character-wise selection
 		-- Get first line (partial)
 		local first_lines = vim.api.nvim_buf_get_lines(buffer, start_line - 1, start_line, false)
 		if first_lines and #first_lines > 0 and first_lines[1] then
@@ -400,6 +425,9 @@ vim.api.nvim_create_user_command("ClaudeCodeSelection", function()
 		end
 	end
 
+	-- Get the filetype of the current buffer
+	local filetype = vim.bo[buffer].filetype
+	
 	-- Create header text with location information
 	local command_text = "Selection from "
 		.. rel_path
@@ -407,7 +435,9 @@ vim.api.nvim_create_user_command("ClaudeCodeSelection", function()
 		.. start_line
 		.. "-"
 		.. end_line
-		.. "):\n\n```\n"
+		.. "):\n\n```"
+		.. filetype
+		.. "\n"
 		.. table.concat(selected_text, "\n")
 		.. "\n```\n\n"
 
@@ -419,7 +449,7 @@ vim.api.nvim_create_user_command("ClaudeCodeSelection", function()
 
 	-- Focus end of buffer
 	focus_end_of_buffer(agent_win, agent_buf)
-end, {})
+end, { range = true })
 
 -- Define a custom command to select directories and send them to buffer below Claude Code
 vim.api.nvim_create_user_command("ClaudeCodeDirectories", function()

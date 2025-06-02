@@ -78,30 +78,47 @@
 
     # Context: Selection
     {
+      mode = "n";
       key = "<leader>av";
       action = "<cmd>ClaudeCodeSelection<CR>";
       options = {
-        desc = "Claude Code: Selection (add)";
+        desc = "Send current line to Claude Code";
+      };
+    }
+    {
+      mode = "v";
+      key = "<leader>av";
+      action = ":<C-u>ClaudeCodeSelection<CR>";
+      options = {
+        desc = "Send visual selection to Claude Code";
+      };
+    }
+    {
+      mode = "x";
+      key = "<leader>av";
+      action = ":<C-u>ClaudeCodeSelection<CR>";
+      options = {
+        desc = "Send visual selection to Claude Code";
       };
     }
 
     # Context: Paths
     {
-      key = "<leader>af";
+      key = "<leader>aff";
       action = "<cmd>ClaudeCodeFile<CR>";
       options = {
         desc = "Claude Code: File (add)";
       };
     }
     {
-      key = "<leader>aF";
+      key = "<leader>afe";
       action = "<cmd>ClaudeCodeFiles<CR>";
       options = {
         desc = "Claude Code: Files (multi add)";
       };
     }
     {
-      key = "<leader>ad";
+      key = "<leader>afd";
       action = "<cmd>ClaudeCodeDirectories<CR>";
       options = {
         desc = "Claude Code: Directories";
@@ -120,15 +137,6 @@
       action = "<cmd>Explore ~/.claude/commands<CR>";
       options = {
         desc = "Open netrw to prompt directory";
-      };
-    }
-
-    # Misc
-    {
-      key = "<leader>aG";
-      action = "<cmd>ClaudeCodeCommit<CR>";
-      options = {
-        desc = "Claude Code: Git Commit";
       };
     }
   ];
