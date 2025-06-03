@@ -1,4 +1,8 @@
 {pkgs, ...}: {
+  extraPackages = [
+    pkgs.tmux
+  ];
+
   extraPlugins = [
     (pkgs.vimUtils.buildVimPlugin {
       name = "tabby-nvim";
