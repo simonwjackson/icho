@@ -3,34 +3,22 @@
     wl-clipboard
   ];
 
-  # NOTE: Incase this plugin gets removed:
-  # extraPlugins = [
-  #   (pkgs.vimUtils.buildVimPlugin {
-  #     name = "my-plugin";
-  #     src = pkgs.fetchFromGitHub {
-  #       owner = "ojroques";
-  #       repo = "nvim-osc52";
-  #       rev = "04cfaba1865ae5c53b6f887c3ca7304973824fb2";
-  #       hash = "sha256:cVivuGzsG2bKfUBklyK7in0C8Xis0aO0pfyOuTol1mU=";
-  #     };
-  #   })
-  # ];
-
-  # plugins.nvim-osc52.enable = true;
-
-  keymaps = [
-    {
-      key = "p";
-      action = ''"_dP'';
-      mode = "v";
-      options = {
-        desc = "Paste without losing yank buffer";
-      };
-    }
-  ];
-
   extraConfigLua = ''
-    -- Configure native clipboard support
+    -- Configure clipboard for nested tmux sessions
+    -- Use OSC 52 for better compatibility with nested tmux
+    vim.g.clipboard = {
+      name = 'OSC 52',
+      copy = {
+        ['+'] = require('vim.ui.clipboard.osc52').copy('+'),
+        ['*'] = require('vim.ui.clipboard.osc52').copy('*'),
+      },
+      paste = {
+        ['+'] = require('vim.ui.clipboard.osc52').paste('+'),
+        ['*'] = require('vim.ui.clipboard.osc52').paste('*'),
+      },
+    }
+    
+    -- Ensure clipboard integration is enabled
     vim.opt.clipboard = 'unnamedplus'
   '';
 }

@@ -344,8 +344,7 @@ local function tab_picker()
 			vim.fn.system("tmux select-window -t " .. info.tmux_index)
 		elseif info.type == "worktree_new" then
 			-- Create new tmux window and start neovim in worktree directory
-			local cmd =
-				string.format("tmux new-window -n '%s' -c '%s' 'nix run ~/Downloads/icho'", info.name, info.path)
+			local cmd = string.format("tmux new-window -n '%s' -c '%s' 'nvim'", info.name, info.path)
 			vim.fn.system(cmd)
 		end
 	end)
