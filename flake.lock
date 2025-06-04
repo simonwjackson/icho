@@ -334,6 +334,7 @@
         "flake-parts": "flake-parts",
         "nixpkgs": "nixpkgs",
         "nixvim": "nixvim",
+        "tabby-nvim": "tabby-nvim",
         "tmesh": "tmesh",
         "vim-overseer": "vim-overseer"
       }
@@ -468,6 +469,22 @@
       "original": {
         "owner": "nix-systems",
         "repo": "default",
+        "type": "github"
+      }
+    },
+    "tabby-nvim": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1747993690,
+        "narHash": "sha256-26ysSn0klZYMPEaxCe/1zD2qCYwobU5dZSq5P/GtwMU=",
+        "owner": "nanozuki",
+        "repo": "tabby.nvim",
+        "rev": "b3affa6db7eab80fca2a2db5b73b473144507039",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nanozuki",
+        "repo": "tabby.nvim",
         "type": "github"
       }
     },

@@ -9,6 +9,10 @@
       url = "github:simonwjackson/overseer.nvim/custom";
       flake = false;
     };
+    tabby-nvim = {
+      url = "github:nanozuki/tabby.nvim";
+      flake = false;
+    };
     tmesh.url = "github:simonwjackson/tmesh";
   };
 
@@ -43,6 +47,10 @@
                 prev.vimPlugins
                 // {
                   tmux-session-switcher = tmesh.packages.${system}.tmux-session-switcher;
+                  tabby-nvim = final.vimUtils.buildVimPlugin {
+                    name = "tabby-nvim";
+                    src = inputs.tabby-nvim;
+                  };
                 };
             })
           ];

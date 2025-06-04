@@ -4,15 +4,7 @@
   ];
 
   extraPlugins = [
-    (pkgs.vimUtils.buildVimPlugin {
-      name = "tabby-nvim";
-      src = pkgs.fetchFromGitHub {
-        owner = "nanozuki";
-        repo = "tabby.nvim";
-        rev = "main";
-        sha256 = "sha256-I6ShLFhRj3pdSFqEOViXhWzL9UnrXcs7IFtgRsnIo30=";
-      };
-    })
+    pkgs.vimPlugins.tabby-nvim
     pkgs.vimPlugins.nvim-web-devicons # Optional dependency for file icons
   ];
 
