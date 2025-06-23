@@ -118,7 +118,7 @@ local function get_agent_buffer()
 		vim.api.nvim_buf_set_name(agent_buf, "agent-input")
 
 		-- Set buffer options
-		vim.bo[agent_buf].buftype = "nofile"
+		vim.bo[agent_buf].buftype = "acwrite"
 		vim.bo[agent_buf].filetype = "markdown"
 		vim.bo[agent_buf].swapfile = false
 		vim.bo[agent_buf].modified = false
@@ -134,6 +134,22 @@ local function get_agent_buffer()
 			noremap = true,
 			silent = true,
 			desc = "Send agent-input to Claude Code",
+		})
+		-- Add Return key mapping in normal mode
+		vim.api.nvim_buf_set_keymap(agent_buf, "n", "<CR>", "<cmd>ClaudeCodeSend<CR>", {
+			noremap = true,
+			silent = true,
+			desc = "Send agent-input to Claude Code",
+		})
+
+		-- Set up autocommand to intercept buffer write events
+		vim.api.nvim_create_autocmd("BufWriteCmd", {
+			buffer = agent_buf,
+			callback = function()
+				-- Trigger ClaudeCodeSend command instead of writing
+				vim.cmd("ClaudeCodeSend")
+			end,
+			desc = "Send to Claude instead of writing agent-input buffer",
 		})
 	end
 
