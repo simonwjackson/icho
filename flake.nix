@@ -13,6 +13,18 @@
       url = "github:nanozuki/tabby.nvim";
       flake = false;
     };
+    claude-code-nvim = {
+      url = "github:greggh/claude-code.nvim";
+      flake = false;
+    };
+    edgy-nvim = {
+      url = "github:folke/edgy.nvim";
+      flake = false;
+    };
+    resession-nvim = {
+      url = "github:stevearc/resession.nvim";
+      flake = false;
+    };
     tmesh.url = "github:simonwjackson/tmesh";
   };
 
@@ -50,6 +62,23 @@
                   tabby-nvim = final.vimUtils.buildVimPlugin {
                     name = "tabby-nvim";
                     src = inputs.tabby-nvim;
+                  };
+                  claude-code-nvim = final.vimUtils.buildVimPlugin {
+                    name = "claude-code-nvim";
+                    src = inputs.claude-code-nvim;
+                  };
+                  edgy-nvim = final.vimUtils.buildVimPlugin {
+                    name = "edgy-nvim";
+                    src = inputs.edgy-nvim;
+                  };
+                  overseer-nvim = final.vimUtils.buildVimPlugin {
+                    name = "overseer-nvim";
+                    src = inputs.vim-overseer;
+                    doCheck = false;
+                  };
+                  resession-nvim = final.vimUtils.buildVimPlugin {
+                    name = "resession-nvim";
+                    src = inputs.resession-nvim;
                   };
                 };
             })

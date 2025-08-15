@@ -1,14 +1,6 @@
 {pkgs, ...}: {
   extraPlugins = with pkgs; [
-    (vimUtils.buildVimPlugin {
-      name = "edgy-nvim";
-      src = fetchFromGitHub {
-        owner = "folke";
-        repo = "edgy.nvim";
-        rev = "main";
-        sha256 = "sha256-KP8lA+HU3xtX5gOigROva65bf7YH+12EVPM185riJTk=";
-      };
-    })
+    vimPlugins.edgy-nvim
   ];
 
   extraConfigLua = ''

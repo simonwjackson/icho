@@ -5,11 +5,7 @@
 }: {
   plugins.overseer = {
     enable = true;
-    package = pkgs.vimUtils.buildVimPlugin {
-      name = "overseer-nvim";
-      src = inputs.vim-overseer;
-      doCheck = false;
-    };
+    package = pkgs.vimPlugins.overseer-nvim;
   };
 
   keymaps = [
