@@ -4,18 +4,10 @@
     pkgs.bun
   ];
 
-  # Create plugin from GitHub source
+  # Add plugins
   extraPlugins = with pkgs; [
     vimPlugins.supermaven-nvim # AI code completion
-    (vimUtils.buildVimPlugin {
-      name = "claude-code-nvim";
-      src = fetchFromGitHub {
-        owner = "greggh";
-        repo = "claude-code.nvim";
-        rev = "main";
-        sha256 = "sha256-W9tRrZRZsJiK3ROFF1UTKDS22CCFDu8hlMptT46SRLA=";
-      };
-    })
+    vimPlugins.claude-code-nvim
     vimPlugins.plenary-nvim # Required dependency
     vimPlugins.telescope-nvim # For file selection
   ];

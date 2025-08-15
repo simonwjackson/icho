@@ -13,6 +13,10 @@
       url = "github:nanozuki/tabby.nvim";
       flake = false;
     };
+    claude-code-nvim = {
+      url = "github:greggh/claude-code.nvim";
+      flake = false;
+    };
     tmesh.url = "github:simonwjackson/tmesh";
   };
 
@@ -50,6 +54,10 @@
                   tabby-nvim = final.vimUtils.buildVimPlugin {
                     name = "tabby-nvim";
                     src = inputs.tabby-nvim;
+                  };
+                  claude-code-nvim = final.vimUtils.buildVimPlugin {
+                    name = "claude-code-nvim";
+                    src = inputs.claude-code-nvim;
                   };
                 };
             })
