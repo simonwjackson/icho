@@ -33,25 +33,26 @@
     end
 
     require("claude-code").setup({
-      window = {
-        split_ratio = 0.381,
-        position = "vsplit", -- Changed from "vertical" to "vsplit"
-      },
-      command = "${pkgs.lib.getExe pkgs.bun} x @anthropic-ai/claude-code --dangerously-skip-permissions",
-      -- command = "${pkgs.claude-code}/bin/claude --dangerously-skip-permissions",
-      -- command = "~/.claude/local/claude --dangerously-skip-permissions",
-      command_variants = {
-        -- Conversation management
-        continue = "--continue", -- Resume the most recent conversation
-        resume = "--resume",     -- Display an interactive conversation picker
-
-        -- Output options
-        verbose = "--verbose",   -- Enable verbose logging with full turn-by-turn output
-        commit = "'execute a commitizen style commit for everything staged. if no files are staged, then commit all. Do not use any claude branding.'",
-      },
-      keymaps = {
-        window_navigation = false,
-      },
+        window = {
+          -- split_ratio = 0.381,
+          position = 'vertical', -- Test the new "none" position option
+          enter_insert = true,
+          hide_numbers = true,
+          hide_signcolumn = true,
+        },
+        refresh = {
+          enable = true,
+          updatetime = 100,
+          timer_interval = 1000,
+          show_notifications = true,
+        },
+        git = {
+          use_git_root = true,
+        },
+        command = "${pkgs.lib.getExe pkgs.bun} x '@anthropic-ai/claude-code' --dangerously-skip-permissions",
+        -- keymaps = {
+        --   window_navigation = false,
+        -- },
     })
 
     ${builtins.readFile ./agent-commands.lua}

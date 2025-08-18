@@ -18,7 +18,7 @@
       -- close_when_all_hidden = false,
       options = {
         right = { size = 0.381 },
-        -- left = { size = 0.234 }, -- or 0.144
+        left = { size = 0.234 }, -- or 0.144
         bottom = { size = 0.381 },
       },
       animate = {
@@ -32,7 +32,7 @@
         },
         {
           title = "Claude Code",
-          ft = "claude-code",
+          ft = "claudecode",
         },
         {
           title = "Agent Input",

@@ -13,16 +13,21 @@ end
 -- Claude Code integration functions
 local function ensure_claude_open()
 	local claude_code = require("claude-code")
-	local bufnr = claude_code.claude_code.bufnr
 
-	-- Open Claude Code if not already open
+	-- Get current instance buffer using the correct multi-instance tracking
+	local current_instance = claude_code.claude_code.current_instance
+	local bufnr = current_instance and claude_code.claude_code.instances[current_instance]
+
+	-- Open Claude Code if not already open or buffer is invalid
 	if not bufnr or not vim.api.nvim_buf_is_valid(bufnr) then
 		claude_code.toggle()
-		bufnr = claude_code.claude_code.bufnr
+		-- Get updated buffer number after toggle
+		current_instance = claude_code.claude_code.current_instance
+		bufnr = current_instance and claude_code.claude_code.instances[current_instance]
 
-		-- Set the buffer filetype to "claude-code" so edgy can manage it
+		-- Set the buffer filetype to "claudecode" so edgy can manage it (matching init.lua)
 		if bufnr and vim.api.nvim_buf_is_valid(bufnr) then
-			vim.api.nvim_buf_set_option(bufnr, "filetype", "claude-code")
+			vim.api.nvim_buf_set_option(bufnr, "filetype", "claudecode")
 		end
 	else
 		-- Find Claude window and focus it
@@ -33,19 +38,24 @@ local function ensure_claude_open()
 			-- Open Claude Code window if not visible
 			claude_code.toggle()
 
-			-- Set the buffer filetype to "claude-code" so edgy can manage it
+			-- Set the buffer filetype to "claudecode" so edgy can manage it (matching init.lua)
 			if bufnr and vim.api.nvim_buf_is_valid(bufnr) then
-				vim.api.nvim_buf_set_option(bufnr, "filetype", "claude-code")
+				vim.api.nvim_buf_set_option(bufnr, "filetype", "claudecode")
 			end
 		end
 	end
 
-	return claude_code.claude_code.bufnr
+	-- Return the correct buffer number from instances
+	current_instance = claude_code.claude_code.current_instance
+	return current_instance and claude_code.claude_code.instances[current_instance]
 end
 
 local function send_to_claude(content)
 	local claude_code = require("claude-code")
-	local bufnr = claude_code.claude_code.bufnr
+
+	-- Get current instance buffer using the correct multi-instance tracking
+	local current_instance = claude_code.claude_code.current_instance
+	local bufnr = current_instance and claude_code.claude_code.instances[current_instance]
 
 	-- Check if Claude Code buffer exists
 	if not bufnr or not vim.api.nvim_buf_is_valid(bufnr) then
@@ -54,6 +64,12 @@ local function send_to_claude(content)
 
 	-- Find Claude Code window
 	local win_ids = vim.fn.win_findbuf(bufnr)
+	if #win_ids == 0 then
+		-- Claude Code window not visible, ensure it's open
+		bufnr = ensure_claude_open()
+		win_ids = vim.fn.win_findbuf(bufnr)
+	end
+
 	if #win_ids > 0 then
 		-- Focus the Claude Code window
 		vim.api.nvim_set_current_win(win_ids[1])
@@ -64,18 +80,15 @@ local function send_to_claude(content)
 		-- Use the current buffer's terminal channel
 		local term_channel = vim.b[term_buf].terminal_job_id
 		if term_channel then
-			-- Check if terminal is in insert mode by looking for "-- INSERT --" in the buffer
+			-- Check if terminal is in insert mode by looking for terminal indicators
 			local in_insert_mode = false
-
-			-- Save current window to restore it later
-			local current_win = vim.api.nvim_get_current_win()
 
 			-- Temporarily capture the terminal contents
 			local lines = vim.api.nvim_buf_get_lines(term_buf, 0, -1, false)
 			local term_text = table.concat(lines, "\n")
 
-			-- Check if "-- INSERT --" or "failed to connect" appears in the terminal
-			if term_text:match("-- INSERT --") or term_text:match("failed to connect") then
+			-- Check if we're in insert mode or if terminal is ready
+			if term_text:match("-- INSERT") or term_text:match("failed to connect") then
 				in_insert_mode = true
 			end
 
@@ -86,11 +99,10 @@ local function send_to_claude(content)
 				vim.cmd("sleep 10m")
 			end
 
-			-- Then send the content
+			-- Send the content
 			vim.fn.chansend(term_channel, content .. "\n")
 
-			-- Restore original window focus
-			vim.api.nvim_set_current_win(current_win)
+		-- Don't restore focus immediately - let user see the result in Claude Code
 		else
 			-- Fallback: Use feedkeys
 			vim.cmd("startinsert")
@@ -157,24 +169,6 @@ local function get_agent_buffer()
 end
 
 -- Window management functions
--- Function to resize agent window based on focus
-local function resize_agent_window(win_id)
-	if not vim.api.nvim_win_is_valid(win_id) then
-		return
-	end
-
-	local is_current = (vim.api.nvim_get_current_win() == win_id)
-
-	if is_current then
-		-- If agent window is active, set to 38% of screen height
-		local screen_height = vim.api.nvim_get_option("lines")
-		local height = math.floor(screen_height * 0.38)
-		vim.api.nvim_win_set_height(win_id, height)
-	else
-		-- If agent window is inactive, set to 10 rows
-		vim.api.nvim_win_set_height(win_id, 10)
-	end
-end
 
 local function get_agent_window(agent_buf)
 	agent_buf = agent_buf or get_agent_buffer()
@@ -197,28 +191,9 @@ local function get_agent_window(agent_buf)
 		vim.cmd("new")
 		agent_win = vim.api.nvim_get_current_win()
 		vim.api.nvim_win_set_buf(agent_win, agent_buf)
-
-		-- Create autocommands to resize the window when it gains or loses focus
-		local agent_augroup = vim.api.nvim_create_augroup("AgentWindowResize", { clear = true })
-
-		vim.api.nvim_create_autocmd({ "WinEnter", "WinLeave" }, {
-			group = agent_augroup,
-			callback = function()
-				-- Only resize if the agent window still exists
-				if vim.api.nvim_win_is_valid(agent_win) then
-					resize_agent_window(agent_win)
-				end
-			end,
-		})
-
-		-- Initial resize based on current focus
-		resize_agent_window(agent_win)
 	else
 		-- Focus the existing agent window
 		vim.api.nvim_set_current_win(agent_win)
-
-		-- Resize based on focus
-		resize_agent_window(agent_win)
 	end
 
 	return agent_win
@@ -389,7 +364,7 @@ vim.api.nvim_create_user_command("ClaudeCodeSelection", function(opts)
 			start_line = cursor_pos[1]
 			end_line = cursor_pos[1]
 			start_col = 1
-			end_col = -1  -- Will be handled as full line
+			end_col = -1 -- Will be handled as full line
 		end
 	end
 
@@ -402,7 +377,9 @@ vim.api.nvim_create_user_command("ClaudeCodeSelection", function(opts)
 	local selected_text = {}
 
 	-- Check if this is a line-wise selection (visual line mode 'V')
-	local is_linewise = vim.fn.visualmode() == "V" or (opts.range > 0 and start_col == 1 and end_col == 2147483647) or end_col == -1
+	local is_linewise = vim.fn.visualmode() == "V"
+		or (opts.range > 0 and start_col == 1 and end_col == 2147483647)
+		or end_col == -1
 
 	if is_linewise then
 		-- For line-wise selection, get complete lines
@@ -443,7 +420,7 @@ vim.api.nvim_create_user_command("ClaudeCodeSelection", function(opts)
 
 	-- Get the filetype of the current buffer
 	local filetype = vim.bo[buffer].filetype
-	
+
 	-- Create header text with location information
 	local command_text = "Selection from "
 		.. rel_path
@@ -882,7 +859,7 @@ vim.api.nvim_create_autocmd("BufDelete", {
 		local filetype = vim.bo[ev.buf].filetype
 
 		-- Check if this is a claude-code buffer (terminal with claude-code filetype)
-		if buftype == "terminal" and filetype == "claude-code" then
+		if buftype == "terminal" and filetype == "claudecode" then
 			-- Find and close the agent-input buffer
 			for _, buf in ipairs(vim.api.nvim_list_bufs()) do
 				if vim.api.nvim_buf_is_valid(buf) and vim.api.nvim_buf_get_name(buf):match("agent%-input$") then

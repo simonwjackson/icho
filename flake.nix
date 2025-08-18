@@ -14,7 +14,7 @@
       flake = false;
     };
     claude-code-nvim = {
-      url = "github:greggh/claude-code.nvim";
+      url = "github:simonwjackson/claude-code.nvim/custom";
       flake = false;
     };
     edgy-nvim = {
