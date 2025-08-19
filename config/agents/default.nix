@@ -49,7 +49,8 @@
         git = {
           use_git_root = true,
         },
-        command = "${pkgs.lib.getExe pkgs.bun} x '@anthropic-ai/claude-code' --dangerously-skip-permissions",
+        -- HACK:: https://github.com/anthropics/claude-code/issues/5893#issuecomment-3196248481
+        command = "${pkgs.lib.getExe pkgs.bun} x '@anthropic-ai/claude-code@1.0.81' --dangerously-skip-permissions",
         -- keymaps = {
         --   window_navigation = false,
         -- },
