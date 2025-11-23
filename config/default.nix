@@ -35,8 +35,12 @@
     markdown-preview.enable = true;
     neo-tree = {
       enable = true;
-      filesystem = {
-        hijackNetrwBehavior = "disabled";
+      settings = {
+        log_to_file = false;
+        log_level = "error";
+        filesystem = {
+          hijack_netrw_behavior = "disabled";
+        };
       };
     };
     toggleterm = {
@@ -70,8 +74,10 @@
     web-devicons.enable = true;
 
     # HTTP
+    # TODO: Re-enable once kulala_http treesitter parser is packaged
+    # kulala tries to auto-install its parser which fails in nix sandbox
     kulala = {
-      enable = true;
+      enable = false;
       settings = {
         additional_curl_options = {};
         debug = false;
@@ -148,7 +154,7 @@
     # # Syntax
     todo-comments.enable = true;
     typescript-tools.enable = true;
-    tailwind-tools.enable = true;
+    # tailwind-tools is deprecated (upstream archived)
     scope.enable = true;
     refactoring = {
       enable = true;
@@ -170,8 +176,10 @@
     marks.enable = true;
     navbuddy = {
       enable = true;
-      lsp = {
-        autoAttach = true;
+      settings = {
+        lsp = {
+          auto_attach = true;
+        };
       };
     };
 
@@ -266,6 +274,24 @@
 
   extraConfigLua = ''
     local opt = vim.opt
+
+    -- Liquid template filetype detection
+    vim.filetype.add({
+      extension = {
+        liquid = 'liquid',
+      },
+      pattern = {
+        ['.*%.ts%.liquid'] = 'liquid',
+        ['.*%.tsx%.liquid'] = 'liquid',
+        ['.*%.js%.liquid'] = 'liquid',
+        ['.*%.jsx%.liquid'] = 'liquid',
+        ['.*%.nix%.liquid'] = 'liquid',
+        ['.*%.json%.liquid'] = 'liquid',
+        ['.*%.html%.liquid'] = 'liquid',
+        ['.*%.css%.liquid'] = 'liquid',
+        ['.*%.md%.liquid'] = 'liquid',
+      },
+    })
 
     opt.shortmess:append('filnxtToOCcIF')
 

@@ -24,7 +24,8 @@
         {name = "luasnip";}
         {name = "nvim_lsp";}
         {name = "nvim_lua";}
-        {name = "supermaven";}
+        # supermaven is configured manually in agents/default.nix
+        # to avoid network calls during nix flake check
         {name = "zsh";}
       ];
     };

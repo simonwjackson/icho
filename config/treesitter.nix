@@ -5,44 +5,112 @@
 
   plugins.treesitter-textobjects = {
     enable = true;
-    move = {
-      enable = true;
-      setJumps = true;
-      gotoNextStart = {
-        "]f" = {query = "@function.outer";};
-        "]c" = {query = "@conditional.outer";};
-        "]l" = {query = "@loop.outer";};
-        "]o" = {query = "@class.outer";};
+    settings = {
+      move = {
+        enable = true;
+        set_jumps = true;
+        goto_next_start = {
+          "]f" = {
+            query = "@function.outer";
+            desc = "Next function start";
+          };
+          "]c" = {
+            query = "@conditional.outer";
+            desc = "Next conditional start";
+          };
+          "]l" = {
+            query = "@loop.outer";
+            desc = "Next loop start";
+          };
+          "]o" = {
+            query = "@class.outer";
+            desc = "Next class start";
+          };
+        };
+        goto_next_end = {
+          "]F" = {
+            query = "@function.outer";
+            desc = "Next function end";
+          };
+          "]C" = {
+            query = "@conditional.outer";
+            desc = "Next conditional end";
+          };
+          "]L" = {
+            query = "@loop.outer";
+            desc = "Next loop end";
+          };
+          "]O" = {
+            query = "@class.outer";
+            desc = "Next class end";
+          };
+        };
+        goto_previous_start = {
+          "[f" = {
+            query = "@function.outer";
+            desc = "Previous function start";
+          };
+          "[c" = {
+            query = "@conditional.outer";
+            desc = "Previous conditional start";
+          };
+          "[l" = {
+            query = "@loop.outer";
+            desc = "Previous loop start";
+          };
+          "[o" = {
+            query = "@class.outer";
+            desc = "Previous class start";
+          };
+        };
+        goto_previous_end = {
+          "[F" = {
+            query = "@function.outer";
+            desc = "Previous function end";
+          };
+          "[C" = {
+            query = "@conditional.outer";
+            desc = "Previous conditional end";
+          };
+          "[L" = {
+            query = "@loop.outer";
+            desc = "Previous loop end";
+          };
+          "[O" = {
+            query = "@class.outer";
+            desc = "Previous class end";
+          };
+        };
       };
-      gotoNextEnd = {
-        "]F" = {query = "@function.outer";};
-        "]C" = {query = "@conditional.outer";};
-        "]L" = {query = "@loop.outer";};
-        "]O" = {query = "@class.outer";};
-      };
-      gotoPreviousStart = {
-        "[f" = {query = "@function.outer";};
-        "[c" = {query = "@conditional.outer";};
-        "[l" = {query = "@loop.outer";};
-        "[o" = {query = "@class.outer";};
-      };
-      gotoPreviousEnd = {
-        "[F" = {query = "@function.outer";};
-        "[C" = {query = "@conditional.outer";};
-        "[L" = {query = "@loop.outer";};
-        "[O" = {query = "@class.outer";};
-      };
-    };
-    select = {
-      enable = true;
-      lookahead = true;
-      keymaps = {
-        "af" = {query = "@function.outer";};
-        "if" = {query = "@function.inner";};
-        "ac" = {query = "@conditional.outer";};
-        "ic" = {query = "@conditional.inner";};
-        "al" = {query = "@loop.outer";};
-        "il" = {query = "@loop.inner";};
+      select = {
+        enable = true;
+        lookahead = true;
+        keymaps = {
+          "af" = {
+            query = "@function.outer";
+            desc = "Select outer function";
+          };
+          "if" = {
+            query = "@function.inner";
+            desc = "Select inner function";
+          };
+          "ac" = {
+            query = "@conditional.outer";
+            desc = "Select outer conditional";
+          };
+          "ic" = {
+            query = "@conditional.inner";
+            desc = "Select inner conditional";
+          };
+          "al" = {
+            query = "@loop.outer";
+            desc = "Select outer loop";
+          };
+          "il" = {
+            query = "@loop.inner";
+            desc = "Select inner loop";
+          };
+        };
       };
     };
   };
@@ -50,9 +118,11 @@
   plugins.treesitter-refactor = {
     enable = true;
     # smartRename.enable = true;
-    navigation.enable = true;
-    highlightCurrentScope.enable = false;
-    highlightDefinitions.enable = false;
+    settings = {
+      navigation.enable = true;
+      highlight_current_scope.enable = false;
+      highlight_definitions.enable = false;
+    };
   };
 
   plugins.treesitter = {
@@ -76,12 +146,14 @@
       graphql
       haskell
       html
+      http
       ini
       java
       javascript
       json
       just
       latex
+      liquid
       lua
       make
       markdown
