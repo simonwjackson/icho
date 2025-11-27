@@ -267,6 +267,29 @@
 
         vim.keymap.set('n', '<leader>ap', function() open_compose_prompt() end, { desc = 'Claude Code: Compose prompt' })
 
+        -- Smart open/focus Claude Code (not toggle)
+        vim.keymap.set('n', '<leader>ai', function()
+          -- Find Claude terminal window
+          for _, win in ipairs(vim.api.nvim_list_wins()) do
+            local buf = vim.api.nvim_win_get_buf(win)
+            local name = vim.api.nvim_buf_get_name(buf)
+            if name:match("claude") or name:match("ClaudeCode") or vim.bo[buf].buftype == "terminal" then
+              local chan = vim.bo[buf].channel
+              if chan and chan > 0 then
+                -- Claude window found, focus it
+                vim.api.nvim_set_current_win(win)
+                vim.cmd("startinsert")
+                return
+              end
+            end
+          end
+          -- Not found, open it
+          vim.cmd("silent! ClaudeCode")
+        end, { desc = "Claude Code: Open/Focus" })
+
+        -- Scratchpad shortcut
+        vim.keymap.set('n', '<leader>aI', function() open_compose_prompt() end, { desc = 'Claude Code: Scratchpad' })
+
         -- Compose with current file shown in scratchpad
         vim.keymap.set('n', '<leader>aF', function()
           local file = vim.fn.expand('%:p')
@@ -372,13 +395,6 @@
   # Add convenient keymaps for Claude AI actions
   keymaps = [
     {
-      key = "<leader>ai";
-      action = "<cmd>silent! ClaudeCode<CR>";
-      options = {
-        desc = "Claude Code: Toggle";
-      };
-    }
-    {
       key = "<leader>ac";
       action = "<cmd>silent! ClaudeCode --continue<CR>";
       options = {
@@ -408,17 +424,10 @@
       };
     }
     {
-      key = "<leader>aa";
-      action = "<cmd>silent! ClaudeCodeDiffAccept<CR>";
+      key = "<leader>at";
+      action = "<cmd>silent! ClaudeCode<CR>";
       options = {
-        desc = "Claude Code: Accept diff";
-      };
-    }
-    {
-      key = "<leader>ad";
-      action = "<cmd>silent! ClaudeCodeDiffDeny<CR>";
-      options = {
-        desc = "Claude Code: Deny diff";
+        desc = "Claude Code: Toggle";
       };
     }
     {
