@@ -4,6 +4,38 @@
   ];
   plugins.lspkind.enable = true;
   plugins.lsp = {
+    keymaps = {
+      lspBuf = {
+        gd = {
+          action = "definition";
+          desc = "Go to definition";
+        };
+        gD = {
+          action = "declaration";
+          desc = "Go to declaration";
+        };
+        gr = {
+          action = "references";
+          desc = "Find references";
+        };
+        gi = {
+          action = "implementation";
+          desc = "Go to implementation";
+        };
+        K = {
+          action = "hover";
+          desc = "Hover documentation";
+        };
+        "<leader>rn" = {
+          action = "rename";
+          desc = "Rename symbol";
+        };
+        "<leader>ca" = {
+          action = "code_action";
+          desc = "Code action";
+        };
+      };
+    };
     enable = true;
     servers = {
       astro = {enable = true;};
