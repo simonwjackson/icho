@@ -95,28 +95,46 @@
         vim.g.claude_commands_cache = {}
         vim.g.claude_commands_last_fetch = 0
         vim.g.claude_commands_ttl = 300 -- 5 minutes
+        vim.g.claude_commands_loading = false
 
         -- Fetch slash commands from Claude CLI in background
         local function fetch_claude_commands(callback)
+          vim.g.claude_commands_loading = true
           local cmd = {"sh", "-c", "${pkgs.lib.getExe pkgs.bun} x @anthropic-ai/claude-code -p x --output-format json --tools= --verbose 2>&1"}
           vim.system(cmd, { text = true }, function(obj)
             vim.schedule(function()
+              vim.g.claude_commands_loading = false
+
+              -- Check for non-zero exit code
+              if obj.code ~= 0 then
+                -- Silent fail, keep existing cache
+                if callback then callback(nil) end
+                return
+              end
+
               local output = obj.stdout or ""
               local json_start = output:find("%[{")
-              if json_start then
-                local json_str = output:sub(json_start)
-                local ok, messages = pcall(vim.json.decode, json_str)
-                if ok and type(messages) == "table" then
-                  for _, msg in ipairs(messages) do
-                    if msg.subtype == "init" and msg.slash_commands then
-                      vim.g.claude_commands_cache = msg.slash_commands
-                      vim.g.claude_commands_last_fetch = os.time()
-                      if callback then callback(msg.slash_commands) end
-                      return
-                    end
+              if not json_start then
+                -- No init message found, keep stale cache
+                if callback then callback(nil) end
+                return
+              end
+
+              local json_str = output:sub(json_start)
+              local ok, messages = pcall(vim.json.decode, json_str)
+              if ok and type(messages) == "table" then
+                for _, msg in ipairs(messages) do
+                  if msg.subtype == "init" and msg.slash_commands then
+                    vim.g.claude_commands_cache = msg.slash_commands
+                    vim.g.claude_commands_last_fetch = os.time()
+                    if callback then callback(msg.slash_commands) end
+                    return
                   end
                 end
               end
+
+              -- No init message found in parsed JSON
+              if callback then callback(nil) end
             end)
           end)
         end
@@ -147,11 +165,26 @@
           end,
         })
 
-        -- nvim-cmp source for Claude slash commands
+        -- Persistent compose buffer (declared early for cmp source access)
+        local compose_buf = nil
+
+        -- nvim-cmp source for Claude slash commands (only in scratchpad)
         local claude_commands_source = {}
 
         claude_commands_source.new = function()
           return setmetatable({}, { __index = claude_commands_source })
+        end
+
+        claude_commands_source.is_available = function()
+          -- Only available in the compose scratchpad buffer
+          if not compose_buf or vim.api.nvim_get_current_buf() ~= compose_buf then
+            return false
+          end
+          -- Only trigger if / is at the start of the buffer
+          local cursor = vim.api.nvim_win_get_cursor(0)
+          local row, col = cursor[1], cursor[2]
+          -- Must be on first line, first character position
+          return row == 1 and col <= 1
         end
 
         claude_commands_source.get_trigger_characters = function()
@@ -177,7 +210,7 @@
           callback({ items = items, isIncomplete = false })
         end
 
-        -- Register the source
+        -- Register the source globally (is_available restricts to scratchpad)
         local cmp_ok, cmp = pcall(require, "cmp")
         if cmp_ok then
           cmp.register_source("claude_commands", claude_commands_source.new())
@@ -251,9 +284,6 @@
           end
         end
 
-        -- Persistent compose buffer
-        local compose_buf = nil
-
         -- Compose prompt workflow: floating buffer with Supermaven completions
         -- opts.files: list of file paths to show and add before sending
         -- opts.initial_lines: custom initial content as a table of lines
@@ -269,17 +299,6 @@
             vim.api.nvim_buf_set_option(compose_buf, "swapfile", false)
             vim.api.nvim_buf_set_option(compose_buf, "buftype", "nofile")
 
-            -- Enable claude_commands cmp source for this buffer
-            local cmp_ok, cmp = pcall(require, "cmp")
-            if cmp_ok then
-              cmp.setup.buffer({
-                sources = cmp.config.sources({
-                  { name = "claude_commands" },
-                  { name = "supermaven" },
-                  { name = "buffer" },
-                })
-              })
-            end
           end
 
           local buf = compose_buf
@@ -385,9 +404,17 @@
 
         -- Manual refresh slash commands cache
         vim.keymap.set("n", "<leader>a?", function()
+          if vim.g.claude_commands_loading then
+            vim.notify("Already refreshing...", vim.log.levels.WARN)
+            return
+          end
           vim.notify("Refreshing Claude commands...", vim.log.levels.INFO)
           fetch_claude_commands(function(commands)
-            vim.notify("Loaded " .. #commands .. " commands", vim.log.levels.INFO)
+            if commands and #commands > 0 then
+              vim.notify("Loaded " .. #commands .. " commands", vim.log.levels.INFO)
+            else
+              vim.notify("Failed to load commands", vim.log.levels.WARN)
+            end
           end)
         end, { desc = "Claude Code: Refresh commands" })
 

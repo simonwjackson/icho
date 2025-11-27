@@ -24,6 +24,7 @@
       };
       sources = [
         # Group 1: Paths + AI + LSP (highest priority)
+        {name = "claude_commands"; group_index = 1;}  # Only active in scratchpad (is_available check)
         {name = "async_path"; group_index = 1;}
         {name = "nvim_lsp"; group_index = 1;}
         # supermaven is added manually in agents/default.nix with group_index = 1
