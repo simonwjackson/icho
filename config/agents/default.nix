@@ -124,13 +124,54 @@
           return false
         end
 
+        -- Helper: send content to Claude (handles connection)
+        local function send_content_to_claude(content)
+          local cc = require('claudecode')
+          if cc.is_claude_connected() then
+            send_to_claude_terminal(content)
+          else
+            vim.cmd('ClaudeCode')
+            local attempts = 0
+            local max_attempts = 100
+            local function try_send()
+              attempts = attempts + 1
+              if cc.is_claude_connected() then
+                vim.defer_fn(function()
+                  send_to_claude_terminal(content)
+                end, 200)
+              elseif attempts < max_attempts then
+                vim.defer_fn(try_send, 100)
+              else
+                vim.notify('Claude not connected after 10s', vim.log.levels.ERROR)
+              end
+            end
+            vim.defer_fn(try_send, 100)
+          end
+        end
+
         -- Compose prompt workflow: floating buffer with Supermaven completions
-        vim.keymap.set('n', '<leader>ap', function()
-          local buf = vim.api.nvim_create_buf(true, false) -- listed, not scratch
+        -- opts.files: list of file paths to show and add before sending
+        -- opts.initial_lines: custom initial content as a table of lines
+        local function open_compose_prompt(opts)
+          opts = opts or {}
+          local buf = vim.api.nvim_create_buf(true, false)
           vim.api.nvim_buf_set_name(buf, '/tmp/claude-compose-' .. os.time() .. '.md')
           vim.api.nvim_buf_set_option(buf, 'bufhidden', 'wipe')
           vim.api.nvim_buf_set_option(buf, 'filetype', 'markdown')
           vim.api.nvim_buf_set_option(buf, 'swapfile', false)
+
+          -- Pre-fill buffer content
+          if opts.initial_lines then
+            vim.api.nvim_buf_set_lines(buf, 0, -1, false, opts.initial_lines)
+          elseif opts.files and #opts.files > 0 then
+            local lines = {}
+            for _, file in ipairs(opts.files) do
+              table.insert(lines, "@" .. file)
+            end
+            table.insert(lines, "")
+            table.insert(lines, "")
+            vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+          end
 
           local width = math.floor(vim.o.columns * 0.7)
           local height = math.floor(vim.o.lines * 0.5)
@@ -148,10 +189,11 @@
             footer_pos = 'center',
           })
 
-          -- Start in insert mode and trigger Supermaven
+          -- Move cursor to end and start insert
+          local line_count = vim.api.nvim_buf_line_count(buf)
+          vim.api.nvim_win_set_cursor(win, { line_count, 0 })
           vim.cmd('startinsert')
 
-          -- Trigger Supermaven to attach to this buffer
           vim.schedule(function()
             local sm_ok, sm_api = pcall(require, 'supermaven-nvim.api')
             if sm_ok and sm_api.start then
@@ -159,51 +201,70 @@
             end
           end)
 
-          -- Send content to Claude and close
           local function send_and_close()
             local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
             local content = table.concat(lines, '\n')
-            if content:match('%S') then -- only send if non-empty
+            if content:match('%S') then
               vim.api.nvim_win_close(win, true)
               vim.schedule(function()
-                -- Check if Claude is already connected
-                local cc = require('claudecode')
-                if cc.is_claude_connected() then
-                  send_to_claude_terminal(content)
-                else
-                  -- Open Claude and poll until connected
-                  vim.cmd('ClaudeCode')
-                  local attempts = 0
-                  local max_attempts = 100 -- 10 seconds max
-                  local function try_send()
-                    attempts = attempts + 1
-                    if cc.is_claude_connected() then
-                      -- Small extra delay for TUI to be fully ready
-                      vim.defer_fn(function()
-                        send_to_claude_terminal(content)
-                      end, 200)
-                    elseif attempts < max_attempts then
-                      vim.defer_fn(try_send, 100)
-                    else
-                      vim.notify('Claude not connected after 10s', vim.log.levels.ERROR)
-                    end
+                -- Add files to Claude context first
+                if opts.files then
+                  for _, file in ipairs(opts.files) do
+                    vim.cmd('silent! ClaudeCodeAdd ' .. vim.fn.fnameescape(file))
                   end
-                  vim.defer_fn(try_send, 100)
                 end
+                vim.defer_fn(function()
+                  send_content_to_claude(content)
+                end, opts.files and #opts.files > 0 and 100 or 0)
               end)
             else
               vim.notify('Empty prompt, not sending', vim.log.levels.WARN)
             end
           end
 
-          -- Keybindings for the compose buffer
-          local opts = { buffer = buf, noremap = true, silent = true }
-          vim.keymap.set('n', '<C-CR>', send_and_close, opts)
-          vim.keymap.set('i', '<C-CR>', send_and_close, opts)
+          local buf_opts = { buffer = buf, noremap = true, silent = true }
+          vim.keymap.set('n', '<C-CR>', send_and_close, buf_opts)
+          vim.keymap.set('i', '<C-CR>', send_and_close, buf_opts)
           vim.keymap.set('n', '<Esc><Esc>', function()
             vim.api.nvim_win_close(win, true)
-          end, opts)
-        end, { desc = 'Claude Code: Compose prompt' })
+          end, buf_opts)
+        end
+
+        -- Expose for yazi hook
+        vim.g.claude_open_compose_prompt = open_compose_prompt
+        vim.g.claude_send_content = send_content_to_claude
+
+        vim.keymap.set('n', '<leader>ap', function() open_compose_prompt() end, { desc = 'Claude Code: Compose prompt' })
+
+        -- Compose with current file shown in scratchpad
+        vim.keymap.set('n', '<leader>aF', function()
+          local file = vim.fn.expand('%:p')
+          open_compose_prompt({ files = { file } })
+        end, { desc = 'Claude Code: Compose + send file' })
+
+        -- Select files via yazi, then compose with them shown in scratchpad
+        vim.keymap.set('n', '<leader>aE', function()
+          vim.g.claude_yazi_mode = true
+          vim.g.claude_compose_after_yazi = true
+          require('yazi').yazi()
+        end, { desc = 'Claude Code: Add files (yazi) + compose' })
+
+        -- Compose with visual selection shown in scratchpad
+        vim.keymap.set("v", "<leader>aV", function()
+          -- Get visual selection
+          vim.cmd('normal! "vy')
+          local selection = vim.fn.getreg("v")
+          local file = vim.fn.expand("%:p")
+          local backticks = string.rep("`", 3)
+          local initial_lines = { "@" .. file, "", backticks }
+          for line in selection:gmatch("[^\n]+") do
+            table.insert(initial_lines, line)
+          end
+          table.insert(initial_lines, backticks)
+          table.insert(initial_lines, "")
+          table.insert(initial_lines, "")
+          open_compose_prompt({ initial_lines = initial_lines })
+        end, { desc = "Claude Code: Selection + compose" })
       end
     end
   '';

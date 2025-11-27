@@ -13,10 +13,20 @@
             function(chosen_files, config, state)
               if vim.g.claude_yazi_mode then
                 vim.g.claude_yazi_mode = false
-                for _, file in ipairs(chosen_files) do
-                  vim.cmd("ClaudeCodeAdd " .. vim.fn.fnameescape(file))
+                local should_compose = vim.g.claude_compose_after_yazi
+                vim.g.claude_compose_after_yazi = false
+                if should_compose and vim.g.claude_open_compose_prompt then
+                  -- Open scratchpad with selected files shown
+                  vim.schedule(function()
+                    vim.g.claude_open_compose_prompt({ files = chosen_files })
+                  end)
+                else
+                  -- Just add files directly (original <leader>ae behavior)
+                  for _, file in ipairs(chosen_files) do
+                    vim.cmd("ClaudeCodeAdd " .. vim.fn.fnameescape(file))
+                  end
+                  vim.notify("Added " .. #chosen_files .. " file(s) to Claude", vim.log.levels.INFO)
                 end
-                vim.notify("Added " .. #chosen_files .. " file(s) to Claude", vim.log.levels.INFO)
               else
                 -- Default: open in quickfix
                 local items = {}
