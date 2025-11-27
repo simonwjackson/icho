@@ -140,6 +140,49 @@
           fetch_claude_commands()
         end, 2000)
 
+        -- Refresh cache on directory change
+        vim.api.nvim_create_autocmd("DirChanged", {
+          callback = function()
+            fetch_claude_commands()
+          end,
+        })
+
+        -- nvim-cmp source for Claude slash commands
+        local claude_commands_source = {}
+
+        claude_commands_source.new = function()
+          return setmetatable({}, { __index = claude_commands_source })
+        end
+
+        claude_commands_source.get_trigger_characters = function()
+          return { "/" }
+        end
+
+        claude_commands_source.get_keyword_pattern = function()
+          return [[\%(/\w*\)]]
+        end
+
+        claude_commands_source.complete = function(self, params, callback)
+          local items = {}
+          local commands = vim.g.claude_commands_cache or {}
+
+          for _, cmd in ipairs(commands) do
+            table.insert(items, {
+              label = "/" .. cmd,
+              kind = require("cmp").lsp.CompletionItemKind.Function,
+              insertText = "/" .. cmd,
+            })
+          end
+
+          callback({ items = items, isIncomplete = false })
+        end
+
+        -- Register the source
+        local cmp_ok, cmp = pcall(require, "cmp")
+        if cmp_ok then
+          cmp.register_source("claude_commands", claude_commands_source.new())
+        end
+
         -- Helper: find Claude Code terminal and send text
         local function send_to_claude_terminal(text)
           -- Find the Claude Code terminal buffer
@@ -216,6 +259,7 @@
         -- opts.initial_lines: custom initial content as a table of lines
         local function open_compose_prompt(opts)
           opts = opts or {}
+          refresh_if_stale()
 
           -- Reuse existing buffer or create new one
           if not compose_buf or not vim.api.nvim_buf_is_valid(compose_buf) then
@@ -224,6 +268,18 @@
             vim.api.nvim_buf_set_option(compose_buf, "filetype", "markdown")
             vim.api.nvim_buf_set_option(compose_buf, "swapfile", false)
             vim.api.nvim_buf_set_option(compose_buf, "buftype", "nofile")
+
+            -- Enable claude_commands cmp source for this buffer
+            local cmp_ok, cmp = pcall(require, "cmp")
+            if cmp_ok then
+              cmp.setup.buffer({
+                sources = cmp.config.sources({
+                  { name = "claude_commands" },
+                  { name = "supermaven" },
+                  { name = "buffer" },
+                })
+              })
+            end
           end
 
           local buf = compose_buf
@@ -326,6 +382,14 @@
         -- Expose for yazi hook
         vim.g.claude_open_compose_prompt = open_compose_prompt
         vim.g.claude_send_content = send_content_to_claude
+
+        -- Manual refresh slash commands cache
+        vim.keymap.set("n", "<leader>a?", function()
+          vim.notify("Refreshing Claude commands...", vim.log.levels.INFO)
+          fetch_claude_commands(function(commands)
+            vim.notify("Loaded " .. #commands .. " commands", vim.log.levels.INFO)
+          end)
+        end, { desc = "Claude Code: Refresh commands" })
 
         vim.keymap.set('n', '<leader>ap', function() open_compose_prompt() end, { desc = 'Claude Code: Compose prompt' })
 
