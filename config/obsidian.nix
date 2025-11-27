@@ -60,6 +60,7 @@
     enable = true;
     autoLoad = true;
     settings = {
+      legacy_commands = false;
       workspaces = [
         {
           name = "personal";
