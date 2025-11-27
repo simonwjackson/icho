@@ -37,6 +37,8 @@
         };
       };
       nil_ls = {enable = true;};
+      pyright = {enable = true;};
+      ruff = {enable = true;};
       tailwindcss = {
         enable = true;
         settings = {

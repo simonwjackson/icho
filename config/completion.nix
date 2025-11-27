@@ -15,18 +15,24 @@
     enable = true;
     autoEnableSources = true;
     settings = {
+      mapping = {
+        "<C-n>" = "cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select })";
+        "<C-p>" = "cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select })";
+        "<C-y>" = "cmp.mapping.confirm({ select = true })";
+        "<C-e>" = "cmp.mapping.abort()";
+        "<CR>" = "cmp.mapping.confirm({ select = false })";
+      };
       sources = [
-        {name = "async_path";}
-        {name = "buffer";}
-        {name = "cmdline";}
-        {name = "cmdline_history";}
-        {name = "emoji";}
-        {name = "luasnip";}
-        {name = "nvim_lsp";}
-        {name = "nvim_lua";}
-        # supermaven is configured manually in agents/default.nix
-        # to avoid network calls during nix flake check
-        {name = "zsh";}
+        # Group 1: Paths + AI + LSP (highest priority)
+        {name = "async_path"; group_index = 1;}
+        {name = "nvim_lsp"; group_index = 1;}
+        # supermaven is added manually in agents/default.nix with group_index = 1
+        # Group 2: Everything else (fallback)
+        {name = "cmdline"; group_index = 2;}
+        {name = "cmdline_history"; group_index = 2;}
+        {name = "emoji"; group_index = 2;}
+        {name = "nvim_lua"; group_index = 2;}
+        {name = "zsh"; group_index = 2;}
       ];
     };
   };

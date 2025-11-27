@@ -32,11 +32,11 @@
           end -- condition to check for stopping supermaven, `true` means to stop supermaven when the condition is true.
         })
 
-        -- Register supermaven as a cmp source
+        -- Register supermaven as a cmp source (group 1 = highest priority)
         local cmp_ok, cmp = pcall(require, "cmp")
         if cmp_ok then
           local config = cmp.get_config()
-          table.insert(config.sources, { name = "supermaven" })
+          table.insert(config.sources, 1, { name = "supermaven", group_index = 1 })
           cmp.setup(config)
         end
       end
