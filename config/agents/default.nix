@@ -59,6 +59,27 @@
             vertical_split = true,
           },
         })
+
+        -- Auto-reload buffers when files change on disk (for Claude Code edits)
+        vim.o.autoread = true
+
+        -- Timer-based file change detection
+        local refresh_timer = vim.uv.new_timer()
+        refresh_timer:start(0, 1000, vim.schedule_wrap(function()
+          if vim.fn.getcmdwintype() == "" then
+            vim.cmd("silent! checktime")
+          end
+        end))
+
+        -- Also check on focus/buffer events
+        vim.api.nvim_create_autocmd({"FocusGained", "BufEnter", "CursorHold"}, {
+          group = vim.api.nvim_create_augroup("ClaudeCodeAutoReload", { clear = true }),
+          callback = function()
+            if vim.fn.getcmdwintype() == "" then
+              vim.cmd("silent! checktime")
+            end
+          end,
+        })
       end
     end
   '';
