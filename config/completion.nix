@@ -15,6 +15,11 @@
     enable = true;
     autoEnableSources = true;
     settings = {
+      window = {
+        completion = {
+          max_height = 5;
+        };
+      };
       mapping = {
         "<C-n>" = "cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select })";
         "<C-p>" = "cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select })";
