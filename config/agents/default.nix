@@ -1,13 +1,12 @@
 {pkgs, ...}: {
   extraPackages = [
-    # pkgs.claude-code
     pkgs.bun
   ];
 
   # Add plugins
   extraPlugins = with pkgs; [
     vimPlugins.supermaven-nvim # AI code completion
-    vimPlugins.claude-code-nvim
+    vimPlugins.claudecode-nvim
     vimPlugins.plenary-nvim # Required dependency
     vimPlugins.telescope-nvim # For file selection
   ];
@@ -41,40 +40,79 @@
           cmp.setup(config)
         end
       end
+
+      -- claudecode.nvim setup (skip in headless mode)
+      local claude_ok, claudecode = pcall(require, "claudecode")
+      if claude_ok then
+        claudecode.setup({
+          auto_start = true,
+          log_level = "info",
+          terminal_cmd = "${pkgs.lib.getExe pkgs.bun} x @anthropic-ai/claude-code --dangerously-skip-permissions",
+          terminal = {
+            split_side = "right",
+            split_width_percentage = 0.40,
+            provider = "native",
+            auto_close = true,
+          },
+          diff_opts = {
+            auto_close_on_accept = true,
+            vertical_split = true,
+          },
+        })
+      end
     end
-
-    require("claude-code").setup({
-        window = {
-          -- split_ratio = 0.381,
-          position = 'vertical', -- Test the new "none" position option
-          enter_insert = true,
-          hide_numbers = true,
-          hide_signcolumn = true,
-        },
-        refresh = {
-          enable = true,
-          updatetime = 100,
-          timer_interval = 1000,
-          show_notifications = true,
-        },
-        git = {
-          use_git_root = true,
-        },
-        command = "${pkgs.lib.getExe pkgs.bun} x '@anthropic-ai/claude-code' --dangerously-skip-permissions",
-        -- keymaps = {
-        --   window_navigation = false,
-        -- },
-    })
-
   '';
 
   # Add convenient keymaps for Claude AI actions
   keymaps = [
     {
       key = "<leader>ai";
-      action = "<cmd>lua require('claude-code').toggle()<CR>";
+      action = "<cmd>ClaudeCode<CR>";
       options = {
         desc = "Claude Code: Toggle";
+      };
+    }
+    {
+      key = "<leader>ac";
+      action = "<cmd>ClaudeCode --continue<CR>";
+      options = {
+        desc = "Claude Code: Continue";
+      };
+    }
+    {
+      key = "<leader>ar";
+      action = "<cmd>ClaudeCode --resume<CR>";
+      options = {
+        desc = "Claude Code: Resume";
+      };
+    }
+    {
+      key = "<leader>af";
+      action = "<cmd>ClaudeCodeAdd %<CR>";
+      options = {
+        desc = "Claude Code: Send file";
+      };
+    }
+    {
+      key = "<leader>av";
+      action = "<cmd>ClaudeCodeSend<CR>";
+      mode = "v";
+      options = {
+        desc = "Claude Code: Send selection";
+      };
+    }
+    {
+      key = "<leader>aa";
+      action = "<cmd>ClaudeCodeDiffAccept<CR>";
+      options = {
+        desc = "Claude Code: Accept diff";
+      };
+    }
+    {
+      key = "<leader>ad";
+      action = "<cmd>ClaudeCodeDiffDeny<CR>";
+      options = {
+        desc = "Claude Code: Deny diff";
       };
     }
   ];

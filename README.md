@@ -181,7 +181,7 @@ This configuration includes a variety of plugins:
 ### AI
 
 - **supermaven-nvim**: AI code completion with customizable keymaps and conditions.
-- **avante**: AI-powered plugin (specific functionality not detailed in the config).
+- **claudecode.nvim**: Deep integration with Claude Code CLI via WebSocket MCP protocol.
 
 ### Keyboard
 

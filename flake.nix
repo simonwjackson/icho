@@ -4,7 +4,10 @@
   inputs = {
     flake-parts.url = "github:hercules-ci/flake-parts";
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
-    nixvim.url = "github:nix-community/nixvim";
+    nixvim = {
+      url = "github:nix-community/nixvim";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     vim-overseer = {
       url = "github:simonwjackson/overseer.nvim/custom";
       flake = false;
@@ -13,8 +16,8 @@
       url = "github:nanozuki/tabby.nvim";
       flake = false;
     };
-    claude-code-nvim = {
-      url = "github:simonwjackson/claude-code.nvim/custom";
+    claudecode-nvim = {
+      url = "github:coder/claudecode.nvim";
       flake = false;
     };
     edgy-nvim = {
@@ -55,6 +58,9 @@
           };
           overlays = [
             (final: prev: {
+              neovim-unwrapped = prev.neovim-unwrapped.overrideAttrs (old: {
+                disallowedRequisites = [];
+              });
               vimPlugins =
                 prev.vimPlugins
                 // {
@@ -63,9 +69,9 @@
                     name = "tabby-nvim";
                     src = inputs.tabby-nvim;
                   };
-                  claude-code-nvim = final.vimUtils.buildVimPlugin {
-                    name = "claude-code-nvim";
-                    src = inputs.claude-code-nvim;
+                  claudecode-nvim = final.vimUtils.buildVimPlugin {
+                    name = "claudecode-nvim";
+                    src = inputs.claudecode-nvim;
                   };
                   edgy-nvim = final.vimUtils.buildVimPlugin {
                     name = "edgy-nvim";

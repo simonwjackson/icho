@@ -1,19 +1,18 @@
 {
   "nodes": {
-    "claude-code-nvim": {
+    "claudecode-nvim": {
       "flake": false,
       "locked": {
-        "lastModified": 1755484473,
-        "narHash": "sha256-6qVWHgaEattXpKnQCiMYB6pt6qs4L+ZhSXuZ9ZEe8VA=",
-        "owner": "simonwjackson",
-        "repo": "claude-code.nvim",
-        "rev": "0d3963d70b1a868524e3a8069cda8194b716895a",
+        "lastModified": 1760892433,
+        "narHash": "sha256-XYmf1RQ2bVK6spINZW4rg6OQQ5CWWcR0Tw4QX8ZDjgs=",
+        "owner": "coder",
+        "repo": "claudecode.nvim",
+        "rev": "1552086ebcce9f4a2ea3b9793018a884d6b60169",
         "type": "github"
       },
       "original": {
-        "owner": "simonwjackson",
-        "ref": "custom",
-        "repo": "claude-code.nvim",
+        "owner": "coder",
+        "repo": "claudecode.nvim",
         "type": "github"
       }
     },
@@ -221,11 +220,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1763618868,
-        "narHash": "sha256-v5afmLjn/uyD9EQuPBn7nZuaZVV9r+JerayK/4wvdWA=",
+        "lastModified": 1764167966,
+        "narHash": "sha256-nXv6xb7cq+XpjBYIjWEGTLCqQetxJu6zvVlrqHMsCOA=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "a8d610af3f1a5fb71e23e08434d8d61a466fc942",
+        "rev": "5c46f3bd98147c8d82366df95bbef2cab3a967ea",
         "type": "github"
       },
       "original": {
@@ -252,22 +251,6 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1763618868,
-        "narHash": "sha256-v5afmLjn/uyD9EQuPBn7nZuaZVV9r+JerayK/4wvdWA=",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "a8d610af3f1a5fb71e23e08434d8d61a466fc942",
-        "type": "github"
-      },
-      "original": {
-        "owner": "NixOS",
-        "ref": "nixpkgs-unstable",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
-    "nixpkgs_3": {
-      "locked": {
         "lastModified": 1716137900,
         "narHash": "sha256-sowPU+tLQv8GlqtVtsXioTKeaQvlMz/pefcdwg8MvfM=",
         "owner": "nixos",
@@ -282,7 +265,7 @@
         "type": "github"
       }
     },
-    "nixpkgs_4": {
+    "nixpkgs_3": {
       "locked": {
         "lastModified": 1672428209,
         "narHash": "sha256-eejhqkDz2cb2vc5VeaWphJz8UXNuoNoM8/Op8eWv2tQ=",
@@ -301,16 +284,18 @@
     "nixvim": {
       "inputs": {
         "flake-parts": "flake-parts_2",
-        "nixpkgs": "nixpkgs_2",
+        "nixpkgs": [
+          "nixpkgs"
+        ],
         "nuschtosSearch": "nuschtosSearch",
         "systems": "systems_2"
       },
       "locked": {
-        "lastModified": 1763819965,
-        "narHash": "sha256-zDXFIuTMrmpf6xzDebNdQTv3qNs3BFJrhHa+qYbzDko=",
+        "lastModified": 1764238240,
+        "narHash": "sha256-7Znm3koZ4sF+O41Y7rJqf651BPEbjIUYF3r9H23GRGw=",
         "owner": "nix-community",
         "repo": "nixvim",
-        "rev": "2606dc719488065e735ff0fc622d743566b21ad4",
+        "rev": "f1e07ba53abd0fb4872a365cba45562144ad6130",
         "type": "github"
       },
       "original": {
@@ -321,7 +306,7 @@
     },
     "nmd": {
       "inputs": {
-        "nixpkgs": "nixpkgs_4",
+        "nixpkgs": "nixpkgs_3",
         "scss-reset": "scss-reset"
       },
       "locked": {
@@ -380,7 +365,7 @@
     },
     "root": {
       "inputs": {
-        "claude-code-nvim": "claude-code-nvim",
+        "claudecode-nvim": "claudecode-nvim",
         "edgy-nvim": "edgy-nvim",
         "flake-parts": "flake-parts",
         "nixpkgs": "nixpkgs",
@@ -542,7 +527,7 @@
     },
     "tmesh": {
       "inputs": {
-        "nixpkgs": "nixpkgs_3",
+        "nixpkgs": "nixpkgs_2",
         "snowfall-frost": "snowfall-frost",
         "snowfall-lib": "snowfall-lib_2"
       },

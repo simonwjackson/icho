@@ -32,7 +32,11 @@
         },
         {
           title = "Claude Code",
-          ft = "claudecode",
+          ft = "terminal",
+          filter = function(buf)
+            local bufname = vim.api.nvim_buf_get_name(buf)
+            return bufname:match("claude") ~= nil
+          end,
         },
         {
           title = "Agent Input",
