@@ -67,35 +67,35 @@
   keymaps = [
     {
       key = "<leader>ai";
-      action = "<cmd>ClaudeCode<CR>";
+      action = "<cmd>silent! ClaudeCode<CR>";
       options = {
         desc = "Claude Code: Toggle";
       };
     }
     {
       key = "<leader>ac";
-      action = "<cmd>ClaudeCode --continue<CR>";
+      action = "<cmd>silent! ClaudeCode --continue<CR>";
       options = {
         desc = "Claude Code: Continue";
       };
     }
     {
       key = "<leader>ar";
-      action = "<cmd>ClaudeCode --resume<CR>";
+      action = "<cmd>silent! ClaudeCode --resume<CR>";
       options = {
         desc = "Claude Code: Resume";
       };
     }
     {
       key = "<leader>af";
-      action = "<cmd>ClaudeCodeAdd %<CR>";
+      action = "<cmd>silent! ClaudeCodeAdd %<CR>";
       options = {
         desc = "Claude Code: Send file";
       };
     }
     {
       key = "<leader>av";
-      action = "<cmd>ClaudeCodeSend<CR>";
+      action = "<cmd>silent! ClaudeCodeSend<CR>";
       mode = "v";
       options = {
         desc = "Claude Code: Send selection";
@@ -103,14 +103,14 @@
     }
     {
       key = "<leader>aa";
-      action = "<cmd>ClaudeCodeDiffAccept<CR>";
+      action = "<cmd>silent! ClaudeCodeDiffAccept<CR>";
       options = {
         desc = "Claude Code: Accept diff";
       };
     }
     {
       key = "<leader>ad";
-      action = "<cmd>ClaudeCodeDiffDeny<CR>";
+      action = "<cmd>silent! ClaudeCodeDiffDeny<CR>";
       options = {
         desc = "Claude Code: Deny diff";
       };
