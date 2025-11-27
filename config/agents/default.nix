@@ -149,53 +149,82 @@
           end
         end
 
+        -- Persistent compose buffer
+        local compose_buf = nil
+
         -- Compose prompt workflow: floating buffer with Supermaven completions
         -- opts.files: list of file paths to show and add before sending
         -- opts.initial_lines: custom initial content as a table of lines
         local function open_compose_prompt(opts)
           opts = opts or {}
-          local buf = vim.api.nvim_create_buf(true, false)
-          vim.api.nvim_buf_set_name(buf, '/tmp/claude-compose-' .. os.time() .. '.md')
-          vim.api.nvim_buf_set_option(buf, 'bufhidden', 'wipe')
-          vim.api.nvim_buf_set_option(buf, 'filetype', 'markdown')
-          vim.api.nvim_buf_set_option(buf, 'swapfile', false)
 
-          -- Pre-fill buffer content
+          -- Reuse existing buffer or create new one
+          if not compose_buf or not vim.api.nvim_buf_is_valid(compose_buf) then
+            compose_buf = vim.api.nvim_create_buf(true, true)
+            vim.api.nvim_buf_set_option(compose_buf, "bufhidden", "hide")
+            vim.api.nvim_buf_set_option(compose_buf, "filetype", "markdown")
+            vim.api.nvim_buf_set_option(compose_buf, "swapfile", false)
+            vim.api.nvim_buf_set_option(compose_buf, "buftype", "nofile")
+          end
+
+          local buf = compose_buf
+
+          -- Append content if provided (don't replace existing)
+          local current_lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+          local has_content = #current_lines > 1 or (current_lines[1] and current_lines[1] ~= "")
+
           if opts.initial_lines then
-            vim.api.nvim_buf_set_lines(buf, 0, -1, false, opts.initial_lines)
-          elseif opts.files and #opts.files > 0 then
-            local lines = {}
-            for _, file in ipairs(opts.files) do
-              table.insert(lines, "@" .. file)
+            if has_content then
+              -- Append to existing content
+              table.insert(current_lines, "")
+              for _, line in ipairs(opts.initial_lines) do
+                table.insert(current_lines, line)
+              end
+              vim.api.nvim_buf_set_lines(buf, 0, -1, false, current_lines)
+            else
+              vim.api.nvim_buf_set_lines(buf, 0, -1, false, opts.initial_lines)
             end
-            table.insert(lines, "")
-            table.insert(lines, "")
-            vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+          elseif opts.files and #opts.files > 0 then
+            local new_lines = {}
+            for _, file in ipairs(opts.files) do
+              table.insert(new_lines, "@" .. file)
+            end
+            table.insert(new_lines, "")
+            table.insert(new_lines, "")
+            if has_content then
+              table.insert(current_lines, "")
+              for _, line in ipairs(new_lines) do
+                table.insert(current_lines, line)
+              end
+              vim.api.nvim_buf_set_lines(buf, 0, -1, false, current_lines)
+            else
+              vim.api.nvim_buf_set_lines(buf, 0, -1, false, new_lines)
+            end
           end
 
           local width = math.floor(vim.o.columns * 0.7)
           local height = math.floor(vim.o.lines * 0.5)
           local win = vim.api.nvim_open_win(buf, true, {
-            relative = 'editor',
+            relative = "editor",
             width = width,
             height = height,
             col = math.floor((vim.o.columns - width) / 2),
             row = math.floor((vim.o.lines - height) / 2),
-            style = 'minimal',
-            border = 'rounded',
-            title = ' Compose Prompt (Supermaven active) ',
-            title_pos = 'center',
-            footer = ' <C-CR> send | <Esc><Esc> cancel ',
-            footer_pos = 'center',
+            style = "minimal",
+            border = "rounded",
+            title = " Compose Prompt (Supermaven active) ",
+            title_pos = "center",
+            footer = " <C-CR> send | <Esc><Esc> cancel ",
+            footer_pos = "center",
           })
 
           -- Move cursor to end and start insert
           local line_count = vim.api.nvim_buf_line_count(buf)
           vim.api.nvim_win_set_cursor(win, { line_count, 0 })
-          vim.cmd('startinsert')
+          vim.cmd("startinsert")
 
           vim.schedule(function()
-            local sm_ok, sm_api = pcall(require, 'supermaven-nvim.api')
+            local sm_ok, sm_api = pcall(require, "supermaven-nvim.api")
             if sm_ok and sm_api.start then
               sm_api.start()
             end
@@ -203,14 +232,16 @@
 
           local function send_and_close()
             local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
-            local content = table.concat(lines, '\n')
-            if content:match('%S') then
+            local content = table.concat(lines, "\n")
+            if content:match("%S") then
               vim.api.nvim_win_close(win, true)
+              -- Clear buffer after sending
+              vim.api.nvim_buf_set_lines(buf, 0, -1, false, {""})
               vim.schedule(function()
                 -- Add files to Claude context first
                 if opts.files then
                   for _, file in ipairs(opts.files) do
-                    vim.cmd('silent! ClaudeCodeAdd ' .. vim.fn.fnameescape(file))
+                    vim.cmd("silent! ClaudeCodeAdd " .. vim.fn.fnameescape(file))
                   end
                 end
                 vim.defer_fn(function()
@@ -218,14 +249,14 @@
                 end, opts.files and #opts.files > 0 and 100 or 0)
               end)
             else
-              vim.notify('Empty prompt, not sending', vim.log.levels.WARN)
+              vim.notify("Empty prompt, not sending", vim.log.levels.WARN)
             end
           end
 
           local buf_opts = { buffer = buf, noremap = true, silent = true }
-          vim.keymap.set('n', '<C-CR>', send_and_close, buf_opts)
-          vim.keymap.set('i', '<C-CR>', send_and_close, buf_opts)
-          vim.keymap.set('n', '<Esc><Esc>', function()
+          vim.keymap.set("n", "<C-CR>", send_and_close, buf_opts)
+          vim.keymap.set("i", "<C-CR>", send_and_close, buf_opts)
+          vim.keymap.set("n", "<Esc><Esc>", function()
             vim.api.nvim_win_close(win, true)
           end, buf_opts)
         end
@@ -265,6 +296,75 @@
           table.insert(initial_lines, "")
           open_compose_prompt({ initial_lines = initial_lines })
         end, { desc = "Claude Code: Selection + compose" })
+
+        -- Helper: get unique files from grep results
+        local function get_unique_files(selections)
+          local files = {}
+          local seen = {}
+          for _, entry in ipairs(selections) do
+            local file = entry.filename or entry.path
+            if file and not seen[file] then
+              seen[file] = true
+              table.insert(files, file)
+            end
+          end
+          return files
+        end
+
+        -- Telescope grep -> send to Claude
+        vim.keymap.set("n", "<leader>aw", function()
+          local actions = require("telescope.actions")
+          local action_state = require("telescope.actions.state")
+          require("telescope.builtin").live_grep({
+            attach_mappings = function(prompt_bufnr, map)
+              local function send_to_claude()
+                local picker = action_state.get_current_picker(prompt_bufnr)
+                local selections = picker:get_multi_selection()
+                if #selections == 0 then
+                  local entry = action_state.get_selected_entry()
+                  if entry then selections = { entry } end
+                end
+                actions.close(prompt_bufnr)
+                if #selections > 0 then
+                  local files = get_unique_files(selections)
+                  for _, file in ipairs(files) do
+                    vim.cmd("silent! ClaudeCodeAdd " .. vim.fn.fnameescape(file))
+                  end
+                  vim.notify("Added " .. #files .. " file(s) to Claude", vim.log.levels.INFO)
+                end
+              end
+              map("i", "<CR>", send_to_claude)
+              map("n", "<CR>", send_to_claude)
+              return true
+            end,
+          })
+        end, { desc = "Claude Code: Grep + send" })
+
+        -- Telescope grep -> scratchpad
+        vim.keymap.set("n", "<leader>aW", function()
+          local actions = require("telescope.actions")
+          local action_state = require("telescope.actions.state")
+          require("telescope.builtin").live_grep({
+            attach_mappings = function(prompt_bufnr, map)
+              local function send_to_scratchpad()
+                local picker = action_state.get_current_picker(prompt_bufnr)
+                local selections = picker:get_multi_selection()
+                if #selections == 0 then
+                  local entry = action_state.get_selected_entry()
+                  if entry then selections = { entry } end
+                end
+                actions.close(prompt_bufnr)
+                if #selections > 0 then
+                  local files = get_unique_files(selections)
+                  open_compose_prompt({ files = files })
+                end
+              end
+              map("i", "<CR>", send_to_scratchpad)
+              map("n", "<CR>", send_to_scratchpad)
+              return true
+            end,
+          })
+        end, { desc = "Claude Code: Grep + compose" })
       end
     end
   '';
