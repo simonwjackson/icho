@@ -66,88 +66,15 @@
         -- },
     })
 
-    ${builtins.readFile ./agent-commands.lua}
   '';
 
   # Add convenient keymaps for Claude AI actions
   keymaps = [
-    # Chats
     {
       key = "<leader>ai";
-      action = "<cmd>ClaudeCodeInput<CR>";
+      action = "<cmd>lua require('claude-code').toggle()<CR>";
       options = {
-        desc = "Claude Code: Toggle Input Buffer";
-      };
-    }
-
-    # Context: Selection
-    {
-      mode = "n";
-      key = "<leader>av";
-      action = "<cmd>ClaudeCodeSelection<CR>";
-      options = {
-        desc = "Send current line to Claude Code";
-      };
-    }
-    {
-      mode = "v";
-      key = "<leader>av";
-      action = ":<C-u>ClaudeCodeSelection<CR>";
-      options = {
-        desc = "Send visual selection to Claude Code";
-      };
-    }
-    {
-      mode = "x";
-      key = "<leader>av";
-      action = ":<C-u>ClaudeCodeSelection<CR>";
-      options = {
-        desc = "Send visual selection to Claude Code";
-      };
-    }
-
-    # Context: Paths
-    {
-      key = "<leader>aff";
-      action = "<cmd>ClaudeCodeFile<CR>";
-      options = {
-        desc = "Claude Code: File (add)";
-      };
-    }
-    {
-      key = "<leader>afe";
-      action = "<cmd>ClaudeCodeFiles<CR>";
-      options = {
-        desc = "Claude Code: Files (multi add)";
-      };
-    }
-    {
-      key = "<leader>afw";
-      action = "<cmd>ClaudeCodeFilesWithContent<CR>";
-      options = {
-        desc = "Claude Code: Files by content search";
-      };
-    }
-    {
-      key = "<leader>afd";
-      action = "<cmd>ClaudeCodeDirectories<CR>";
-      options = {
-        desc = "Claude Code: Directories";
-      };
-    }
-
-    {
-      key = "<leader>ap";
-      action = "<cmd>ClaudeCodePrompt<CR>";
-      options = {
-        desc = "Claude Code: Prompts";
-      };
-    }
-    {
-      key = "<leader>aP";
-      action = "<cmd>Explore ~/.claude/commands<CR>";
-      options = {
-        desc = "Open netrw to prompt directory";
+        desc = "Claude Code: Toggle";
       };
     }
   ];
