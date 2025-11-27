@@ -115,5 +115,12 @@
         desc = "Claude Code: Deny diff";
       };
     }
+    {
+      key = "<leader>ae";
+      action = "<cmd>lua vim.g.claude_yazi_mode = true; require('yazi').yazi()<CR>";
+      options = {
+        desc = "Claude Code: Add files (yazi)";
+      };
+    }
   ];
 }

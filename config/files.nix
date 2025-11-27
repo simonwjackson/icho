@@ -8,6 +8,27 @@
       enable = true;
       settings = {
         floating_window_scaling_factor = 0.618;
+        hooks = {
+          yazi_opened_multiple_files.__raw = ''
+            function(chosen_files, config, state)
+              if vim.g.claude_yazi_mode then
+                vim.g.claude_yazi_mode = false
+                for _, file in ipairs(chosen_files) do
+                  vim.cmd("ClaudeCodeAdd " .. vim.fn.fnameescape(file))
+                end
+                vim.notify("Added " .. #chosen_files .. " file(s) to Claude", vim.log.levels.INFO)
+              else
+                -- Default: open in quickfix
+                local items = {}
+                for _, file in ipairs(chosen_files) do
+                  table.insert(items, { filename = file, text = file })
+                end
+                vim.fn.setqflist(items)
+                vim.cmd("copen")
+              end
+            end
+          '';
+        };
       };
     };
   };
