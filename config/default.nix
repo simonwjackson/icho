@@ -20,6 +20,7 @@
     ./gutter.nix
     ./lsp.nix
     ./movements.nix
+    ./obsidian.nix
     ./snippets.nix
     ./sessions
     ./splits.nix
@@ -171,7 +172,6 @@
       };
     };
     nvim-surround.enable = true;
-    # obsidian.enable = true;
 
     marks.enable = true;
     navbuddy = {
