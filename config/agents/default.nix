@@ -44,6 +44,16 @@
       -- claudecode.nvim setup (skip in headless mode)
       local claude_ok, claudecode = pcall(require, "claudecode")
       if claude_ok then
+        -- Shared background for compose prompt and terminals
+        vim.api.nvim_set_hl(0, "TerminalBackground", { bg = "#1a1b26" })
+
+        -- Apply background to all terminal windows
+        vim.api.nvim_create_autocmd("TermOpen", {
+          group = vim.api.nvim_create_augroup("TerminalBackgroundGroup", { clear = true }),
+          callback = function()
+            vim.wo.winhighlight = "Normal:TerminalBackground,NormalFloat:TerminalBackground"
+          end,
+        })
         claudecode.setup({
           auto_start = true,
           log_level = "info",
@@ -80,6 +90,55 @@
             end
           end,
         })
+
+        -- Slash command cache for completions
+        vim.g.claude_commands_cache = {}
+        vim.g.claude_commands_last_fetch = 0
+        vim.g.claude_commands_ttl = 300 -- 5 minutes
+
+        -- Fetch slash commands from Claude CLI in background
+        local function fetch_claude_commands(callback)
+          local cmd = {"sh", "-c", "${pkgs.lib.getExe pkgs.bun} x @anthropic-ai/claude-code -p x --output-format json --tools= --verbose 2>&1"}
+          vim.system(cmd, { text = true }, function(obj)
+            vim.schedule(function()
+              local output = obj.stdout or ""
+              local json_start = output:find("%[{")
+              if json_start then
+                local json_str = output:sub(json_start)
+                local ok, messages = pcall(vim.json.decode, json_str)
+                if ok and type(messages) == "table" then
+                  for _, msg in ipairs(messages) do
+                    if msg.subtype == "init" and msg.slash_commands then
+                      vim.g.claude_commands_cache = msg.slash_commands
+                      vim.g.claude_commands_last_fetch = os.time()
+                      if callback then callback(msg.slash_commands) end
+                      return
+                    end
+                  end
+                end
+              end
+            end)
+          end)
+        end
+
+        -- Check if cache is stale
+        local function is_cache_stale()
+          return os.time() - vim.g.claude_commands_last_fetch > vim.g.claude_commands_ttl
+        end
+
+        -- Refresh cache if stale (non-blocking)
+        local function refresh_if_stale(callback)
+          if is_cache_stale() then
+            fetch_claude_commands(callback)
+          elseif callback then
+            callback(vim.g.claude_commands_cache)
+          end
+        end
+
+        -- Initial fetch on startup (delayed to not block)
+        vim.defer_fn(function()
+          fetch_claude_commands()
+        end, 2000)
 
         -- Helper: find Claude Code terminal and send text
         local function send_to_claude_terminal(text)
@@ -217,6 +276,9 @@
             footer = " <C-CR> send | <Esc><Esc> cancel ",
             footer_pos = "center",
           })
+
+          -- Apply shared background
+          vim.wo[win].winhighlight = "Normal:TerminalBackground,NormalFloat:TerminalBackground"
 
           -- Move cursor to end and start insert
           local line_count = vim.api.nvim_buf_line_count(buf)
