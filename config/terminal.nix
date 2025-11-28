@@ -24,6 +24,12 @@
           winblend = 0;
         };
         highlights = {
+          Normal = {
+            guibg = "#1a1b26";
+          };
+          NormalFloat = {
+            guibg = "#1a1b26";
+          };
           FloatBorder = {
             guifg = "#7aa2f7";
             guibg = "NONE";
