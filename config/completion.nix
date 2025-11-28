@@ -1,5 +1,8 @@
 {...}: {
   extraConfigLua = ''
+    -- Limit completion popup height
+    vim.opt.pumheight = 5
+
     -- lspkind.lua
     local lspkind = require("lspkind")
     lspkind.init({
@@ -15,11 +18,6 @@
     enable = true;
     autoEnableSources = true;
     settings = {
-      window = {
-        completion = {
-          max_height = 5;
-        };
-      };
       mapping = {
         "<C-n>" = "cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select })";
         "<C-p>" = "cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select })";
