@@ -348,7 +348,7 @@
             border = "rounded",
             title = " Compose Prompt (Supermaven active) ",
             title_pos = "center",
-            footer = " <C-CR> send | <Esc><Esc> cancel ",
+            footer = " <C-s> send | <Esc><Esc> cancel ",
             footer_pos = "center",
           })
 
@@ -391,8 +391,8 @@
           end
 
           local buf_opts = { buffer = buf, noremap = true, silent = true }
-          vim.keymap.set("n", "<C-CR>", send_and_close, buf_opts)
-          vim.keymap.set("i", "<C-CR>", send_and_close, buf_opts)
+          vim.keymap.set("n", "<C-s>", send_and_close, buf_opts)
+          vim.keymap.set("i", "<C-s>", send_and_close, buf_opts)
           vim.keymap.set("n", "<Esc><Esc>", function()
             vim.api.nvim_win_close(win, true)
           end, buf_opts)
