@@ -1,0 +1,11 @@
+pre-commit:
+  parallel: true
+  commands:
+    gitleaks:
+      glob: '*'
+      run: gitleaks protect --staged --verbose
+      fail_text: Secrets detected! Remove them before committing.
+    nixfmt:
+      glob: '*.nix'
+      run: nixfmt {staged_files}
+      stage_fixed: true
