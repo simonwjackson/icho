@@ -1,7 +1,9 @@
-{...}: {
+{ ... }:
+{
   imports = [
     ./agents
     ./clipboard.nix
+    ./plugins/claude-instances
     ./color.nix
     ./completion.nix
     ./database.nix
