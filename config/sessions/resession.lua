@@ -268,6 +268,7 @@ vim.api.nvim_create_autocmd("User", {
 				id = id,
 				cwd = data.cwd,
 				args = data.args or "",
+				session_id = data.session_id,
 			})
 		end
 
@@ -298,6 +299,7 @@ vim.api.nvim_create_autocmd("VimLeavePre", {
 				id = id,
 				cwd = data.cwd,
 				args = data.args or "",
+				session_id = data.session_id,
 			})
 		end
 
@@ -341,7 +343,8 @@ vim.api.nvim_create_autocmd("User", {
 				_G.claude_spawn_instance({
 					id = inst.id,
 					cwd = inst.cwd,
-					args = inst.args,
+					args = inst.args or "",
+					session_id = inst.session_id, -- Triggers --resume <session_id>
 				})
 				-- Close immediately so they're available but not in the way
 				vim.defer_fn(function()

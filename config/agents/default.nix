@@ -581,8 +581,9 @@
         local function get_instance_display_name(id, data)
           if data.terminal and data.terminal.bufnr and vim.api.nvim_buf_is_valid(data.terminal.bufnr) then
             local title = vim.b[data.terminal.bufnr].term_title
-            if title and title ~= "" then
-              -- Clean up common prefixes and extract meaningful part
+            -- Skip if empty or if it's just the buffer name (term://...)
+            if title and title ~= "" and not title:match("^term://") then
+              -- Clean up common prefixes
               title = title:gsub("^Claude Code%s*[-–]?%s*", "")
               title = title:gsub("^claude%s*[-–]?%s*", "")
               if title ~= "" then
@@ -593,6 +594,23 @@
           return id -- Fallback to ID
         end
 
+        -- Generate UUID for session tracking
+        local function generate_uuid()
+          local handle = io.popen("uuidgen 2>/dev/null || cat /proc/sys/kernel/random/uuid")
+          if handle then
+            local uuid = handle:read("*a"):gsub("%s+", "")
+            handle:close()
+            return uuid
+          end
+          -- Fallback: generate a pseudo-UUID
+          return string.format("%08x-%04x-%04x-%04x-%012x",
+            math.random(0, 0xffffffff),
+            math.random(0, 0xffff),
+            math.random(0, 0x0fff) + 0x4000,
+            math.random(0, 0x3fff) + 0x8000,
+            math.random(0, 0xffffffffffff))
+        end
+
         -- Spawn a new Claude instance
         local function spawn_claude_instance(opts)
           opts = opts or {}
@@ -601,9 +619,29 @@
           local cwd = opts.cwd or vim.fn.getcwd()
           local args = opts.args or ""
 
+          -- Session ID: use provided one (for restore) or generate new
+          local session_id = opts.session_id or generate_uuid()
+          local is_restore = opts.session_id ~= nil
+
+          -- Build command args with session tracking
+          local cmd_args
+          if is_restore then
+            -- Restoring: use --resume <session_id>
+            cmd_args = "--resume " .. session_id
+            if args ~= "" then
+              cmd_args = cmd_args .. " " .. args
+            end
+          else
+            -- New instance: use --session-id <uuid>
+            cmd_args = "--session-id " .. session_id
+            if args ~= "" then
+              cmd_args = cmd_args .. " " .. args
+            end
+          end
+
           -- Create terminal
           local term = Terminal:new({
-            cmd = get_claude_cmd(args),
+            cmd = get_claude_cmd(cmd_args),
             dir = cwd,
             direction = "float",
             float_opts = {
@@ -624,19 +662,19 @@
                 vim.api.nvim_create_autocmd("TermRequest", {
                   buffer = t.bufnr,
                   callback = function(ev)
-                    -- TermRequest fires when terminal sends escape sequences
-                    -- Title updates come through here
                     vim.defer_fn(function()
                       if t.window and vim.api.nvim_win_is_valid(t.window) then
-                        local title = vim.b[t.bufnr].term_title or "Claude Code"
-                        -- Truncate long titles
-                        if #title > 50 then
-                          title = title:sub(1, 47) .. "..."
+                        local title = vim.b[t.bufnr].term_title
+                        -- Only update if we have a real title (not buffer name)
+                        if title and title ~= "" and not title:match("^term://") then
+                          if #title > 50 then
+                            title = title:sub(1, 47) .. "..."
+                          end
+                          vim.api.nvim_win_set_config(t.window, {
+                            title = " " .. title .. " ",
+                            title_pos = "center",
+                          })
                         end
-                        vim.api.nvim_win_set_config(t.window, {
-                          title = " " .. title .. " ",
-                          title_pos = "center",
-                        })
                       end
                     end, 50)
                   end,
@@ -655,6 +693,7 @@
             cwd = cwd,
             created_at = os.time(),
             args = args,
+            session_id = session_id,
           }
 
           term:open()
