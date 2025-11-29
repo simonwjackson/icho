@@ -9,6 +9,7 @@
     vimPlugins.claudecode-nvim
     vimPlugins.plenary-nvim # Required dependency
     vimPlugins.telescope-nvim # For file selection
+    vimPlugins.toggleterm-nvim # Multi-terminal management
   ];
 
   extraConfigLua = ''
@@ -541,6 +542,310 @@
             end,
           })
         end, { desc = "Claude Code: Grep + compose" })
+      end
+
+      -- =====================================================
+      -- Multi-Instance Claude Code Management (toggleterm)
+      -- =====================================================
+      local toggleterm_ok, toggleterm = pcall(require, "toggleterm")
+      if toggleterm_ok then
+        local Terminal = require("toggleterm.terminal").Terminal
+
+        -- Configure toggleterm defaults
+        toggleterm.setup({
+          shade_terminals = false,
+          float_opts = {
+            border = "rounded",
+            winblend = 0,
+          },
+          highlights = {
+            Normal = { link = "TerminalBackground" },
+            NormalFloat = { link = "TerminalBackground" },
+          },
+        })
+
+        -- Instance registry: { name = { terminal, cwd, created_at, args } }
+        local claude_instances = {}
+        local instance_counter = 0
+
+        -- Get Claude CLI command
+        local function get_claude_cmd(args)
+          local cmd = "${pkgs.lib.getExe pkgs.bun} x @anthropic-ai/claude-code --dangerously-skip-permissions"
+          if args and args ~= "" then
+            cmd = cmd .. " " .. args
+          end
+          return cmd
+        end
+
+        -- Spawn a new Claude instance
+        local function spawn_claude_instance(opts)
+          opts = opts or {}
+          instance_counter = instance_counter + 1
+          local name = opts.name or ("claude-" .. instance_counter)
+          local cwd = opts.cwd or vim.fn.getcwd()
+          local args = opts.args or ""
+
+          -- Create terminal
+          local term = Terminal:new({
+            cmd = get_claude_cmd(args),
+            dir = cwd,
+            direction = "float",
+            float_opts = {
+              border = "rounded",
+              width = math.floor(vim.o.columns * 0.8),
+              height = math.floor(vim.o.lines * 0.8),
+              title = " " .. name .. " ",
+              title_pos = "center",
+            },
+            hidden = false,
+            on_open = function(t)
+              vim.cmd("startinsert!")
+              -- Apply background
+              vim.wo.winhighlight = "Normal:TerminalBackground,NormalFloat:TerminalBackground"
+            end,
+            on_exit = function(t, job, exit_code, event_name)
+              -- Remove from registry on exit
+              claude_instances[name] = nil
+            end,
+          })
+
+          -- Register and open
+          claude_instances[name] = {
+            terminal = term,
+            cwd = cwd,
+            created_at = os.time(),
+            args = args,
+          }
+
+          term:open()
+
+          -- Send initial prompt if provided
+          if opts.prompt and opts.prompt ~= "" then
+            vim.defer_fn(function()
+              term:send(opts.prompt)
+            end, 500)
+          end
+
+          return name
+        end
+
+        -- List all instances
+        local function list_instances()
+          local instances = {}
+          for name, data in pairs(claude_instances) do
+            table.insert(instances, {
+              name = name,
+              cwd = data.cwd,
+              created_at = data.created_at,
+              is_open = data.terminal:is_open(),
+            })
+          end
+          -- Sort by creation time
+          table.sort(instances, function(a, b)
+            return a.created_at < b.created_at
+          end)
+          return instances
+        end
+
+        -- Focus an instance by name
+        local function focus_instance(name)
+          local data = claude_instances[name]
+          if data and data.terminal then
+            data.terminal:open()
+            vim.cmd("startinsert!")
+            return true
+          end
+          return false
+        end
+
+        -- Close an instance by name
+        local function close_instance(name)
+          local data = claude_instances[name]
+          if data and data.terminal then
+            data.terminal:shutdown()
+            claude_instances[name] = nil
+            return true
+          end
+          return false
+        end
+
+        -- Close all instances
+        local function close_all_instances()
+          for name, _ in pairs(claude_instances) do
+            close_instance(name)
+          end
+        end
+
+        -- Get current instance (if in a Claude terminal)
+        local function get_current_instance()
+          local current_buf = vim.api.nvim_get_current_buf()
+          for name, data in pairs(claude_instances) do
+            if data.terminal.bufnr == current_buf then
+              return name, data
+            end
+          end
+          return nil, nil
+        end
+
+        -- Navigate to next/previous instance
+        local function navigate_instance(direction)
+          local instances = list_instances()
+          if #instances == 0 then
+            vim.notify("No Claude instances", vim.log.levels.WARN)
+            return
+          end
+
+          local current_name = get_current_instance()
+          local current_idx = 1
+
+          if current_name then
+            for i, inst in ipairs(instances) do
+              if inst.name == current_name then
+                current_idx = i
+                break
+              end
+            end
+          end
+
+          local next_idx
+          if direction == "next" then
+            next_idx = (current_idx % #instances) + 1
+          else
+            next_idx = ((current_idx - 2) % #instances) + 1
+          end
+
+          focus_instance(instances[next_idx].name)
+        end
+
+        -- Telescope picker for instances
+        local function pick_claude_instance()
+          local pickers = require("telescope.pickers")
+          local finders = require("telescope.finders")
+          local conf = require("telescope.config").values
+          local actions = require("telescope.actions")
+          local action_state = require("telescope.actions.state")
+          local previewers = require("telescope.previewers")
+
+          local instances = list_instances()
+
+          if #instances == 0 then
+            vim.notify("No Claude instances. Use <leader>an to create one.", vim.log.levels.INFO)
+            return
+          end
+
+          pickers.new({}, {
+            prompt_title = "Claude Instances",
+            finder = finders.new_table({
+              results = instances,
+              entry_maker = function(entry)
+                local age = os.time() - entry.created_at
+                local age_str
+                if age < 60 then
+                  age_str = age .. "s"
+                elseif age < 3600 then
+                  age_str = math.floor(age / 60) .. "m"
+                else
+                  age_str = math.floor(age / 3600) .. "h"
+                end
+
+                local status = entry.is_open and "●" or "○"
+                local display = string.format("%s %-12s %-30s %s",
+                  status, entry.name, entry.cwd:gsub(vim.env.HOME, "~"), age_str)
+
+                return {
+                  value = entry,
+                  display = display,
+                  ordinal = entry.name .. " " .. entry.cwd,
+                }
+              end,
+            }),
+            sorter = conf.generic_sorter({}),
+            attach_mappings = function(prompt_bufnr, map)
+              -- Enter: focus instance
+              actions.select_default:replace(function()
+                local selection = action_state.get_selected_entry()
+                actions.close(prompt_bufnr)
+                if selection then
+                  focus_instance(selection.value.name)
+                end
+              end)
+
+              -- Ctrl-d: delete instance
+              map("i", "<C-d>", function()
+                local selection = action_state.get_selected_entry()
+                if selection then
+                  close_instance(selection.value.name)
+                  vim.notify("Closed " .. selection.value.name, vim.log.levels.INFO)
+                  -- Refresh picker
+                  actions.close(prompt_bufnr)
+                  vim.defer_fn(pick_claude_instance, 100)
+                end
+              end)
+
+              -- Ctrl-n: new instance
+              map("i", "<C-n>", function()
+                actions.close(prompt_bufnr)
+                spawn_claude_instance()
+              end)
+
+              return true
+            end,
+          }):find()
+        end
+
+        -- Prompt for named instance
+        local function spawn_named_instance()
+          vim.ui.input({ prompt = "Instance name: " }, function(name)
+            if name and name ~= "" then
+              spawn_claude_instance({ name = name })
+            end
+          end)
+        end
+
+        -- Expose functions globally for resession hooks
+        vim.g.claude_spawn_instance = spawn_claude_instance
+        vim.g.claude_list_instances = list_instances
+        vim.g.claude_focus_instance = focus_instance
+        vim.g.claude_close_instance = close_instance
+        vim.g.claude_close_all_instances = close_all_instances
+
+        -- Store reference to registry for resession
+        _G.claude_instances_registry = claude_instances
+        _G.claude_spawn_instance = spawn_claude_instance
+
+        -- Keybindings for multi-instance management
+        vim.keymap.set("n", "<leader>an", function()
+          spawn_claude_instance()
+        end, { desc = "Claude: New instance" })
+
+        vim.keymap.set("n", "<leader>aN", spawn_named_instance, { desc = "Claude: New named instance" })
+
+        vim.keymap.set("n", "<leader>al", pick_claude_instance, { desc = "Claude: List instances" })
+
+        vim.keymap.set("n", "<leader>a]", function()
+          navigate_instance("next")
+        end, { desc = "Claude: Next instance" })
+
+        vim.keymap.set("n", "<leader>a[", function()
+          navigate_instance("prev")
+        end, { desc = "Claude: Previous instance" })
+
+        vim.keymap.set("n", "<leader>ax", function()
+          local name = get_current_instance()
+          if name then
+            close_instance(name)
+            vim.notify("Closed " .. name, vim.log.levels.INFO)
+          else
+            vim.notify("Not in a Claude instance", vim.log.levels.WARN)
+          end
+        end, { desc = "Claude: Close current instance" })
+
+        vim.keymap.set("n", "<leader>aX", function()
+          local count = 0
+          for _ in pairs(claude_instances) do count = count + 1 end
+          close_all_instances()
+          vim.notify("Closed " .. count .. " instance(s)", vim.log.levels.INFO)
+        end, { desc = "Claude: Close all instances" })
       end
     end
   '';

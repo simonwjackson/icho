@@ -242,3 +242,116 @@ vim.api.nvim_create_autocmd("VimEnter", {
 	end,
 	nested = true,
 })
+
+-- =====================================================
+-- Claude Instances Persistence Extension
+-- =====================================================
+
+-- File to store claude instances metadata (alongside .resession.json)
+local function get_claude_instances_file()
+	return get_session_dir() .. "/.claude-instances.json"
+end
+
+-- Save claude instances metadata before session save
+vim.api.nvim_create_autocmd("User", {
+	pattern = "ResessionSavePre",
+	callback = function()
+		-- Check if we have any claude instances
+		if not _G.claude_instances_registry then
+			return
+		end
+
+		local instances_data = {}
+		for name, data in pairs(_G.claude_instances_registry) do
+			-- Only save metadata, not the terminal object
+			table.insert(instances_data, {
+				name = name,
+				cwd = data.cwd,
+				args = data.args or "",
+			})
+		end
+
+		if #instances_data > 0 then
+			local file = io.open(get_claude_instances_file(), "w")
+			if file then
+				file:write(vim.json.encode(instances_data))
+				file:close()
+			end
+		else
+			-- Remove file if no instances
+			os.remove(get_claude_instances_file())
+		end
+	end,
+})
+
+-- Also save on VimLeavePre (before the main session save)
+vim.api.nvim_create_autocmd("VimLeavePre", {
+	group = vim.api.nvim_create_augroup("ClaudeInstancesSave", { clear = true }),
+	callback = function()
+		if not _G.claude_instances_registry then
+			return
+		end
+
+		local instances_data = {}
+		for name, data in pairs(_G.claude_instances_registry) do
+			table.insert(instances_data, {
+				name = name,
+				cwd = data.cwd,
+				args = data.args or "",
+			})
+		end
+
+		if #instances_data > 0 then
+			local file = io.open(get_claude_instances_file(), "w")
+			if file then
+				file:write(vim.json.encode(instances_data))
+				file:close()
+			end
+		else
+			os.remove(get_claude_instances_file())
+		end
+	end,
+})
+
+-- Restore claude instances after session load
+vim.api.nvim_create_autocmd("User", {
+	pattern = "ResessionLoadPost",
+	callback = function()
+		-- Wait for toggleterm to be initialized
+		vim.defer_fn(function()
+			if not _G.claude_spawn_instance then
+				return
+			end
+
+			local file = io.open(get_claude_instances_file(), "r")
+			if not file then
+				return
+			end
+
+			local content = file:read("*all")
+			file:close()
+
+			local ok, instances_data = pcall(vim.json.decode, content)
+			if not ok or type(instances_data) ~= "table" then
+				return
+			end
+
+			-- Restore each instance
+			for _, inst in ipairs(instances_data) do
+				_G.claude_spawn_instance({
+					name = inst.name,
+					cwd = inst.cwd,
+					args = inst.args,
+				})
+				-- Close immediately so they're available but not in the way
+				vim.defer_fn(function()
+					if _G.claude_instances_registry and _G.claude_instances_registry[inst.name] then
+						_G.claude_instances_registry[inst.name].terminal:close()
+					end
+				end, 100)
+			end
+
+			vim.notify("Restored " .. #instances_data .. " Claude instance(s)", vim.log.levels.INFO)
+		end, 500)
+	end,
+})
