@@ -857,13 +857,25 @@
 
         vim.keymap.set("n", "<leader>al", pick_claude_instance, { desc = "Claude: List instances" })
 
-        vim.keymap.set("n", "<leader>a]", function()
-          navigate_instance("next")
-        end, { desc = "Claude: Next instance" })
+        -- Cycle instances with C-n/C-p when in a Claude float (normal + terminal mode)
+        for _, mode in ipairs({"n", "t"}) do
+          vim.keymap.set(mode, "<C-n>", function()
+            if get_current_instance() then
+              navigate_instance("next")
+            else
+              -- Pass through
+              vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<C-n>", true, false, true), "n", false)
+            end
+          end, { desc = "Claude: Next instance" })
 
-        vim.keymap.set("n", "<leader>a[", function()
-          navigate_instance("prev")
-        end, { desc = "Claude: Previous instance" })
+          vim.keymap.set(mode, "<C-p>", function()
+            if get_current_instance() then
+              navigate_instance("prev")
+            else
+              vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<C-p>", true, false, true), "n", false)
+            end
+          end, { desc = "Claude: Previous instance" })
+        end
 
         vim.keymap.set("n", "<leader>ax", function()
           local id, data = get_current_instance()
