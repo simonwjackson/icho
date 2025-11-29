@@ -622,24 +622,21 @@
           local session_id = opts.session_id or generate_uuid()
           local is_restore = opts.session_id ~= nil
 
-          -- TEMP: Test without --session-id to check if it affects terminal titles
-          local cmd_args = args
-
-          -- -- Build command args with session tracking
-          -- local cmd_args
-          -- if is_restore then
-          --   -- Restoring: use --resume <session_id>
-          --   cmd_args = "--resume " .. session_id
-          --   if args ~= "" then
-          --     cmd_args = cmd_args .. " " .. args
-          --   end
-          -- else
-          --   -- New instance: use --session-id <uuid>
-          --   cmd_args = "--session-id " .. session_id
-          --   if args ~= "" then
-          --     cmd_args = cmd_args .. " " .. args
-          --   end
-          -- end
+          -- Build command args with session tracking
+          local cmd_args
+          if is_restore then
+            -- Restoring: use --resume <session_id>
+            cmd_args = "--resume " .. session_id
+            if args ~= "" then
+              cmd_args = cmd_args .. " " .. args
+            end
+          else
+            -- New instance: use --session-id <uuid>
+            cmd_args = "--session-id " .. session_id
+            if args ~= "" then
+              cmd_args = cmd_args .. " " .. args
+            end
+          end
 
           -- Create terminal
           local term = Terminal:new({
