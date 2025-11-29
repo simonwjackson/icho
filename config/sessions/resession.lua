@@ -252,67 +252,21 @@ local function get_claude_instances_file()
 	return get_session_dir() .. "/.claude-instances.json"
 end
 
--- Save claude instances metadata before session save
+-- Save on session save and exit (uses function from agents/default.nix)
+local function trigger_save()
+	if _G.claude_save_instances then
+		_G.claude_save_instances()
+	end
+end
+
 vim.api.nvim_create_autocmd("User", {
 	pattern = "ResessionSavePre",
-	callback = function()
-		-- Check if we have any claude instances
-		if not _G.claude_instances_registry then
-			return
-		end
-
-		local instances_data = {}
-		for id, data in pairs(_G.claude_instances_registry) do
-			-- Only save metadata, not the terminal object
-			table.insert(instances_data, {
-				id = id,
-				cwd = data.cwd,
-				args = data.args or "",
-				session_id = data.session_id,
-			})
-		end
-
-		if #instances_data > 0 then
-			local file = io.open(get_claude_instances_file(), "w")
-			if file then
-				file:write(vim.json.encode(instances_data))
-				file:close()
-			end
-		else
-			-- Remove file if no instances
-			os.remove(get_claude_instances_file())
-		end
-	end,
+	callback = trigger_save,
 })
 
--- Also save on VimLeavePre (before the main session save)
 vim.api.nvim_create_autocmd("VimLeavePre", {
 	group = vim.api.nvim_create_augroup("ClaudeInstancesSave", { clear = true }),
-	callback = function()
-		if not _G.claude_instances_registry then
-			return
-		end
-
-		local instances_data = {}
-		for id, data in pairs(_G.claude_instances_registry) do
-			table.insert(instances_data, {
-				id = id,
-				cwd = data.cwd,
-				args = data.args or "",
-				session_id = data.session_id,
-			})
-		end
-
-		if #instances_data > 0 then
-			local file = io.open(get_claude_instances_file(), "w")
-			if file then
-				file:write(vim.json.encode(instances_data))
-				file:close()
-			end
-		else
-			os.remove(get_claude_instances_file())
-		end
-	end,
+	callback = trigger_save,
 })
 
 -- Restore claude instances after session load
@@ -345,6 +299,7 @@ vim.api.nvim_create_autocmd("User", {
 					cwd = inst.cwd,
 					args = inst.args or "",
 					session_id = inst.session_id, -- Triggers --resume <session_id>
+					last_title = inst.last_title, -- Restore saved title
 				})
 				-- Close immediately so they're available but not in the way
 				vim.defer_fn(function()

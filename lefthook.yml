@@ -9,9 +9,8 @@ pre-commit:
       glob: '*.nix'
       run: nixfmt {staged_files}
       stage_fixed: true
-
 pre-push:
   commands:
     flake-check:
       run: nix flake check
-      fail_text: Flake check failed! Fix issues before pushing.
+      fail_text: Flake check failed! Fix issues before pushing

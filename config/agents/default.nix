@@ -1,4 +1,5 @@
-{pkgs, ...}: {
+{ pkgs, ... }:
+{
   extraPackages = [
     pkgs.bun
   ];
@@ -568,6 +569,43 @@
         local claude_instances = {}
         local instance_counter = 0
 
+        -- Get session directory (mirrors resession.lua logic)
+        local function get_session_dir()
+          local git_root = vim.fn.system("git rev-parse --show-toplevel 2>/dev/null"):gsub("\n", "")
+          if vim.v.shell_error ~= 0 then
+            return vim.fn.getcwd()
+          end
+          return git_root
+        end
+
+        -- Save instances to file (called on title change)
+        local function save_claude_instances()
+          local instances_data = {}
+          for id, data in pairs(claude_instances) do
+            table.insert(instances_data, {
+              id = id,
+              cwd = data.cwd,
+              args = data.args or "",
+              session_id = data.session_id,
+              last_title = data.last_title,
+            })
+          end
+
+          local file_path = get_session_dir() .. "/.claude-instances.json"
+          if #instances_data > 0 then
+            local file = io.open(file_path, "w")
+            if file then
+              file:write(vim.json.encode(instances_data))
+              file:close()
+            end
+          else
+            os.remove(file_path)
+          end
+        end
+
+        -- Expose for resession hooks
+        _G.claude_save_instances = save_claude_instances
+
         -- Get Claude CLI command
         local function get_claude_cmd(args)
           local cmd = "${pkgs.lib.getExe pkgs.bun} x @anthropic-ai/claude-code --dangerously-skip-permissions"
@@ -579,15 +617,26 @@
 
         -- Get display name for an instance (uses terminal title if available)
         local function get_instance_display_name(id, data)
+          -- Try live terminal title first
           if data.terminal and data.terminal.bufnr and vim.api.nvim_buf_is_valid(data.terminal.bufnr) then
             local title = vim.b[data.terminal.bufnr].term_title
-            if title and title ~= "" then
+            -- Skip buffer name format (term://...) - wait for real title
+            if title and title ~= "" and not title:match("^term://") then
               -- Clean up common prefixes and extract meaningful part
               title = title:gsub("^Claude Code%s*[-–]?%s*", "")
               title = title:gsub("^claude%s*[-–]?%s*", "")
               if title ~= "" then
                 return title
               end
+            end
+          end
+          -- Fall back to stored last_title (persisted across restarts)
+          if data.last_title and data.last_title ~= "" then
+            local title = data.last_title
+            title = title:gsub("^Claude Code%s*[-–]?%s*", "")
+            title = title:gsub("^claude%s*[-–]?%s*", "")
+            if title ~= "" then
+              return title
             end
           end
           return id -- Fallback to ID
@@ -658,22 +707,28 @@
 
               -- Watch for title changes and update float title
               if t.bufnr then
+                local instance_id = id
                 vim.api.nvim_create_autocmd("TermRequest", {
                   buffer = t.bufnr,
                   callback = function(ev)
-                    -- TermRequest fires when terminal sends escape sequences
-                    -- Title updates come through here
                     vim.defer_fn(function()
-                      if t.window and vim.api.nvim_win_is_valid(t.window) then
-                        local title = vim.b[t.bufnr].term_title or "Claude Code"
-                        -- Truncate long titles
-                        if #title > 50 then
-                          title = title:sub(1, 47) .. "..."
+                      if not vim.api.nvim_buf_is_valid(t.bufnr) then return end
+                      local title = vim.b[t.bufnr].term_title
+                      if title and title ~= "" and not title:match("^term://") then
+                        if claude_instances[instance_id] then
+                          claude_instances[instance_id].last_title = title
+                          save_claude_instances()
                         end
-                        vim.api.nvim_win_set_config(t.window, {
-                          title = " " .. title .. " ",
-                          title_pos = "center",
-                        })
+                        if t.window and vim.api.nvim_win_is_valid(t.window) then
+                          local display_title = title
+                          if #display_title > 50 then
+                            display_title = display_title:sub(1, 47) .. "..."
+                          end
+                          vim.api.nvim_win_set_config(t.window, {
+                            title = " " .. display_title .. " ",
+                            title_pos = "center",
+                          })
+                        end
                       end
                     end, 50)
                   end,
@@ -693,6 +748,7 @@
             created_at = os.time(),
             args = args,
             session_id = session_id,
+            last_title = opts.last_title, -- Restore saved title
           }
 
           term:open()
