@@ -581,9 +581,8 @@
         local function get_instance_display_name(id, data)
           if data.terminal and data.terminal.bufnr and vim.api.nvim_buf_is_valid(data.terminal.bufnr) then
             local title = vim.b[data.terminal.bufnr].term_title
-            -- Skip if empty or if it's just the buffer name (term://...)
-            if title and title ~= "" and not title:match("^term://") then
-              -- Clean up common prefixes
+            if title and title ~= "" then
+              -- Clean up common prefixes and extract meaningful part
               title = title:gsub("^Claude Code%s*[-–]?%s*", "")
               title = title:gsub("^claude%s*[-–]?%s*", "")
               if title ~= "" then
@@ -623,21 +622,24 @@
           local session_id = opts.session_id or generate_uuid()
           local is_restore = opts.session_id ~= nil
 
-          -- Build command args with session tracking
-          local cmd_args
-          if is_restore then
-            -- Restoring: use --resume <session_id>
-            cmd_args = "--resume " .. session_id
-            if args ~= "" then
-              cmd_args = cmd_args .. " " .. args
-            end
-          else
-            -- New instance: use --session-id <uuid>
-            cmd_args = "--session-id " .. session_id
-            if args ~= "" then
-              cmd_args = cmd_args .. " " .. args
-            end
-          end
+          -- TEMP: Test without --session-id to check if it affects terminal titles
+          local cmd_args = args
+
+          -- -- Build command args with session tracking
+          -- local cmd_args
+          -- if is_restore then
+          --   -- Restoring: use --resume <session_id>
+          --   cmd_args = "--resume " .. session_id
+          --   if args ~= "" then
+          --     cmd_args = cmd_args .. " " .. args
+          --   end
+          -- else
+          --   -- New instance: use --session-id <uuid>
+          --   cmd_args = "--session-id " .. session_id
+          --   if args ~= "" then
+          --     cmd_args = cmd_args .. " " .. args
+          --   end
+          -- end
 
           -- Create terminal
           local term = Terminal:new({
@@ -662,19 +664,19 @@
                 vim.api.nvim_create_autocmd("TermRequest", {
                   buffer = t.bufnr,
                   callback = function(ev)
+                    -- TermRequest fires when terminal sends escape sequences
+                    -- Title updates come through here
                     vim.defer_fn(function()
                       if t.window and vim.api.nvim_win_is_valid(t.window) then
-                        local title = vim.b[t.bufnr].term_title
-                        -- Only update if we have a real title (not buffer name)
-                        if title and title ~= "" and not title:match("^term://") then
-                          if #title > 50 then
-                            title = title:sub(1, 47) .. "..."
-                          end
-                          vim.api.nvim_win_set_config(t.window, {
-                            title = " " .. title .. " ",
-                            title_pos = "center",
-                          })
+                        local title = vim.b[t.bufnr].term_title or "Claude Code"
+                        -- Truncate long titles
+                        if #title > 50 then
+                          title = title:sub(1, 47) .. "..."
                         end
+                        vim.api.nvim_win_set_config(t.window, {
+                          title = " " .. title .. " ",
+                          title_pos = "center",
+                        })
                       end
                     end, 50)
                   end,
