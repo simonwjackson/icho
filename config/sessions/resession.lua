@@ -262,10 +262,10 @@ vim.api.nvim_create_autocmd("User", {
 		end
 
 		local instances_data = {}
-		for name, data in pairs(_G.claude_instances_registry) do
+		for id, data in pairs(_G.claude_instances_registry) do
 			-- Only save metadata, not the terminal object
 			table.insert(instances_data, {
-				name = name,
+				id = id,
 				cwd = data.cwd,
 				args = data.args or "",
 			})
@@ -293,9 +293,9 @@ vim.api.nvim_create_autocmd("VimLeavePre", {
 		end
 
 		local instances_data = {}
-		for name, data in pairs(_G.claude_instances_registry) do
+		for id, data in pairs(_G.claude_instances_registry) do
 			table.insert(instances_data, {
-				name = name,
+				id = id,
 				cwd = data.cwd,
 				args = data.args or "",
 			})
@@ -339,14 +339,14 @@ vim.api.nvim_create_autocmd("User", {
 			-- Restore each instance
 			for _, inst in ipairs(instances_data) do
 				_G.claude_spawn_instance({
-					name = inst.name,
+					id = inst.id,
 					cwd = inst.cwd,
 					args = inst.args,
 				})
 				-- Close immediately so they're available but not in the way
 				vim.defer_fn(function()
-					if _G.claude_instances_registry and _G.claude_instances_registry[inst.name] then
-						_G.claude_instances_registry[inst.name].terminal:close()
+					if _G.claude_instances_registry and _G.claude_instances_registry[inst.id] then
+						_G.claude_instances_registry[inst.id].terminal:close()
 					end
 				end, 100)
 			end

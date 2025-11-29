@@ -564,7 +564,7 @@
           },
         })
 
-        -- Instance registry: { name = { terminal, cwd, created_at, args } }
+        -- Instance registry: { id = { terminal, cwd, created_at, args } }
         local claude_instances = {}
         local instance_counter = 0
 
@@ -577,11 +577,27 @@
           return cmd
         end
 
+        -- Get display name for an instance (uses terminal title if available)
+        local function get_instance_display_name(id, data)
+          if data.terminal and data.terminal.bufnr and vim.api.nvim_buf_is_valid(data.terminal.bufnr) then
+            local title = vim.b[data.terminal.bufnr].term_title
+            if title and title ~= "" then
+              -- Clean up common prefixes and extract meaningful part
+              title = title:gsub("^Claude Code%s*[-–]?%s*", "")
+              title = title:gsub("^claude%s*[-–]?%s*", "")
+              if title ~= "" then
+                return title
+              end
+            end
+          end
+          return id -- Fallback to ID
+        end
+
         -- Spawn a new Claude instance
         local function spawn_claude_instance(opts)
           opts = opts or {}
           instance_counter = instance_counter + 1
-          local name = opts.name or ("claude-" .. instance_counter)
+          local id = opts.id or ("claude-" .. instance_counter)
           local cwd = opts.cwd or vim.fn.getcwd()
           local args = opts.args or ""
 
@@ -594,7 +610,7 @@
               border = "rounded",
               width = math.floor(vim.o.columns * 0.8),
               height = math.floor(vim.o.lines * 0.8),
-              title = " " .. name .. " ",
+              title = " Claude Code ",
               title_pos = "center",
             },
             hidden = false,
@@ -602,15 +618,39 @@
               vim.cmd("startinsert!")
               -- Apply background
               vim.wo.winhighlight = "Normal:TerminalBackground,NormalFloat:TerminalBackground"
+
+              -- Watch for title changes and update float title
+              if t.bufnr then
+                vim.api.nvim_create_autocmd("TermRequest", {
+                  buffer = t.bufnr,
+                  callback = function(ev)
+                    -- TermRequest fires when terminal sends escape sequences
+                    -- Title updates come through here
+                    vim.defer_fn(function()
+                      if t.window and vim.api.nvim_win_is_valid(t.window) then
+                        local title = vim.b[t.bufnr].term_title or "Claude Code"
+                        -- Truncate long titles
+                        if #title > 50 then
+                          title = title:sub(1, 47) .. "..."
+                        end
+                        vim.api.nvim_win_set_config(t.window, {
+                          title = " " .. title .. " ",
+                          title_pos = "center",
+                        })
+                      end
+                    end, 50)
+                  end,
+                })
+              end
             end,
             on_exit = function(t, job, exit_code, event_name)
               -- Remove from registry on exit
-              claude_instances[name] = nil
+              claude_instances[id] = nil
             end,
           })
 
           -- Register and open
-          claude_instances[name] = {
+          claude_instances[id] = {
             terminal = term,
             cwd = cwd,
             created_at = os.time(),
@@ -626,15 +666,16 @@
             end, 500)
           end
 
-          return name
+          return id
         end
 
         -- List all instances
         local function list_instances()
           local instances = {}
-          for name, data in pairs(claude_instances) do
+          for id, data in pairs(claude_instances) do
             table.insert(instances, {
-              name = name,
+              id = id,
+              name = get_instance_display_name(id, data),
               cwd = data.cwd,
               created_at = data.created_at,
               is_open = data.terminal:is_open(),
@@ -647,9 +688,9 @@
           return instances
         end
 
-        -- Focus an instance by name
-        local function focus_instance(name)
-          local data = claude_instances[name]
+        -- Focus an instance by id
+        local function focus_instance(id)
+          local data = claude_instances[id]
           if data and data.terminal then
             data.terminal:open()
             vim.cmd("startinsert!")
@@ -658,12 +699,12 @@
           return false
         end
 
-        -- Close an instance by name
-        local function close_instance(name)
-          local data = claude_instances[name]
+        -- Close an instance by id
+        local function close_instance(id)
+          local data = claude_instances[id]
           if data and data.terminal then
             data.terminal:shutdown()
-            claude_instances[name] = nil
+            claude_instances[id] = nil
             return true
           end
           return false
@@ -671,17 +712,17 @@
 
         -- Close all instances
         local function close_all_instances()
-          for name, _ in pairs(claude_instances) do
-            close_instance(name)
+          for id, _ in pairs(claude_instances) do
+            close_instance(id)
           end
         end
 
         -- Get current instance (if in a Claude terminal)
         local function get_current_instance()
           local current_buf = vim.api.nvim_get_current_buf()
-          for name, data in pairs(claude_instances) do
+          for id, data in pairs(claude_instances) do
             if data.terminal.bufnr == current_buf then
-              return name, data
+              return id, data
             end
           end
           return nil, nil
@@ -695,12 +736,12 @@
             return
           end
 
-          local current_name = get_current_instance()
+          local current_id = get_current_instance()
           local current_idx = 1
 
-          if current_name then
+          if current_id then
             for i, inst in ipairs(instances) do
-              if inst.name == current_name then
+              if inst.id == current_id then
                 current_idx = i
                 break
               end
@@ -714,7 +755,7 @@
             next_idx = ((current_idx - 2) % #instances) + 1
           end
 
-          focus_instance(instances[next_idx].name)
+          focus_instance(instances[next_idx].id)
         end
 
         -- Telescope picker for instances
@@ -749,8 +790,13 @@
                 end
 
                 local status = entry.is_open and "●" or "○"
-                local display = string.format("%s %-12s %-30s %s",
-                  status, entry.name, entry.cwd:gsub(vim.env.HOME, "~"), age_str)
+                -- Truncate name for display
+                local display_name = entry.name
+                if #display_name > 40 then
+                  display_name = display_name:sub(1, 37) .. "..."
+                end
+                local display = string.format("%s %-40s %s",
+                  status, display_name, age_str)
 
                 return {
                   value = entry,
@@ -766,7 +812,7 @@
                 local selection = action_state.get_selected_entry()
                 actions.close(prompt_bufnr)
                 if selection then
-                  focus_instance(selection.value.name)
+                  focus_instance(selection.value.id)
                 end
               end)
 
@@ -774,7 +820,7 @@
               map("i", "<C-d>", function()
                 local selection = action_state.get_selected_entry()
                 if selection then
-                  close_instance(selection.value.name)
+                  close_instance(selection.value.id)
                   vim.notify("Closed " .. selection.value.name, vim.log.levels.INFO)
                   -- Refresh picker
                   actions.close(prompt_bufnr)
@@ -793,15 +839,6 @@
           }):find()
         end
 
-        -- Prompt for named instance
-        local function spawn_named_instance()
-          vim.ui.input({ prompt = "Instance name: " }, function(name)
-            if name and name ~= "" then
-              spawn_claude_instance({ name = name })
-            end
-          end)
-        end
-
         -- Expose functions globally for resession hooks
         vim.g.claude_spawn_instance = spawn_claude_instance
         vim.g.claude_list_instances = list_instances
@@ -818,8 +855,6 @@
           spawn_claude_instance()
         end, { desc = "Claude: New instance" })
 
-        vim.keymap.set("n", "<leader>aN", spawn_named_instance, { desc = "Claude: New named instance" })
-
         vim.keymap.set("n", "<leader>al", pick_claude_instance, { desc = "Claude: List instances" })
 
         vim.keymap.set("n", "<leader>a]", function()
@@ -831,10 +866,11 @@
         end, { desc = "Claude: Previous instance" })
 
         vim.keymap.set("n", "<leader>ax", function()
-          local name = get_current_instance()
-          if name then
-            close_instance(name)
-            vim.notify("Closed " .. name, vim.log.levels.INFO)
+          local id, data = get_current_instance()
+          if id then
+            local display_name = get_instance_display_name(id, data)
+            close_instance(id)
+            vim.notify("Closed: " .. display_name, vim.log.levels.INFO)
           else
             vim.notify("Not in a Claude instance", vim.log.levels.WARN)
           end
