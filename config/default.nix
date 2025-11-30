@@ -22,7 +22,7 @@
     ./obsidian.nix
     ./sessions
     ./snippets.nix
-    ./splits.nix
+    ./plugins/panels
     ./splash.nix
     ./syntax.nix
     ./tabs
