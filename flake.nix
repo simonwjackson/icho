@@ -121,7 +121,7 @@
                 pkgs.nixfmt-rfc-style
               ];
               shellHook = ''
-                lefthook install
+                lefthook install || true
               '';
             };
           };
