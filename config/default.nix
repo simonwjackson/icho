@@ -13,6 +13,7 @@
     ./files.nix
     ./formatting.nix
     ./git.nix
+    ./lint.nix
     ./gutter.nix
     ./http.nix
     ./lsp.nix
