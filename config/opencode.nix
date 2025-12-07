@@ -32,22 +32,32 @@ in
     vim.keymap.set({ "n", "x" }, "<leader>ap", function() require("opencode").prompt("\n@this") end, { desc = "Prompt with context" })
     vim.keymap.set({ "n", "t" }, "<leader>at", function() require("opencode").toggle() end, { desc = "Toggle opencode" })
     vim.keymap.set({ "n", "x" }, "<leader>ai", function() require("opencode").ask("\n") end, { desc = "Input prompt" })
-    vim.keymap.set("n", "<leader>ag", function()
+    -- Helper to focus opencode window
+    local function focus_opencode()
       for _, buf in ipairs(vim.api.nvim_list_bufs()) do
         if vim.bo[buf].filetype == "opencode_terminal" then
           local wins = vim.fn.win_findbuf(buf)
           if #wins > 0 then
             vim.api.nvim_set_current_win(wins[1])
+            return true
           end
-          return
         end
       end
-      require("opencode").toggle()
+      return false
+    end
+
+    vim.keymap.set("n", "<leader>ag", function()
+      if not focus_opencode() then
+        require("opencode").toggle()
+      end
     end, { desc = "Go to opencode" })
 
     -- Session commands
     vim.keymap.set("n", "<leader>an", function() require("opencode").command("session.new") end, { desc = "New session" })
-    vim.keymap.set("n", "<leader>al", function() require("opencode").command("session.list") end, { desc = "List sessions" })
+    vim.keymap.set("n", "<leader>al", function()
+      require("opencode").command("session.list")
+      vim.defer_fn(focus_opencode, 100)
+    end, { desc = "List sessions" })
     vim.keymap.set("n", "<leader>ac", function() require("opencode").command("session.compact") end, { desc = "Compact session" })
     vim.keymap.set("n", "<leader>ax", function() require("opencode").command("session.interrupt") end, { desc = "Interrupt session" })
     vim.keymap.set("n", "<leader>au", function() require("opencode").command("session.undo") end, { desc = "Undo" })

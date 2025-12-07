@@ -5,6 +5,7 @@
     ./opencode.nix
     ./options.nix
     ./snacks.nix
+    ./tokyonight.nix
     ./which-key.nix
   ];
 }
