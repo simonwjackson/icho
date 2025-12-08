@@ -62,10 +62,11 @@ in
       if zoom_win and vim.api.nvim_win_is_valid(zoom_win) then
         -- Unzoom: close float, go back to original window
         local cursor = vim.api.nvim_win_get_cursor(zoom_win)
+        local buf = zoom_buf
         vim.api.nvim_win_close(zoom_win, false)
         -- Restore cursor in original window showing same buffer
         for _, win in ipairs(vim.api.nvim_list_wins()) do
-          if vim.api.nvim_win_get_buf(win) == zoom_buf then
+          if vim.api.nvim_win_get_buf(win) == buf then
             vim.api.nvim_set_current_win(win)
             pcall(vim.api.nvim_win_set_cursor, win, cursor)
             break
@@ -74,6 +75,10 @@ in
         zoom_win = nil
         zoom_buf = nil
         vim.g.zoom_win_active = false
+        -- Enter insert mode if it's a terminal
+        if vim.bo[buf].buftype == "terminal" then
+          vim.cmd("startinsert")
+        end
       else
         -- Zoom: create floating window covering entire editor
         zoom_buf = vim.api.nvim_get_current_buf()
@@ -94,6 +99,10 @@ in
         vim.wo[zoom_win].winhighlight = "NormalFloat:Normal"
         vim.api.nvim_win_set_cursor(zoom_win, cursor)
         vim.g.zoom_win_active = true
+        -- Enter insert mode if it's a terminal
+        if vim.bo[zoom_buf].buftype == "terminal" then
+          vim.cmd("startinsert")
+        end
       end
       vim.cmd("redrawtabline")
     end, { desc = "Toggle zoom" })
