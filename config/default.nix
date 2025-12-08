@@ -6,6 +6,7 @@
     ./gitsigns.nix
     ./hardtime.nix
     ./heirline.nix
+    ./incline.nix
     ./opencode.nix
     ./options.nix
     ./snacks.nix
