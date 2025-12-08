@@ -14,7 +14,14 @@
       picker = {
         enabled = true;
       };
-      terminal = {};
+      terminal = {
+        win = {
+          position = "float";
+          border = "rounded";
+          width = 0.8;
+          height = 0.8;
+        };
+      };
       zen = {};
     };
   };
@@ -42,6 +49,9 @@
     { key = "<leader>gs"; action.__raw = "function() Snacks.picker.git_status() end"; options.desc = "Git status"; }
     { key = "<leader>gf"; action.__raw = "function() Snacks.lazygit.log_file() end"; options.desc = "Lazygit file history"; }
     { key = "<leader>gL"; action.__raw = "function() Snacks.lazygit.log() end"; options.desc = "Lazygit log (cwd)"; }
+
+    # Terminal
+    { key = "<A-.>"; action.__raw = "function() Snacks.terminal.toggle() end"; options.desc = "Toggle terminal"; mode = ["n" "t"]; }
 
     # LSP
     { key = "gd"; action.__raw = "function() Snacks.picker.lsp_definitions() end"; options.desc = "Go to definition"; }
