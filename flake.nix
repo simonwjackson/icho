@@ -5,6 +5,10 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     nixvim.url = "github:nix-community/nixvim";
     flake-parts.url = "github:hercules-ci/flake-parts";
+    resession-nvim = {
+      url = "github:stevearc/resession.nvim";
+      flake = false;
+    };
   };
 
   outputs =
@@ -30,7 +34,7 @@
             inherit pkgs;
             module = import ./config;
             extraSpecialArgs = {
-              # inherit (inputs) foo;
+              inherit (inputs) resession-nvim;
             };
           };
           nvim = nixvim'.makeNixvimWithModule nixvimModule;

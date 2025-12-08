@@ -106,11 +106,28 @@
         "type": "github"
       }
     },
+    "resession-nvim": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1762326008,
+        "narHash": "sha256-7Wa3PwTWEueRkhKBhOMbvstT5vFj2sxyiHoJOrdcJAc=",
+        "owner": "stevearc",
+        "repo": "resession.nvim",
+        "rev": "05adc14db5c2d0eae064765101dd5e9c594c7851",
+        "type": "github"
+      },
+      "original": {
+        "owner": "stevearc",
+        "repo": "resession.nvim",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "flake-parts": "flake-parts",
         "nixpkgs": "nixpkgs",
-        "nixvim": "nixvim"
+        "nixvim": "nixvim",
+        "resession-nvim": "resession-nvim"
       }
     },
     "systems": {

@@ -9,6 +9,7 @@
     ./incline.nix
     ./opencode.nix
     ./options.nix
+    ./resession.nix
     ./snacks.nix
     ./terminal.nix
     ./tokyonight.nix
