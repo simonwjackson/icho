@@ -81,6 +81,59 @@
       return total
     end
 
+    -- Animation state
+    local animation_fps = 60
+    local animation_duration = 150  -- ms
+    local animation_timer = nil
+
+    local function ease_in_out_sine(t)
+      return -(math.cos(math.pi * t) - 1) / 2
+    end
+
+    local function animate_windows(target_widths)
+      if animation_timer then
+        animation_timer:stop()
+        animation_timer = nil
+      end
+
+      -- Get current widths
+      local start_widths = {}
+      for win, _ in pairs(target_widths) do
+        if vim.api.nvim_win_is_valid(win) then
+          start_widths[win] = vim.api.nvim_win_get_width(win)
+        end
+      end
+
+      local frame_time = 1000 / animation_fps
+      local total_frames = math.floor(animation_duration / frame_time)
+      local current_frame = 0
+
+      animation_timer = vim.uv.new_timer()
+      animation_timer:start(0, frame_time, vim.schedule_wrap(function()
+        current_frame = current_frame + 1
+        local progress = ease_in_out_sine(current_frame / total_frames)
+
+        for win, target in pairs(target_widths) do
+          if vim.api.nvim_win_is_valid(win) then
+            local start = start_widths[win] or target
+            local current = math.floor(start + (target - start) * progress)
+            pcall(vim.api.nvim_win_set_width, win, current)
+          end
+        end
+
+        if current_frame >= total_frames then
+          animation_timer:stop()
+          animation_timer = nil
+          -- Ensure final widths are exact
+          for win, target in pairs(target_widths) do
+            if vim.api.nvim_win_is_valid(win) then
+              pcall(vim.api.nvim_win_set_width, win, target)
+            end
+          end
+        end
+      end))
+    end
+
     local function apply_golden_ratio()
       local wins = get_resizable_wins()
       if #wins < 2 then return end
@@ -96,13 +149,16 @@
       local remaining = available - separators - focused_width
       local other_width = math.floor(remaining / (#wins - 1))
 
+      local target_widths = {}
       for _, win in ipairs(wins) do
         if win == cur_win then
-          vim.api.nvim_win_set_width(win, focused_width)
+          target_widths[win] = focused_width
         else
-          vim.api.nvim_win_set_width(win, other_width)
+          target_widths[win] = other_width
         end
       end
+
+      animate_windows(target_widths)
     end
 
     vim.api.nvim_create_autocmd("WinEnter", {
