@@ -223,12 +223,18 @@ M.ClaudeBudget = {
 	update = { "User", pattern = "ClaudeUsageUpdated" },
 }
 
--- Zoom indicator
+-- Zoom indicator with filename
 M.ZoomIndicator = {
 	condition = function()
 		return vim.g.zoom_win_active
 	end,
-	provider = " 󰊓 ",
+	provider = function()
+		local filename = vim.fn.expand("%:t")
+		if filename == "" then
+			filename = "[No Name]"
+		end
+		return " 󰊓  " .. filename .. " "
+	end,
 	hl = { fg = "purple", bold = true },
 }
 
