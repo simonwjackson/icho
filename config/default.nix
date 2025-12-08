@@ -11,6 +11,7 @@
     ./heirline.nix
     ./incline.nix
     ./lsp.nix
+    ./markdown.nix
     ./opencode.nix
     ./options.nix
     ./resession.nix
