@@ -2,6 +2,7 @@
   plugins.flash = {
     enable = true;
     settings = {
+      case_mode = "smart";
       modes = {
         char = {
           jump_labels = true;
