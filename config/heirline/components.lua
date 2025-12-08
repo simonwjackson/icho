@@ -66,7 +66,7 @@ M.ViMode = {
 -- Hostname
 M.Hostname = {
   provider = function()
-    return " 🖥️ " .. vim.fn.hostname() .. " "
+    return "  󰒋  " .. vim.fn.hostname() .. "  "
   end,
   hl = { fg = "bright_fg", bg = "seg_host", bold = true },
 }
@@ -92,7 +92,7 @@ M.GitBranch = {
     return true
   end,
   provider = function(self)
-    return " 🌿 " .. self.branch .. " "
+    return "  󰘬  " .. self.branch .. "  "
   end,
   hl = { fg = "bright_fg", bg = "seg_git", bold = true },
 }
@@ -115,7 +115,7 @@ M.ClaudeWeekly = {
   condition = has_claude_usage,
   provider = function(self)
     local pct = math.floor(self.seven_day.utilization)
-    return " 󰃭 " .. pct .. "% "
+    return "  󰃭  " .. pct .. "%  "
   end,
   hl = function(self)
     local severity = claude.get_weekly_severity(
@@ -142,7 +142,7 @@ M.ClaudePace = {
       self.seven_day.resets_at
     )
     local sign = pace >= 0 and "+" or ""
-    return " 󰓅 " .. sign .. string.format("%.1f", pace) .. "% "
+    return "  󰓅  " .. sign .. string.format("%.1f", pace) .. "%  "
   end,
   hl = function(self)
     local pace = claude.calculate_pace(
@@ -168,7 +168,7 @@ M.ClaudeBudget = {
       self.seven_day.utilization,
       self.seven_day.resets_at
     )
-    return " 󰀻 " .. string.format("%.1f", budget) .. "% "
+    return "  󰀻  " .. string.format("%.1f", budget) .. "%  "
   end,
   hl = { fg = "bright_fg", bg = "seg_claude", bold = true },
   update = { "User", pattern = "ClaudeUsageUpdated" },

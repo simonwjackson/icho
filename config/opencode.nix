@@ -56,33 +56,17 @@ in
     end, { desc = "Go to opencode" })
 
     -- Track zoom state
-    local opencode_zoom_win = nil
-    vim.keymap.set("n", "<leader>az", function()
+    local zoom_win = nil
+    vim.keymap.set("n", "<A-m>", function()
       -- If zoomed, close the zoom window
-      if opencode_zoom_win then
-        local ok = pcall(function() opencode_zoom_win:close() end)
-        opencode_zoom_win = nil
-        if ok then
-          -- Toggle opencode to force terminal resize
-          vim.schedule(function()
-            require("opencode").toggle()
-            vim.schedule(function()
-              require("opencode").toggle()
-            end)
-          end)
-          return
-        end
+      if zoom_win then
+        pcall(function() zoom_win:close() end)
+        zoom_win = nil
+        return
       end
-      -- Otherwise, focus opencode and zoom
-      if not focus_opencode() then
-        require("opencode").toggle()
-        vim.defer_fn(function()
-          opencode_zoom_win = Snacks.zen.zoom()
-        end, 100)
-      else
-        opencode_zoom_win = Snacks.zen.zoom()
-      end
-    end, { desc = "Zoom opencode" })
+      -- Otherwise, zoom current buffer
+      zoom_win = Snacks.zen.zoom()
+    end, { desc = "Toggle zoom" })
 
     -- Helper to send keys to opencode terminal
     local function send_to_opencode(keys)
