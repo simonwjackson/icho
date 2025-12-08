@@ -72,6 +72,46 @@
       return wins
     end
 
+    -- Group windows by their column (windows stacked vertically share the same column)
+    local function get_window_columns()
+      local wins = get_resizable_wins()
+      local columns = {}  -- key: left edge position, value: list of windows in that column
+
+      for _, win in ipairs(wins) do
+        local pos = vim.api.nvim_win_get_position(win)
+        local col = pos[2]  -- column position (left edge)
+
+        -- Find existing column within a small tolerance (for separator differences)
+        local found_col = nil
+        for existing_col, _ in pairs(columns) do
+          if math.abs(existing_col - col) <= 2 then
+            found_col = existing_col
+            break
+          end
+        end
+
+        if found_col then
+          table.insert(columns[found_col], win)
+        else
+          columns[col] = { win }
+        end
+      end
+
+      return columns
+    end
+
+    -- Get the column that contains a specific window
+    local function get_column_for_win(columns, target_win)
+      for col, wins in pairs(columns) do
+        for _, win in ipairs(wins) do
+          if win == target_win then
+            return col, wins
+          end
+        end
+      end
+      return nil, nil
+    end
+
     local function get_ignored_width()
       local total = 0
       for _, win in ipairs(vim.api.nvim_list_wins()) do
@@ -137,26 +177,34 @@
     end
 
     local function apply_golden_ratio()
-      local wins = get_resizable_wins()
-      if #wins < 2 then return end
+      local columns = get_window_columns()
+
+      -- Count actual columns
+      local col_count = 0
+      for _ in pairs(columns) do col_count = col_count + 1 end
+      if col_count < 2 then return end
 
       local cur_win = vim.api.nvim_get_current_win()
       if is_ignored(cur_win) then return end
 
+      -- Find which column the current window is in
+      local cur_col, _ = get_column_for_win(columns, cur_win)
+      if not cur_col then return end
+
       local ignored_width = get_ignored_width()
       local available = vim.o.columns - ignored_width
-      local separators = #wins - 1
+      local separators = col_count - 1
 
       local focused_width = math.floor((available - separators) * 0.618)
       local remaining = available - separators - focused_width
-      local other_width = math.floor(remaining / (#wins - 1))
+      local other_width = math.floor(remaining / (col_count - 1))
 
       local target_widths = {}
-      for _, win in ipairs(wins) do
-        if win == cur_win then
-          target_widths[win] = focused_width
-        else
-          target_widths[win] = other_width
+      for col, wins in pairs(columns) do
+        local width = (col == cur_col) and focused_width or other_width
+        -- All windows in the same column get the same width
+        for _, win in ipairs(wins) do
+          target_widths[win] = width
         end
       end
 
