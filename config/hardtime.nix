@@ -6,6 +6,8 @@
       hint = true;
       # Max count before key is disabled
       max_count = 3;
+      # Allow mouse
+      disable_mouse = false;
       # Disable hjkl spam
       disabled_keys = {
         "<Up>" = [ "n" "x" ];

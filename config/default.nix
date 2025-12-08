@@ -4,7 +4,7 @@
     ./bufferline.nix
     ./flash.nix
     ./hardtime.nix
-    ./incline.nix
+    ./heirline.nix
     ./opencode.nix
     ./options.nix
     ./snacks.nix
