@@ -20,6 +20,7 @@
     ./supermaven.nix
     ./terminal.nix
     ./tokyonight.nix
+    ./treesitter.nix
     ./which-key.nix
     ./windows.nix
     ./yazi.nix
