@@ -1,6 +1,7 @@
 local conditions = require("heirline.conditions")
 local utils = require("heirline.utils")
 local devicons = require("nvim-web-devicons")
+local claude = require("heirline.claude_usage")
 
 local M = {}
 
@@ -72,20 +73,106 @@ M.Hostname = {
 
 
 
--- Git Branch
+-- Git Branch (handles bare worktree workflow, hides default branches)
 M.GitBranch = {
-  condition = conditions.is_git_repo,
-  init = function(self)
-    self.status_dict = vim.b.gitsigns_status_dict
+  condition = function(self)
+    local handle = io.popen("git branch --show-current 2>/dev/null")
+    if handle then
+      self.branch = handle:read("*a"):gsub("^%s*(.-)%s*$", "%1")
+      handle:close()
+    else
+      self.branch = ""
+    end
+
+    -- Hide if empty or default branch
+    if self.branch == "" then return false end
+    local default_branches = { main = true, master = true }
+    if default_branches[self.branch] then return false end
+
+    return true
   end,
   provider = function(self)
-    return " 🌿 " .. self.status_dict.head .. " "
+    return " 🌿 " .. self.branch .. " "
   end,
   hl = { fg = "bright_fg", bg = "seg_git", bold = true },
 }
 
+-- ============================================================================
+-- Claude Usage Segments
+-- ============================================================================
 
+-- Helper to check if claude usage data is available
+local function has_claude_usage(self)
+  local data = claude.get_usage_data()
+  if not data or not data.seven_day then return false end
+  self.seven_day = data.seven_day
+  return true
+end
 
+-- Weekly usage segment: shows current 7-day utilization %
+-- Colors based on projected end-of-week usage
+M.ClaudeWeekly = {
+  condition = has_claude_usage,
+  provider = function(self)
+    local pct = math.floor(self.seven_day.utilization)
+    return " 󰃭 " .. pct .. "% "
+  end,
+  hl = function(self)
+    local severity = claude.get_weekly_severity(
+      self.seven_day.utilization,
+      self.seven_day.resets_at
+    )
+    if severity == "danger" then
+      return { fg = "bright_fg", bg = "claude_danger", bold = true }
+    elseif severity == "warning" then
+      return { fg = "bright_bg", bg = "claude_warning", bold = true }
+    end
+    return { fg = "bright_fg", bg = "seg_claude", bold = true }
+  end,
+  update = { "User", pattern = "ClaudeUsageUpdated" },
+}
+
+-- Pace segment: shows how far ahead/behind expected schedule
+-- Positive = under budget (good), Negative = over budget (bad)
+M.ClaudePace = {
+  condition = has_claude_usage,
+  provider = function(self)
+    local pace = claude.calculate_pace(
+      self.seven_day.utilization,
+      self.seven_day.resets_at
+    )
+    local sign = pace >= 0 and "+" or ""
+    return " 󰓅 " .. sign .. string.format("%.1f", pace) .. "% "
+  end,
+  hl = function(self)
+    local pace = claude.calculate_pace(
+      self.seven_day.utilization,
+      self.seven_day.resets_at
+    )
+    local severity = claude.get_pace_severity(pace)
+    if severity == "danger" then
+      return { fg = "bright_fg", bg = "claude_danger", bold = true }
+    elseif severity == "warning" then
+      return { fg = "bright_bg", bg = "claude_warning", bold = true }
+    end
+    return { fg = "bright_fg", bg = "seg_claude", bold = true }
+  end,
+  update = { "User", pattern = "ClaudeUsageUpdated" },
+}
+
+-- Budget segment: shows % available per remaining work day
+M.ClaudeBudget = {
+  condition = has_claude_usage,
+  provider = function(self)
+    local budget = claude.calculate_daily_budget(
+      self.seven_day.utilization,
+      self.seven_day.resets_at
+    )
+    return " 󰀻 " .. string.format("%.1f", budget) .. "% "
+  end,
+  hl = { fg = "bright_fg", bg = "seg_claude", bold = true },
+  update = { "User", pattern = "ClaudeUsageUpdated" },
+}
 
 
 return M

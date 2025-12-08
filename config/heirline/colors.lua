@@ -40,6 +40,10 @@ function M.setup()
     seg_diag = utils.get_highlight("DiffDelete").bg or cursorline_bg,
     seg_lsp = utils.get_highlight("Search").bg or cursorline_bg,
     seg_pos = statusline_bg or cursorline_bg,
+    -- Claude usage segment colors
+    seg_claude = utils.get_highlight("DiffChange").bg or cursorline_bg,
+    claude_warning = utils.get_highlight("DiagnosticWarn").fg,
+    claude_danger = utils.get_highlight("DiagnosticError").fg,
   }
 end
 
