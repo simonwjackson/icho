@@ -9,6 +9,10 @@
       url = "github:stevearc/resession.nvim";
       flake = false;
     };
+    vim-overseer = {
+      url = "github:simonwjackson/overseer.nvim/custom";
+      flake = false;
+    };
   };
 
   outputs =
@@ -34,7 +38,7 @@
             inherit pkgs;
             module = import ./config;
             extraSpecialArgs = {
-              inherit (inputs) resession-nvim;
+              inherit (inputs) resession-nvim vim-overseer;
             };
           };
           nvim = nixvim'.makeNixvimWithModule nixvimModule;

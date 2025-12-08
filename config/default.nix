@@ -18,6 +18,7 @@
     ./resession.nix
     ./snacks.nix
     ./supermaven.nix
+    ./tasks.nix
     ./terminal.nix
     ./tokyonight.nix
     ./treesitter.nix
