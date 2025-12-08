@@ -30,7 +30,7 @@ in
     vim.keymap.set({ "n", "x" }, "<leader>aa", function() require("opencode").ask("\n@this: ") end, { desc = "Ask opencode" })
     vim.keymap.set({ "n", "x" }, "<leader>as", function() require("opencode").select() end, { desc = "Select opencode action" })
     vim.keymap.set({ "n", "x" }, "<leader>ap", function() require("opencode").prompt("\n@this") end, { desc = "Prompt with context" })
-    vim.keymap.set({ "n", "t" }, "<leader>at", function() require("opencode").toggle() end, { desc = "Toggle opencode" })
+    vim.keymap.set("n", "<leader>at", function() require("opencode").toggle() end, { desc = "Toggle opencode" })
     vim.keymap.set({ "n", "x" }, "<leader>ai", function() require("opencode").ask("\n") end, { desc = "Input prompt" })
     -- Helper to focus opencode window and enter terminal mode
     local function focus_opencode(enter_terminal_mode)
@@ -57,7 +57,7 @@ in
 
     -- Track zoom state
     local opencode_zoom_win = nil
-    vim.keymap.set({ "n", "t" }, "<leader>az", function()
+    vim.keymap.set("n", "<leader>az", function()
       -- If zoomed, close the zoom window
       if opencode_zoom_win then
         local ok = pcall(function() opencode_zoom_win:close() end)
