@@ -106,7 +106,7 @@
         app.buf = vim.api.nvim_create_buf(false, true)
         -- tmux command: attach to existing session or create new one with the app
         local tmux_cmd = string.format(
-          "/run/current-system/sw/bin/nix shell nixpkgs#tmux -c tmux new-session -A -s '%s' '%s'",
+          "/run/current-system/sw/bin/nix shell nixpkgs#tmux -c tmux new-session -A -s '%s' '%s' \\; set status off \\; set prefix None \\; set prefix2 None",
           name,
           cmd
         )
