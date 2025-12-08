@@ -26,7 +26,7 @@ M.ViMode = {
     },
   },
   provider = function(self)
-    return " " .. self.mode_names[self.mode] .. " "
+    return self.mode_names[self.mode]
   end,
   hl = function(self)
     local mode = self.mode:sub(1, 1)
@@ -47,8 +47,8 @@ M.ViMode = {
       t = "String",
     }
     local hl_group = mode_hl[mode] or "Function"
-    local bg = utils.get_highlight(hl_group).fg
-    return { fg = "bright_bg", bg = bg, bold = true }
+    local fg = utils.get_highlight(hl_group).fg
+    return { fg = fg, bold = true }
   end,
   update = {
     "ModeChanged",
@@ -66,9 +66,9 @@ M.ViMode = {
 -- Hostname
 M.Hostname = {
   provider = function()
-    return "  󰒋  " .. vim.fn.hostname() .. "  "
+    return " 󰒋  " .. vim.fn.hostname() .. ""
   end,
-  hl = { fg = "bright_fg", bg = "seg_host", bold = true },
+  hl = { fg = "blue", bold = true },
 }
 
 
@@ -88,9 +88,9 @@ M.GitBranch = {
     return self.branch ~= ""
   end,
   provider = function(self)
-    return "  󰘬  " .. self.branch .. "  "
+    return "󰘬  " .. self.branch .. " "
   end,
-  hl = { fg = "bright_fg", bg = "seg_git", bold = true },
+  hl = { fg = "purple", bold = true },
 }
 
 -- WorkDir (shows folder name) - LEFT SIDE, always shows
@@ -98,9 +98,9 @@ M.WorkDir = {
   provider = function()
     local cwd = vim.fn.getcwd()
     local folder = vim.fn.fnamemodify(cwd, ":t")
-    return "  󰉋  " .. folder .. "  "
+    return "  " .. folder .. ""
   end,
-  hl = { fg = "bright_fg", bg = "seg_dir", bold = true },
+  hl = { fg = "cyan", bold = true },
 }
 
 -- ============================================================================
@@ -121,7 +121,7 @@ M.ClaudeWeekly = {
   condition = has_claude_usage,
   provider = function(self)
     local pct = math.floor(self.seven_day.utilization)
-    return "  󰃭  " .. pct .. "%  "
+    return " 󰃭  " .. pct .. "% "
   end,
   hl = function(self)
     local severity = claude.get_weekly_severity(
@@ -129,11 +129,11 @@ M.ClaudeWeekly = {
       self.seven_day.resets_at
     )
     if severity == "danger" then
-      return { fg = "bright_fg", bg = "claude_danger", bold = true }
+      return { fg = "claude_danger", bold = true }
     elseif severity == "warning" then
-      return { fg = "bright_bg", bg = "claude_warning", bold = true }
+      return { fg = "claude_warning", bold = true }
     end
-    return { fg = "bright_fg", bg = "seg_claude", bold = true }
+    return { fg = "gray", bold = true }
   end,
   update = { "User", pattern = "ClaudeUsageUpdated" },
 }
@@ -148,7 +148,7 @@ M.ClaudePace = {
       self.seven_day.resets_at
     )
     local sign = pace >= 0 and "+" or ""
-    return "  󰓅  " .. sign .. string.format("%.1f", pace) .. "%  "
+    return "󰓅  " .. sign .. string.format("%.1f", pace) .. "% "
   end,
   hl = function(self)
     local pace = claude.calculate_pace(
@@ -157,11 +157,11 @@ M.ClaudePace = {
     )
     local severity = claude.get_pace_severity(pace)
     if severity == "danger" then
-      return { fg = "bright_fg", bg = "claude_danger", bold = true }
+      return { fg = "claude_danger", bold = true }
     elseif severity == "warning" then
-      return { fg = "bright_bg", bg = "claude_warning", bold = true }
+      return { fg = "claude_warning", bold = true }
     end
-    return { fg = "bright_fg", bg = "seg_claude", bold = true }
+    return { fg = "gray", bold = true }
   end,
   update = { "User", pattern = "ClaudeUsageUpdated" },
 }
@@ -174,9 +174,9 @@ M.ClaudeBudget = {
       self.seven_day.utilization,
       self.seven_day.resets_at
     )
-    return "  󰀻  " .. string.format("%.1f", budget) .. "%  "
+    return "󰀻  " .. string.format("%.1f", budget) .. "% "
   end,
-  hl = { fg = "bright_fg", bg = "seg_claude", bold = true },
+  hl = { fg = "gray", bold = true },
   update = { "User", pattern = "ClaudeUsageUpdated" },
 }
 
@@ -186,8 +186,8 @@ M.ZoomIndicator = {
   condition = function()
     return vim.g.zoom_win_active
   end,
-  provider = "  󰊓  ",
-  hl = { fg = "bright_fg", bg = "seg_host", bold = true },
+  provider = " 󰊓  ",
+  hl = { fg = "orange", bold = true },
 }
 
 return M

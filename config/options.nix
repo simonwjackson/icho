@@ -64,5 +64,8 @@
       local darker_bg = darken_now(string.format("#%06x", normal_bg), 0.85)
       vim.api.nvim_set_hl(0, "TabLineFill", { bg = darker_bg })
     end
+
+    -- Ctrl-S to save (only if modified)
+    vim.keymap.set({ "n", "i", "v" }, "<C-s>", "<Cmd>update<CR>", { desc = "Save" })
   '';
 }
