@@ -2,8 +2,9 @@
   plugins.grug-far = {
     enable = true;
     settings = {
-      windowCreationCommand = "split";
+      windowCreationCommand = "leftabove vsplit";
       transient = true;
+      wrap = false;
     };
   };
 
@@ -12,7 +13,7 @@
       key = "<leader>S";
       action.__raw = ''
         function()
-          require('grug-far').open()
+          require('grug-far').open({ windowCreationCommand = "topleft 60vsplit" })
         end
       '';
       options.desc = "Search and Replace";
@@ -22,7 +23,7 @@
       mode = "v";
       action.__raw = ''
         function()
-          require('grug-far').with_visual_selection()
+          require('grug-far').with_visual_selection({ windowCreationCommand = "topleft 60vsplit" })
         end
       '';
       options.desc = "Search and Replace (selection)";

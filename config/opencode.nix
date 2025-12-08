@@ -22,6 +22,10 @@ in
         enabled = "snacks",
         snacks = {
           cmd = { "opencode" },
+          win = {
+            position = "right",
+            width = 80,
+          },
         },
       },
     }
