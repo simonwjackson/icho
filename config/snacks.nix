@@ -7,6 +7,7 @@
         enabled = true;
       };
       terminal = {};
+      zen = {};
     };
   };
 

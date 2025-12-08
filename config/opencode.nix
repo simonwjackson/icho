@@ -32,13 +32,16 @@ in
     vim.keymap.set({ "n", "x" }, "<leader>ap", function() require("opencode").prompt("\n@this") end, { desc = "Prompt with context" })
     vim.keymap.set({ "n", "t" }, "<leader>at", function() require("opencode").toggle() end, { desc = "Toggle opencode" })
     vim.keymap.set({ "n", "x" }, "<leader>ai", function() require("opencode").ask("\n") end, { desc = "Input prompt" })
-    -- Helper to focus opencode window
-    local function focus_opencode()
+    -- Helper to focus opencode window and enter terminal mode
+    local function focus_opencode(enter_terminal_mode)
       for _, buf in ipairs(vim.api.nvim_list_bufs()) do
         if vim.bo[buf].filetype == "opencode_terminal" then
           local wins = vim.fn.win_findbuf(buf)
           if #wins > 0 then
             vim.api.nvim_set_current_win(wins[1])
+            if enter_terminal_mode ~= false then
+              vim.cmd("startinsert")
+            end
             return true
           end
         end
@@ -52,12 +55,60 @@ in
       end
     end, { desc = "Go to opencode" })
 
+    -- Track zoom state
+    local opencode_zoom_win = nil
+    vim.keymap.set({ "n", "t" }, "<leader>az", function()
+      -- If zoomed, close the zoom window
+      if opencode_zoom_win then
+        local ok = pcall(function() opencode_zoom_win:close() end)
+        opencode_zoom_win = nil
+        if ok then
+          -- Toggle opencode to force terminal resize
+          vim.schedule(function()
+            require("opencode").toggle()
+            vim.schedule(function()
+              require("opencode").toggle()
+            end)
+          end)
+          return
+        end
+      end
+      -- Otherwise, focus opencode and zoom
+      if not focus_opencode() then
+        require("opencode").toggle()
+        vim.defer_fn(function()
+          opencode_zoom_win = Snacks.zen.zoom()
+        end, 100)
+      else
+        opencode_zoom_win = Snacks.zen.zoom()
+      end
+    end, { desc = "Zoom opencode" })
+
+    -- Helper to send keys to opencode terminal
+    local function send_to_opencode(keys)
+      for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+        if vim.bo[buf].filetype == "opencode_terminal" then
+          local chan = vim.bo[buf].channel
+          if chan and chan > 0 then
+            vim.api.nvim_chan_send(chan, keys)
+          end
+          return true
+        end
+      end
+      return false
+    end
+
     -- Session commands
     vim.keymap.set("n", "<leader>an", function() require("opencode").command("session.new") end, { desc = "New session" })
     vim.keymap.set("n", "<leader>al", function()
       require("opencode").command("session.list")
       vim.defer_fn(focus_opencode, 100)
     end, { desc = "List sessions" })
+    vim.keymap.set("n", "<leader>ah", function()
+      -- Note: session.timeline only works when viewing a session in opencode
+      require("opencode").command("session.timeline")
+      vim.defer_fn(focus_opencode, 100)
+    end, { desc = "Timeline (in session)" })
     vim.keymap.set("n", "<leader>ac", function() require("opencode").command("session.compact") end, { desc = "Compact session" })
     vim.keymap.set("n", "<leader>ax", function() require("opencode").command("session.interrupt") end, { desc = "Interrupt session" })
     vim.keymap.set("n", "<leader>au", function() require("opencode").command("session.undo") end, { desc = "Undo" })
