@@ -4,11 +4,11 @@
     pkgs.vimPlugins.heirline-nvim
   ];
 
-  # Global statusline (empty) + tabline at top
+  # Global statusline at bottom
   opts.laststatus = 3; # global statusline provides window separator
-  opts.showtabline = 2; # always show tabline
+  opts.showtabline = 0; # hide tabline
   opts.showmode = false;
-  opts.cmdheight = 0; # hide cmdline when not in use (saves 1 line)
+  opts.cmdheight = 0; # hide cmdline when not in use
 
   # Add our lua files to the runtime path
   extraFiles = {
@@ -323,11 +323,13 @@
     }
 
     ---------------------------------------------------------------------------
-    -- Empty Statusline (to prevent window separator lines)
+    -- Statusline (same content as tabline was)
     ---------------------------------------------------------------------------
 
-    local EmptyStatusline = {
-      provider = "",
+    local Statusline = {
+      LeftSegments,
+      c.Align,
+      RightSegments,
     }
 
     ---------------------------------------------------------------------------
@@ -335,8 +337,7 @@
     ---------------------------------------------------------------------------
 
     require("heirline").setup({
-      statusline = EmptyStatusline,
-      tabline = TabLine,
+      statusline = Statusline,
     })
   '';
 }
