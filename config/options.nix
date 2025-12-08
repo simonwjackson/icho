@@ -2,6 +2,9 @@
   globals.mapleader = " ";
   globals.maplocalleader = " ";
 
+  # Always show sign column to prevent text shifting
+  opts.signcolumn = "yes";
+
   # Style the window separators
   highlightOverride = {
     WinSeparator = { fg = "#3b4261"; bg = "none"; };

@@ -3,6 +3,7 @@
   imports = [
     ./bufferline.nix
     ./flash.nix
+    ./gitsigns.nix
     ./hardtime.nix
     ./heirline.nix
     ./opencode.nix

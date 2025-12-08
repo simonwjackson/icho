@@ -66,7 +66,7 @@ M.ViMode = {
 -- Hostname
 M.Hostname = {
   provider = function()
-    return " 󰒋  " .. vim.fn.hostname() .. ""
+    return "    " .. vim.fn.hostname() .. ""
   end,
   hl = { fg = "blue", bold = true },
 }
@@ -94,11 +94,42 @@ M.GitBranch = {
 }
 
 -- WorkDir (shows folder name) - LEFT SIDE, always shows
+-- For bare git worktrees, shows the root bare repo name instead of worktree folder
 M.WorkDir = {
   provider = function()
     local cwd = vim.fn.getcwd()
+
+    -- Find git repo root (bare worktree or normal .git)
+    local function find_repo_name(path)
+      -- Check for .bare (bare worktree setup)
+      local stat = vim.loop.fs_stat(path .. "/.bare")
+      if stat then
+        return vim.fn.fnamemodify(path, ":t")
+      end
+
+      -- Check for .git directory (normal git repo)
+      stat = vim.loop.fs_stat(path .. "/.git")
+      if stat and stat.type == "directory" then
+        return vim.fn.fnamemodify(path, ":t")
+      end
+
+      -- Check parent directory
+      local parent = vim.fn.fnamemodify(path, ":h")
+      if parent ~= path then
+        return find_repo_name(parent)
+      end
+
+      return nil
+    end
+
+    local repo_name = find_repo_name(cwd)
+    if repo_name then
+      return "  " .. repo_name .. ""
+    end
+
+    -- Default: just show current folder name
     local folder = vim.fn.fnamemodify(cwd, ":t")
-    return "  " .. folder .. ""
+    return "  " .. folder .. ""
   end,
   hl = { fg = "cyan", bold = true },
 }
@@ -148,7 +179,7 @@ M.ClaudePace = {
       self.seven_day.resets_at
     )
     local sign = pace >= 0 and "+" or ""
-    return "󰓅  " .. sign .. string.format("%.1f", pace) .. "% "
+    return "󰓅  " .. sign .. math.floor(pace) .. "% "
   end,
   hl = function(self)
     local pace = claude.calculate_pace(
@@ -174,7 +205,7 @@ M.ClaudeBudget = {
       self.seven_day.utilization,
       self.seven_day.resets_at
     )
-    return "󰀻  " .. string.format("%.1f", budget) .. "% "
+    return "󰀻  " .. math.floor(budget) .. "% "
   end,
   hl = { fg = "gray", bold = true },
   update = { "User", pattern = "ClaudeUsageUpdated" },
@@ -186,8 +217,8 @@ M.ZoomIndicator = {
   condition = function()
     return vim.g.zoom_win_active
   end,
-  provider = " 󰊓  ",
-  hl = { fg = "orange", bold = true },
+  provider = " 󰊓 ",
+  hl = { fg = "purple", bold = true },
 }
 
 return M
