@@ -2,12 +2,15 @@
   # Import all your configuration modules here
   imports = [
     ./bufferline.nix
+    ./cmp.nix
+    ./diagnostics.nix
     ./flash.nix
     ./formatting.nix
     ./gitsigns.nix
     ./hardtime.nix
     ./heirline.nix
     ./incline.nix
+    ./lsp.nix
     ./opencode.nix
     ./options.nix
     ./resession.nix
