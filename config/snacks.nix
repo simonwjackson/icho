@@ -6,6 +6,12 @@
     enable = true;
     settings = {
       input = {};
+      notifier = {
+        enabled = true;
+        timeout = 3000;
+        position = "top-left";
+        style = "compact";
+      };
       lazygit = {
         win = {
           backdrop = 20;
@@ -52,6 +58,9 @@
 
     # Terminal
     { key = "<A-.>"; action.__raw = "function() Snacks.terminal.toggle() end"; options.desc = "Toggle terminal"; mode = ["n" "t"]; }
+
+    # Notifications
+    { key = "<leader>th"; action.__raw = "function() Snacks.notifier.show_history() end"; options.desc = "Notification history"; }
 
     # LSP
     { key = "gd"; action.__raw = "function() Snacks.picker.lsp_definitions() end"; options.desc = "Go to definition"; }

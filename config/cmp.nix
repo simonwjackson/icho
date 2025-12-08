@@ -38,14 +38,14 @@
       ];
 
       mapping = {
-        "<C-n>" = "cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select })";
-        "<C-p>" = "cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select })";
-        "<C-y>" = "cmp.mapping.confirm({ select = true })";
-        "<C-d>" = "cmp.mapping.scroll_docs(-4)";
-        "<C-f>" = "cmp.mapping.scroll_docs(4)";
-        "<C-Space>" = "cmp.mapping.complete()";
-        "<C-e>" = "cmp.mapping.abort()";
-        "<CR>" = "cmp.mapping.confirm({ select = false })";
+        "<C-n>".__raw = "cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select })";
+        "<C-p>".__raw = "cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select })";
+        "<C-y>".__raw = "cmp.mapping.confirm({ select = true })";
+        "<C-d>".__raw = "cmp.mapping.scroll_docs(-4)";
+        "<C-f>".__raw = "cmp.mapping.scroll_docs(4)";
+        "<C-Space>".__raw = "cmp.mapping.complete()";
+        "<C-e>".__raw = "cmp.mapping.abort()";
+        "<CR>".__raw = "cmp.mapping.confirm({ select = false })";
       };
 
       window = {
