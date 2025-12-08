@@ -54,7 +54,7 @@
     local popup_apps = {}  -- Track popup state per app
 
     -- Create dim overlay highlight
-    vim.api.nvim_set_hl(0, "PopupDim", { bg = "#000000", blend = 66 })
+    vim.api.nvim_set_hl(0, "PopupDim", { bg = "#000000", blend = 20 })
 
     local function create_dim_overlay()
       local dim_buf = vim.api.nvim_create_buf(false, true)
@@ -68,7 +68,7 @@
         zindex = 40,
       })
       vim.wo[dim_win].winhighlight = "Normal:PopupDim"
-      vim.wo[dim_win].winblend = 66
+      vim.wo[dim_win].winblend = 20
       return dim_win, dim_buf
     end
 

@@ -6,7 +6,11 @@
     enable = true;
     settings = {
       input = {};
-      lazygit = {};
+      lazygit = {
+        win = {
+          backdrop = 20;
+        };
+      };
       picker = {
         enabled = true;
       };
