@@ -14,6 +14,7 @@
     ./incline.nix
     ./lsp.nix
     ./markdown.nix
+    ./noice.nix
     ./opencode.nix
     ./options.nix
     ./resession.nix
