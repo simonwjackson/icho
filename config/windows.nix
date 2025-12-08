@@ -23,7 +23,7 @@
         enable = false,
       },
       ignore = {
-        filetype = { "NvimTree", "neo-tree", "undotree", "gundo", "yazi", "snacks_terminal", "lazygit", "opencode", "opencode_terminal" },
+        filetype = { "NvimTree", "neo-tree", "undotree", "gundo", "yazi", "snacks_terminal", "lazygit", "opencode", "opencode_terminal", "OverseerList" },
         buftype = { "quickfix", "terminal" }
       },
       animation = {
@@ -45,6 +45,7 @@
       yazi = true,
       snacks_terminal = true,
       lazygit = true,
+      OverseerList = true,
     }
 
     local ignored_buftypes = {
