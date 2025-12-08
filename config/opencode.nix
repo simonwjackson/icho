@@ -75,20 +75,20 @@ in
         zoom_buf = nil
         vim.g.zoom_win_active = false
       else
-        -- Zoom: create floating window below tabline
+        -- Zoom: create floating window covering entire editor
         zoom_buf = vim.api.nvim_get_current_buf()
         local cursor = vim.api.nvim_win_get_cursor(0)
         local width = vim.o.columns
-        local height = vim.o.lines - 3  -- 1 for tabline, 1 for statusline, 1 for cmdline
+        local height = vim.o.lines - vim.o.cmdheight - 1  -- only leave cmdline
         zoom_win = vim.api.nvim_open_win(zoom_buf, true, {
           relative = "editor",
-          row = 1,  -- below tabline
+          row = 0,  -- start at top, covering tabline
           col = 0,
           width = width,
           height = height,
           style = "minimal",
           border = "none",
-          zindex = 45,
+          zindex = 50,
         })
         -- Use Normal background instead of NormalFloat
         vim.wo[zoom_win].winhighlight = "NormalFloat:Normal"
