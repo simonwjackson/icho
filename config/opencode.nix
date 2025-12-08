@@ -55,17 +55,47 @@ in
       end
     end, { desc = "Go to opencode" })
 
-    -- Track zoom state
+    -- Zoom toggle: custom floating window below tabline
     local zoom_win = nil
+    local zoom_buf = nil
     vim.keymap.set("n", "<A-m>", function()
-      -- If zoomed, close the zoom window
-      if zoom_win then
-        pcall(function() zoom_win:close() end)
+      if zoom_win and vim.api.nvim_win_is_valid(zoom_win) then
+        -- Unzoom: close float, go back to original window
+        local cursor = vim.api.nvim_win_get_cursor(zoom_win)
+        vim.api.nvim_win_close(zoom_win, false)
+        -- Restore cursor in original window showing same buffer
+        for _, win in ipairs(vim.api.nvim_list_wins()) do
+          if vim.api.nvim_win_get_buf(win) == zoom_buf then
+            vim.api.nvim_set_current_win(win)
+            pcall(vim.api.nvim_win_set_cursor, win, cursor)
+            break
+          end
+        end
         zoom_win = nil
-        return
+        zoom_buf = nil
+        vim.g.zoom_win_active = false
+      else
+        -- Zoom: create floating window below tabline
+        zoom_buf = vim.api.nvim_get_current_buf()
+        local cursor = vim.api.nvim_win_get_cursor(0)
+        local width = vim.o.columns
+        local height = vim.o.lines - 3  -- 1 for tabline, 1 for statusline, 1 for cmdline
+        zoom_win = vim.api.nvim_open_win(zoom_buf, true, {
+          relative = "editor",
+          row = 1,  -- below tabline
+          col = 0,
+          width = width,
+          height = height,
+          style = "minimal",
+          border = "none",
+          zindex = 45,
+        })
+        -- Use Normal background instead of NormalFloat
+        vim.wo[zoom_win].winhighlight = "NormalFloat:Normal"
+        vim.api.nvim_win_set_cursor(zoom_win, cursor)
+        vim.g.zoom_win_active = true
       end
-      -- Otherwise, zoom current buffer
-      zoom_win = Snacks.zen.zoom()
+      vim.cmd("redrawtabline")
     end, { desc = "Toggle zoom" })
 
     -- Helper to send keys to opencode terminal

@@ -73,7 +73,7 @@ M.Hostname = {
 
 
 
--- Git Branch (handles bare worktree workflow, hides default branches)
+-- Git Branch (shows any branch when in a git repo) - RIGHT SIDE
 M.GitBranch = {
   condition = function(self)
     local handle = io.popen("git branch --show-current 2>/dev/null")
@@ -84,17 +84,23 @@ M.GitBranch = {
       self.branch = ""
     end
 
-    -- Hide if empty or default branch
-    if self.branch == "" then return false end
-    local default_branches = { main = true, master = true }
-    if default_branches[self.branch] then return false end
-
-    return true
+    -- Show if we have a branch (any branch)
+    return self.branch ~= ""
   end,
   provider = function(self)
     return "  󰘬  " .. self.branch .. "  "
   end,
   hl = { fg = "bright_fg", bg = "seg_git", bold = true },
+}
+
+-- WorkDir (shows folder name) - LEFT SIDE, always shows
+M.WorkDir = {
+  provider = function()
+    local cwd = vim.fn.getcwd()
+    local folder = vim.fn.fnamemodify(cwd, ":t")
+    return "  󰉋  " .. folder .. "  "
+  end,
+  hl = { fg = "bright_fg", bg = "seg_dir", bold = true },
 }
 
 -- ============================================================================
@@ -174,5 +180,14 @@ M.ClaudeBudget = {
   update = { "User", pattern = "ClaudeUsageUpdated" },
 }
 
+
+-- Zoom indicator
+M.ZoomIndicator = {
+  condition = function()
+    return vim.g.zoom_win_active
+  end,
+  provider = "  󰊓  ",
+  hl = { fg = "bright_fg", bg = "seg_host", bold = true },
+}
 
 return M

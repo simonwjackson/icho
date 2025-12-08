@@ -139,15 +139,13 @@
       end,
     }
 
-    -- Helper to check if branch should show (non-default branch)
+    -- Helper to check if in a git repo (any branch)
     local function has_visible_branch()
       local handle = io.popen("git branch --show-current 2>/dev/null")
       if not handle then return false end
       local branch = handle:read("*a"):gsub("^%s*(.-)%s*$", "%1")
       handle:close()
-      if branch == "" then return false end
-      local default_branches = { main = true, master = true }
-      return not default_branches[branch]
+      return branch ~= ""
     end
 
     local SepModeGitDynamic = {
@@ -183,11 +181,47 @@
       end,
     }
 
+    -- Separator: Host -> WorkDir
+    local SepHostDir = {
+      provider = "",
+      hl = { fg = "seg_host", bg = "seg_dir" },
+    }
+
+    -- Separator: WorkDir -> Mode
+    local SepDirMode = {
+      init = function(self)
+        self.mode = vim.fn.mode(1)
+      end,
+      provider = "",
+      hl = function(self)
+        local mode = self.mode:sub(1, 1)
+        local hl_group = mode_hl_map[mode] or "Function"
+        local bg = utils.get_highlight(hl_group).fg
+        return { fg = "seg_dir", bg = bg }
+      end,
+    }
+
+    -- Separator: Mode -> end
+    local SepModeEnd = {
+      init = function(self)
+        self.mode = vim.fn.mode(1)
+      end,
+      provider = "",
+      hl = function(self)
+        local mode = self.mode:sub(1, 1)
+        local hl_group = mode_hl_map[mode] or "Function"
+        local fg = utils.get_highlight(hl_group).fg
+        return { fg = fg, bg = "none" }
+      end,
+    }
+
     local LeftSegments = {
       c.Hostname,
-      SepHostMode,
+      SepHostDir,
+      c.WorkDir,
+      SepDirMode,
       c.ViMode,
-      SepModeEndDynamic,
+      SepModeEnd,
     }
 
     local SepStartGit = {
@@ -206,27 +240,6 @@
       local data = claude_usage.get_usage_data()
       return data and data.seven_day
     end
-
-    -- Separator before Weekly (start of claude segments)
-    local SepStartClaude = {
-      condition = has_claude_usage,
-      provider = "",
-      hl = function()
-        local data = claude_usage.get_usage_data()
-        if data and data.seven_day then
-          local severity = claude_usage.get_weekly_severity(
-            data.seven_day.utilization,
-            data.seven_day.resets_at
-          )
-          if severity == "danger" then
-            return { fg = "claude_danger", bg = "none" }
-          elseif severity == "warning" then
-            return { fg = "claude_warning", bg = "none" }
-          end
-        end
-        return { fg = "seg_claude", bg = "none" }
-      end,
-    }
 
     -- Separator between Weekly and Pace
     local SepWeeklyPace = {
@@ -281,10 +294,10 @@
       end,
     }
 
-    -- End separator after Budget (only when Git NOT visible)
+    -- End separator after Budget - never used now since WorkDir always follows when no git
     local SepClaudeEnd = {
       condition = function()
-        return has_claude_usage() and not has_visible_branch()
+        return false  -- WorkDir always shows when no git branch
       end,
       provider = "",
       hl = { fg = "seg_claude", bg = "none" },
@@ -299,9 +312,11 @@
       hl = { fg = "seg_claude", bg = "seg_git" },
     }
 
-    -- End separator after Git
+    -- End separator after Git (when zoom NOT active)
     local SepGitEnd = {
-      condition = has_visible_branch,
+      condition = function()
+        return has_visible_branch() and not vim.g.zoom_win_active
+      end,
       provider = "",
       hl = { fg = "seg_git", bg = "none" },
     }
@@ -315,19 +330,122 @@
       hl = { fg = "seg_git", bg = "none" },
     }
 
+    ---------------------------------------------------------------------------
+    -- Zoom Indicator Separators (leftmost in right group)
+    ---------------------------------------------------------------------------
+
+    local function is_zoomed()
+      return vim.g.zoom_win_active
+    end
+
+    -- Start separator for zoom (leftmost)
+    local SepStartZoom = {
+      condition = is_zoomed,
+      provider = "",
+      hl = { fg = "seg_host", bg = "none" },
+    }
+
+    -- Separator after zoom -> claude
+    local SepZoomClaude = {
+      condition = function()
+        return is_zoomed() and has_claude_usage()
+      end,
+      provider = "",
+      hl = function()
+        local data = claude_usage.get_usage_data()
+        if data and data.seven_day then
+          local severity = claude_usage.get_weekly_severity(
+            data.seven_day.utilization,
+            data.seven_day.resets_at
+          )
+          if severity == "danger" then
+            return { fg = "seg_host", bg = "claude_danger" }
+          elseif severity == "warning" then
+            return { fg = "seg_host", bg = "claude_warning" }
+          end
+        end
+        return { fg = "seg_host", bg = "seg_claude" }
+      end,
+    }
+
+    -- Modified: Claude start only when NOT zoomed
+    local SepStartClaudeNoZoom = {
+      condition = function()
+        return has_claude_usage() and not is_zoomed()
+      end,
+      provider = "",
+      hl = function()
+        local data = claude_usage.get_usage_data()
+        if data and data.seven_day then
+          local severity = claude_usage.get_weekly_severity(
+            data.seven_day.utilization,
+            data.seven_day.resets_at
+          )
+          if severity == "danger" then
+            return { fg = "claude_danger", bg = "none" }
+          elseif severity == "warning" then
+            return { fg = "claude_warning", bg = "none" }
+          end
+        end
+        return { fg = "seg_claude", bg = "none" }
+      end,
+    }
+
+    -- Modified: Git start only when NOT zoomed and no claude
+    local SepStartGitNoZoomNoClaude = {
+      condition = function()
+        return has_visible_branch() and not has_claude_usage() and not is_zoomed()
+      end,
+      provider = "",
+      hl = { fg = "seg_git", bg = "none" },
+    }
+
+    -- Separator: Zoom -> Git (no claude, has git)
+    local SepZoomGitNoClaude = {
+      condition = function()
+        return is_zoomed() and not has_claude_usage() and has_visible_branch()
+      end,
+      provider = "",
+      hl = { fg = "seg_host", bg = "seg_git" },
+    }
+
+    -- End separator after Zoom (no claude, no git)
+    local SepZoomEndAlone = {
+      condition = function()
+        return is_zoomed() and not has_claude_usage() and not has_visible_branch()
+      end,
+      provider = "",
+      hl = { fg = "seg_host", bg = "none" },
+    }
+
+    -- Claude end (no git after)
+    local SepClaudeEndNoGit = {
+      condition = function()
+        return has_claude_usage() and not has_visible_branch()
+      end,
+      provider = "",
+      hl = { fg = "seg_claude", bg = "none" },
+    }
+
     local RightSegments = {
+      -- Zoom indicator (leftmost)
+      SepStartZoom,
+      c.ZoomIndicator,
+      SepZoomClaude,
+      SepZoomGitNoClaude,
+      SepZoomEndAlone,
       -- Claude usage segments
-      SepStartClaude,
+      SepStartClaudeNoZoom,
       c.ClaudeWeekly,
       SepWeeklyPace,
       c.ClaudePace,
       SepPaceBudget,
       c.ClaudeBudget,
-      -- End Claude or transition to Git
-      SepClaudeEnd,
+      -- Transition from Claude
       SepClaudeGit,
-      -- Git branch (start only if no claude)
-      SepStartGitNoClaude,
+      SepClaudeEndNoGit,
+      -- Git branch
+      SepStartGitNoZoomNoClaude,
       c.GitBranch,
       SepGitEnd,
     }
