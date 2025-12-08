@@ -12,5 +12,6 @@
     ./terminal.nix
     ./tokyonight.nix
     ./which-key.nix
+    ./yazi.nix
   ];
 }

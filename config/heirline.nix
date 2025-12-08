@@ -5,9 +5,10 @@
   ];
 
   # Global statusline (empty) + tabline at top
-  opts.laststatus = 3; # global statusline prevents per-window separator lines
+  opts.laststatus = 3; # global statusline provides window separator
   opts.showtabline = 2; # always show tabline
   opts.showmode = false;
+  opts.cmdheight = 0; # hide cmdline when not in use (saves 1 line)
 
   # Add our lua files to the runtime path
   extraFiles = {
