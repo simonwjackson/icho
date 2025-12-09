@@ -4,6 +4,7 @@
     ./bufferline.nix
     ./clipboard.nix
     ./cmp.nix
+    ./dap.nix
     ./diagnostics.nix
     ./flash.nix
     ./formatting.nix
