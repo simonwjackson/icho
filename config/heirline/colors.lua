@@ -33,7 +33,7 @@ function M.setup()
 		tabline_fg = utils.get_highlight("TabLine").fg,
 		-- Segment colors - all use same dim background
 		seg_host = cursorline_bg,
-		seg_dir = cursorline_bg,
+		seg_dir = normal_bg,
 		seg_git = cursorline_bg,
 		seg_time = cursorline_bg,
 		seg_mode = cursorline_bg,

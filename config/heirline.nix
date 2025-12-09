@@ -1,5 +1,4 @@
-{ pkgs, ... }:
-{
+{pkgs, ...}: {
   extraPlugins = [
     pkgs.vimPlugins.heirline-nvim
   ];
@@ -35,15 +34,37 @@
     })
 
     ---------------------------------------------------------------------------
-    -- Powerline Separators
+    -- Upside-down Tab Separators (using lower triangles)
     ---------------------------------------------------------------------------
 
-    -- Left side separators (point right →)
-    -- SepHostGit: same bg, use thin divider
-    local SepHostGit = { provider = " │ ", hl = { fg = "gray" } }
-    -- Removed SepHostEnd and SepGitEnd - no longer needed without bg contrast
+    -- Characters needed (you'll add manually):
+    --   TAB_LEFT = "" (U+E0BA, lower-left triangle)
+    --   TAB_RIGHT = "" (U+E0BC, lower-right triangle)
+    -- Creates tabs that appear to point downward/come from above
 
-    -- Right side separators (point left ←)
+    local TAB_LEFT = "◣"   -- MANUAL: replace with U+E0BA
+    local TAB_RIGHT = "◢"  -- MANUAL: replace with U+E0BC
+
+    -- Helper to check if in a git repo (any branch)
+    local function has_visible_branch()
+      local handle = io.popen("git branch --show-current 2>/dev/null")
+      if not handle then return false end
+      local branch = handle:read("*a"):gsub("^%s*(.-)%s*$", "%1")
+      handle:close()
+      return branch ~= ""
+    end
+
+    -- Helper to check if claude usage is available
+    local claude_usage = require("heirline.claude_usage")
+    local function has_claude_usage()
+      local data = claude_usage.get_usage_data()
+      return data and data.seven_day
+    end
+
+    local function is_zoomed()
+      return vim.g.zoom_win_active
+    end
+
     local mode_hl_map = {
       n = "Function",     -- blue
       i = "String",       -- green
@@ -60,260 +81,64 @@
       t = "String",
     }
 
-    local SepStartMode = {
-      init = function(self)
-        self.mode = vim.fn.mode(1)
-      end,
-      provider = "",
-      hl = function(self)
-        local mode = self.mode:sub(1, 1)
-        local hl_group = mode_hl_map[mode] or "Function"
-        local fg = utils.get_highlight(hl_group).fg
-        return { fg = fg, bg = "none" }
-      end,
-    }
-    local SepModeFile = {
-      init = function(self)
-        self.mode = vim.fn.mode(1)
-      end,
-      provider = "",
-      hl = function(self)
-        local mode = self.mode:sub(1, 1)
-        local hl_group = mode_hl_map[mode] or "Function"
-        local bg = utils.get_highlight(hl_group).fg
-        return { fg = "seg_file", bg = bg }
-      end,
-    }
-    local SepModeEnd = {
-      init = function(self)
-        self.mode = vim.fn.mode(1)
-      end,
-      provider = "",
-      hl = function(self)
-        local mode = self.mode:sub(1, 1)
-        local hl_group = mode_hl_map[mode] or "Function"
-        local fg = utils.get_highlight(hl_group).fg
-        return { fg = fg, bg = "none" }
-      end,
-    }
-
     ---------------------------------------------------------------------------
-    -- Tabline (single top bar)
+    -- Left Side Segments
     ---------------------------------------------------------------------------
 
-    local SepHostMode = {
-      init = function(self)
-        self.mode = vim.fn.mode(1)
-      end,
-      provider = "",
-      hl = function(self)
-        local mode = self.mode:sub(1, 1)
-        local hl_group = mode_hl_map[mode] or "Function"
-        local bg = utils.get_highlight(hl_group).fg
-        return { fg = "seg_host", bg = bg }
-      end,
+    -- WorkDir tab (only segment with tab styling)
+    local WorkDirTabStart = {
+      provider = TAB_LEFT,
+      hl = { fg = "tabline_bg", bg = "seg_dir" },
     }
-
-    local SepModeGit = {
-      init = function(self)
-        self.mode = vim.fn.mode(1)
-      end,
-      provider = "",
-      hl = function(self)
-        local mode = self.mode:sub(1, 1)
-        local hl_group = mode_hl_map[mode] or "Function"
-        local fg = utils.get_highlight(hl_group).fg
-        return { fg = fg, bg = "seg_git" }
-      end,
-    }
-
-    local SepModeEnd = {
-      init = function(self)
-        self.mode = vim.fn.mode(1)
-      end,
-      provider = "",
-      hl = function(self)
-        local mode = self.mode:sub(1, 1)
-        local hl_group = mode_hl_map[mode] or "Function"
-        local fg = utils.get_highlight(hl_group).fg
-        return { fg = fg, bg = "none" }
-      end,
-    }
-
-    -- Helper to check if in a git repo (any branch)
-    local function has_visible_branch()
-      local handle = io.popen("git branch --show-current 2>/dev/null")
-      if not handle then return false end
-      local branch = handle:read("*a"):gsub("^%s*(.-)%s*$", "%1")
-      handle:close()
-      return branch ~= ""
-    end
-
-    local SepModeGitDynamic = {
-      condition = has_visible_branch,
-      init = function(self)
-        self.mode = vim.fn.mode(1)
-      end,
-      provider = "",
-      hl = function(self)
-        local mode = self.mode:sub(1, 1)
-        local hl_group = mode_hl_map[mode] or "Function"
-        local fg = utils.get_highlight(hl_group).fg
-        return { fg = fg, bg = "seg_git" }
-      end,
-    }
-
-    local SepGitEndDynamic = {
-      condition = has_visible_branch,
-      provider = "",
-      hl = { fg = "seg_git", bg = "none" },
-    }
-
-    local SepModeEndDynamic = {
-      init = function(self)
-        self.mode = vim.fn.mode(1)
-      end,
-      provider = "",
-      hl = function(self)
-        local mode = self.mode:sub(1, 1)
-        local hl_group = mode_hl_map[mode] or "Function"
-        local fg = utils.get_highlight(hl_group).fg
-        return { fg = fg, bg = "none" }
-      end,
-    }
-
-    -- Separator: Host -> WorkDir (thin divider)
-    local SepHostDir = {
-      provider = " │ ",
-      hl = { fg = "dim" },
-    }
-
-    -- Separator: WorkDir -> Mode (thin divider)
-    local SepDirMode = {
-      provider = " │ ",
-      hl = { fg = "dim" },
-    }
-
-    -- Separator: Mode -> end
-    local SepModeEnd = {
-      init = function(self)
-        self.mode = vim.fn.mode(1)
-      end,
-      provider = "",
-      hl = function(self)
-        local mode = self.mode:sub(1, 1)
-        local hl_group = mode_hl_map[mode] or "Function"
-        local fg = utils.get_highlight(hl_group).fg
-        return { fg = fg, bg = "none" }
-      end,
+    local WorkDirTabEnd = {
+      provider = TAB_RIGHT,
+      hl = { fg = "tabline_bg", bg = "seg_dir" },
     }
 
     local LeftSegments = {
       c.Hostname,
-      SepHostDir,
+      c.Space,
+      -- WorkDir tab
+      WorkDirTabStart,
       c.WorkDir,
-      SepDirMode,
+      WorkDirTabEnd,
+      c.GitBranch,
+      c.Space,
       c.ViMode,
     }
 
-    local SepStartGit = {
-      condition = has_visible_branch,
-      provider = "",
-      hl = { fg = "seg_git", bg = "none" },
-    }
-
     ---------------------------------------------------------------------------
-    -- Claude Usage Separators (right side, point left ←)
+    -- Right Side Segments
     ---------------------------------------------------------------------------
 
-    -- Helper to check if claude usage is available
-    local claude_usage = require("heirline.claude_usage")
-    local function has_claude_usage()
-      local data = claude_usage.get_usage_data()
-      return data and data.seven_day
-    end
-
-    -- Separator between Weekly and Pace (thin divider)
-    local SepWeeklyPace = {
-      condition = has_claude_usage,
-      provider = " │ ",
-      hl = { fg = "dim" },
+    -- Zoom tab (uses seg_dir for normal buffer bg)
+    local ZoomTabStart = {
+      condition = function() return vim.g.zoom_win_active end,
+      provider = TAB_LEFT,
+      hl = { fg = "tabline_bg", bg = "seg_dir" },
     }
-
-    -- Separator between Pace and Budget (thin divider)
-    local SepPaceBudget = {
-      condition = has_claude_usage,
-      provider = " │ ",
-      hl = { fg = "dim" },
+    local ZoomTabEnd = {
+      condition = function() return vim.g.zoom_win_active end,
+      provider = TAB_RIGHT,
+      hl = { fg = "tabline_bg", bg = "seg_dir" },
     }
-
-    -- End separator after Budget - never used now since WorkDir always follows when no git
-    local SepClaudeEnd = {
-      condition = function()
-        return false  -- WorkDir always shows when no git branch
-      end,
-      provider = "",
-      hl = { fg = "seg_claude", bg = "none" },
-    }
-
-    -- Separator between Claude and Git (thin divider)
-    local SepClaudeGit = {
-      condition = function()
-        return has_claude_usage() and has_visible_branch()
-      end,
-      provider = " │ ",
-      hl = { fg = "dim" },
-    }
-
-    -- Removed SepGitEnd and SepStartGitNoClaude - no longer needed without bg contrast
-
-    ---------------------------------------------------------------------------
-    -- Zoom Indicator Separators (leftmost in right group)
-    ---------------------------------------------------------------------------
-
-    local function is_zoomed()
-      return vim.g.zoom_win_active
-    end
-
-    -- Removed SepStartZoom - no longer needed without bg contrast
-
-    -- Separator after zoom -> claude (thin divider)
-    local SepZoomClaude = {
-      condition = function()
-        return is_zoomed() and has_claude_usage()
-      end,
-      provider = " │ ",
-      hl = { fg = "dim" },
-    }
-
-    -- Removed SepStartClaudeNoZoom and SepStartGitNoZoomNoClaude - no longer needed without bg contrast
-
-    -- Separator: Zoom -> Git (thin divider)
-    local SepZoomGitNoClaude = {
-      condition = function()
-        return is_zoomed() and not has_claude_usage() and has_visible_branch()
-      end,
-      provider = " │ ",
-      hl = { fg = "dim" },
-    }
-
-    -- Removed SepZoomEndAlone and SepClaudeEndNoGit - no longer needed without bg contrast
 
     local RightSegments = {
-      -- Zoom indicator (leftmost)
+      ZoomTabStart,
       c.ZoomIndicator,
-      SepZoomClaude,
-      SepZoomGitNoClaude,
-      -- Claude usage segments
+      ZoomTabEnd,
+      c.Space,
+      c.Space,
+      c.Space,
       c.ClaudeWeekly,
-      SepWeeklyPace,
+      c.Space,
+      c.Space,
+      c.Space,
       c.ClaudePace,
-      SepPaceBudget,
+      c.Space,
+      c.Space,
+      c.Space,
       c.ClaudeBudget,
-      -- Transition from Claude
-      SepClaudeGit,
-      -- Git branch
-      c.GitBranch,
     }
 
     local TabLine = {

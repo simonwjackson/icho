@@ -1,7 +1,5 @@
-local conditions = require("heirline.conditions")
-
+---@diagnostic disable: undefined-global
 local utils = require("heirline.utils")
-local devicons = require("nvim-web-devicons")
 local claude = require("heirline.claude_usage")
 
 local M = {}
@@ -90,7 +88,7 @@ M.ViMode = {
 -- Hostname
 M.Hostname = {
 	provider = function()
-		return "    " .. vim.fn.hostname() .. ""
+		return "   " .. vim.fn.hostname() .. ""
 	end,
 	hl = { fg = "blue", bold = true },
 }
@@ -110,7 +108,7 @@ M.GitBranch = {
 		return self.branch ~= ""
 	end,
 	provider = function(self)
-		return "󰘬  " .. self.branch .. " "
+		return " 󰘬  " .. self.branch .. " "
 	end,
 	hl = { fg = "purple", bold = true },
 }
@@ -146,14 +144,14 @@ M.WorkDir = {
 
 		local repo_name = find_repo_name(cwd)
 		if repo_name then
-			return "  " .. repo_name .. ""
+			return "   " .. repo_name .. " "
 		end
 
 		-- Default: just show current folder name
 		local folder = vim.fn.fnamemodify(cwd, ":t")
-		return "  " .. folder .. ""
+		return "   " .. folder .. " "
 	end,
-	hl = { fg = "cyan", bold = true },
+	hl = { fg = "cyan", bg = "seg_dir", bold = true },
 }
 
 -- ============================================================================
@@ -235,7 +233,7 @@ M.ZoomIndicator = {
 		end
 		return " 󰊓  " .. filename .. " "
 	end,
-	hl = { fg = "purple", bold = true },
+	hl = { fg = "purple", bg = "seg_dir", bold = true },
 }
 
 return M
