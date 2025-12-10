@@ -22,7 +22,7 @@ in {
           cmd = { "opencode" },
           win = {
             position = "right",
-            width = 80,
+            width = 0.618,
           },
         },
       },
