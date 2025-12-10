@@ -44,6 +44,10 @@
     -- Ctrl-S to save (only if modified)
     vim.keymap.set({ "n", "i", "v" }, "<C-s>", "<Cmd>update<CR>", { desc = "Save" })
 
+    -- Use <leader>w instead of <C-w> for window commands
+    vim.keymap.set("n", "<C-w>", "<Nop>", { desc = "Disabled - use <leader>w" })
+    vim.keymap.set("n", "<leader>w", "<C-w>", { desc = "Window" })
+
     -- Liquid template filetype detection
     vim.filetype.add({
       extension = {
