@@ -1,10 +1,8 @@
-{pkgs, ...}: 
-let
+{pkgs, ...}: let
   opencode-wrapper = pkgs.writeShellScriptBin "opencode" ''
     exec ${pkgs.steam-run}/bin/steam-run ${pkgs.bun}/bin/bun x opencode-ai@latest "$@"
   '';
-in
-{
+in {
   extraPlugins = [
     pkgs.vimPlugins.opencode-nvim
   ];
@@ -31,9 +29,8 @@ in
     }
 
     -- Keymaps (<leader>a prefix for opencode)
-    vim.keymap.set({ "n", "x" }, "<leader>aa", function() require("opencode").ask("\n@this: ") end, { desc = "Ask opencode" })
     vim.keymap.set({ "n", "x" }, "<leader>as", function() require("opencode").select() end, { desc = "Select opencode action" })
-    vim.keymap.set({ "n", "x" }, "<leader>ap", function() require("opencode").prompt("\n@this") end, { desc = "Prompt with context" })
+
     vim.keymap.set("n", "<leader>at", function() require("opencode").toggle() end, { desc = "Toggle opencode" })
     vim.keymap.set({ "n", "x" }, "<leader>ai", function() require("opencode").ask("\n") end, { desc = "Input prompt" })
     -- Helper to focus opencode window and enter terminal mode
@@ -144,9 +141,8 @@ in
     -- Built-in prompts (with newline prefix to separate from previous input)
     vim.keymap.set({ "n", "x" }, "<leader>ae", function() require("opencode").prompt("\nExplain @this and its context") end, { desc = "Explain" })
     vim.keymap.set({ "n", "x" }, "<leader>ao", function() require("opencode").prompt("\nOptimize @this for performance and readability") end, { desc = "Optimize" })
-    vim.keymap.set({ "n", "x" }, "<leader>av", function() require("opencode").prompt("\nReview @this for correctness and readability") end, { desc = "Review" })
-    vim.keymap.set({ "n", "x" }, "<leader>ad", function() require("opencode").prompt("\nAdd comments documenting @this") end, { desc = "Document" })
-    vim.keymap.set({ "n", "x" }, "<leader>af", function() require("opencode").prompt("\nFix @diagnostics") end, { desc = "Fix diagnostics" })
+    vim.keymap.set("n", "<leader>aff", function() require("opencode").prompt("@" .. vim.fn.expand("%:p") .. "\n") end, { desc = "Send filename to opencode" })
+    vim.keymap.set({ "n", "x" }, "<leader>ad", function() require("opencode").prompt("\nFix @diagnostics") end, { desc = "Fix diagnostics" })
     vim.keymap.set("n", "<leader>aD", function() require("opencode").prompt("\nReview the following git diff for correctness and readability: @diff") end, { desc = "Review diff" })
   '';
 }
