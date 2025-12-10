@@ -10,7 +10,7 @@
     ./formatting.nix
     ./gitsigns.nix
     ./grug-far.nix
-    ./hardtime.nix
+    # ./hardtime.nix
     ./heirline.nix
     ./incline.nix
     ./lsp.nix
