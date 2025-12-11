@@ -206,6 +206,10 @@ local function fetch_rate_limits_async(config, callback)
 			local ok, data = pcall(vim.json.decode, output)
 			if ok and data then
 				write_cache(data)
+				-- Fire the User event so Heirline components re-evaluate
+				vim.schedule(function()
+					vim.api.nvim_exec_autocmds("User", { pattern = "ClaudeUsageUpdated" })
+				end)
 				if callback then
 					callback(data)
 				end
