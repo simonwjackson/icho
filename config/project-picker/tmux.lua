@@ -110,20 +110,16 @@ end
 --- Switch to or create a tmux session for a project
 ---@param project_path string
 ---@param session_name string
----@param start_nvim? boolean whether to start nvim in new sessions (default: true)
-function M.open_project(project_path, session_name, start_nvim)
-  if start_nvim == nil then
-    start_nvim = true
-  end
-
+---@param nvim_cmd? string|nil command to start nvim (nil to not start nvim)
+function M.open_project(project_path, session_name, nvim_cmd)
   local tmux_env = os.getenv("TMUX")
   local tmux_running = M.is_tmux_running()
 
   -- Case 1: Not in tmux and tmux not running - create and attach
   if not tmux_env and not tmux_running then
     local args = { "tmux", "new-session", "-s", session_name, "-c", project_path }
-    if start_nvim then
-      table.insert(args, "nvim")
+    if nvim_cmd then
+      table.insert(args, nvim_cmd)
     end
     run(args)
     return
@@ -132,8 +128,8 @@ function M.open_project(project_path, session_name, start_nvim)
   -- Case 2: Session doesn't exist - create it (detached)
   if not M.session_exists(session_name) then
     local args = { "tmux", "new-session", "-d", "-s", session_name, "-c", project_path }
-    if start_nvim then
-      table.insert(args, "nvim")
+    if nvim_cmd then
+      table.insert(args, nvim_cmd)
     end
     run(args)
   end

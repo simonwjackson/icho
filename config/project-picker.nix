@@ -22,8 +22,8 @@
       },
       -- Maximum depth to search (for fd)
       max_depth = 5,
-      -- Start neovim in new sessions
-      start_nvim = true,
+      -- Command to start neovim in new sessions (nil to disable)
+      nvim_cmd = "nix run /snowscape/code/sandbox/new-nixvim",
       -- Cache TTL in seconds (0 to disable)
       cache_ttl = 300,
     })

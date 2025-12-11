@@ -7,14 +7,14 @@ local tmux = require("project-picker.tmux")
 ---@class ProjectPickerConfig
 ---@field directories string[] Root directories to search for projects
 ---@field max_depth number Maximum depth to search for projects
----@field start_nvim boolean Start neovim in new sessions
+---@field nvim_cmd string|nil Command to start nvim in new sessions (nil to disable)
 ---@field cache_ttl number Cache time-to-live in seconds (0 to disable)
 
 ---@type ProjectPickerConfig
 local default_config = {
   directories = { "~/projects", "~/code" },
   max_depth = 5,
-  start_nvim = true,
+  nvim_cmd = "nvim",
   cache_ttl = 300, -- 5 minutes
 }
 
@@ -281,7 +281,7 @@ function M.pick(opts)
     confirm = function(picker, item)
       picker:close()
       if item then
-        tmux.open_project(item.project_path, item.session_name, M.config.start_nvim)
+        tmux.open_project(item.project_path, item.session_name, M.config.nvim_cmd)
       end
     end,
     win = {
