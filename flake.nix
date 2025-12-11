@@ -17,6 +17,10 @@
       url = "github:simonwjackson/project-picker.nvim";
       flake = false;
     };
+    direnv-nvim = {
+      url = "github:NotAShelf/direnv.nvim";
+      flake = false;
+    };
   };
 
   outputs =
@@ -42,7 +46,7 @@
             inherit pkgs;
             module = import ./config;
             extraSpecialArgs = {
-              inherit (inputs) resession-nvim vim-overseer project-picker-nvim;
+              inherit (inputs) resession-nvim vim-overseer project-picker-nvim direnv-nvim;
             };
           };
           nvim = nixvim'.makeNixvimWithModule nixvimModule;

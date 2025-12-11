@@ -6,6 +6,7 @@
     ./cmp.nix
     ./dap.nix
     ./diagnostics.nix
+    ./direnv.nix
     ./flash.nix
     ./formatting.nix
     ./gitsigns.nix
