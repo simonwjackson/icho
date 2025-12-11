@@ -106,6 +106,22 @@
         "type": "github"
       }
     },
+    "project-picker-nvim": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1765418645,
+        "narHash": "sha256-68GL+w6btXtup7gIlKBAFih7v68SRmyGbafs4uW8Fyk=",
+        "owner": "simonwjackson",
+        "repo": "project-picker.nvim",
+        "rev": "9dd74611da8e845c483d79e1388ec7c2b3a5ed3c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "simonwjackson",
+        "repo": "project-picker.nvim",
+        "type": "github"
+      }
+    },
     "resession-nvim": {
       "flake": false,
       "locked": {
@@ -127,6 +143,7 @@
         "flake-parts": "flake-parts",
         "nixpkgs": "nixpkgs",
         "nixvim": "nixvim",
+        "project-picker-nvim": "project-picker-nvim",
         "resession-nvim": "resession-nvim",
         "vim-overseer": "vim-overseer"
       }

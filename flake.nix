@@ -13,6 +13,10 @@
       url = "github:simonwjackson/overseer.nvim/custom";
       flake = false;
     };
+    project-picker-nvim = {
+      url = "github:simonwjackson/project-picker.nvim";
+      flake = false;
+    };
   };
 
   outputs =
@@ -38,7 +42,7 @@
             inherit pkgs;
             module = import ./config;
             extraSpecialArgs = {
-              inherit (inputs) resession-nvim vim-overseer;
+              inherit (inputs) resession-nvim vim-overseer project-picker-nvim;
             };
           };
           nvim = nixvim'.makeNixvimWithModule nixvimModule;

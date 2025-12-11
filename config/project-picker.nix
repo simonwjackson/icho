@@ -1,15 +1,17 @@
-{ pkgs, ... }:
+{ pkgs, project-picker-nvim, ... }:
 {
   # fd is required for fast project discovery
   # tmux is required for session management
   extraPackages = [ pkgs.fd pkgs.tmux ];
 
-  # Add lua files to the runtime path
-  extraFiles = {
-    "lua/project-picker/init.lua".source = ./project-picker/init.lua;
-    "lua/project-picker/finder.lua".source = ./project-picker/finder.lua;
-    "lua/project-picker/tmux.lua".source = ./project-picker/tmux.lua;
-  };
+  # Add the plugin from flake input
+  extraPlugins = [
+    (pkgs.vimUtils.buildVimPlugin {
+      pname = "project-picker.nvim";
+      version = "0.1.0";
+      src = project-picker-nvim;
+    })
+  ];
 
   extraConfigLua = ''
     -- Setup project picker with configuration
