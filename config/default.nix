@@ -18,6 +18,7 @@
     ./noice.nix
     ./opencode.nix
     ./options.nix
+    ./project-picker.nix
     ./resession.nix
     ./snacks.nix
     ./supermaven.nix
