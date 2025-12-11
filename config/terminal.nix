@@ -1,4 +1,7 @@
+{ pkgs, ... }:
 {
+  extraPackages = [ pkgs.neovim-remote ];
+
   keymaps = [
     { key = "<A-h>"; action = "<Cmd>wincmd h<CR>"; options.desc = "Window left"; }
     { key = "<A-j>"; action = "<Cmd>wincmd j<CR>"; options.desc = "Window down"; }
