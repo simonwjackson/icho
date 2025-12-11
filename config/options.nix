@@ -1,9 +1,9 @@
-{ pkgs, ... }: {
+{pkgs, ...}: {
   globals.mapleader = " ";
   globals.maplocalleader = " ";
 
   # Liquid template support
-  extraPlugins = [ pkgs.vimPlugins.vim-liquid ];
+  extraPlugins = [pkgs.vimPlugins.vim-liquid];
 
   # Always show sign column to prevent text shifting
   opts.signcolumn = "yes";
@@ -15,13 +15,16 @@
   opts.expandtab = true;
 
   # Split behavior
-  opts.splitkeep = "screen";  # keeps same screen lines in all split windows
+  opts.splitkeep = "screen"; # keeps same screen lines in all split windows
   opts.splitbelow = true;
   opts.splitright = true;
 
   # Style the window separators
   highlightOverride = {
-    WinSeparator = { fg = "#3b4261"; bg = "none"; };
+    WinSeparator = {
+      fg = "#3b4261";
+      bg = "none";
+    };
   };
 
   extraConfigLua = ''
@@ -43,10 +46,6 @@
 
     -- Ctrl-S to save (only if modified)
     vim.keymap.set({ "n", "i", "v" }, "<C-s>", "<Cmd>update<CR>", { desc = "Save" })
-
-    -- Use <leader>w instead of <C-w> for window commands
-    vim.keymap.set("n", "<C-w>", "<Nop>", { desc = "Disabled - use <leader>w" })
-    vim.keymap.set("n", "<leader>w", "<C-w>", { desc = "Window" })
 
     -- Liquid template filetype detection
     vim.filetype.add({
