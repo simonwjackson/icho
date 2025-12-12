@@ -1,6 +1,6 @@
 {pkgs, ...}: let
   opencode-wrapper = pkgs.writeShellScriptBin "opencode" ''
-    exec ${pkgs.steam-run}/bin/steam-run ${pkgs.bun}/bin/bun x opencode-ai@latest "$@"
+    exec /run/current-system/sw/bin/nix run github:simonwjackson/opencode -- "$@"
   '';
 in {
   extraPlugins = [
