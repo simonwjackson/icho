@@ -58,6 +58,7 @@
 
     # Terminal
     { key = "<A-.>"; action.__raw = "function() Snacks.terminal.toggle() end"; options.desc = "Toggle terminal"; mode = ["n" "t"]; }
+    { key = "<A-/>"; action.__raw = "function() Snacks.terminal.toggle() end"; options.desc = "Toggle terminal"; mode = ["n" "t"]; }
 
     # Notifications
     { key = "<leader>th"; action.__raw = "function() Snacks.notifier.show_history() end"; options.desc = "Notification history"; }
