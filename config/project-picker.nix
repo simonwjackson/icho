@@ -1,8 +1,12 @@
-{ pkgs, project-picker-nvim, ... }:
 {
+  pkgs,
+  project-picker-nvim,
+  ...
+}: {
   # fd is required for fast project discovery
   # tmux is required for session management
-  extraPackages = [ pkgs.fd pkgs.tmux ];
+  # direnv is used to load project environment before starting nvim
+  extraPackages = [pkgs.fd pkgs.tmux pkgs.direnv];
 
   # Add the plugin from flake input
   extraPlugins = [
@@ -24,8 +28,9 @@
       },
       -- Maximum depth to search (for fd)
       max_depth = 5,
-      -- Command to start neovim in new sessions (nil to disable)
-      nvim_cmd = "nix run /snowscape/code/sandbox/new-nixvim",
+      -- Command to start neovim in new sessions
+      -- Using direnv exec to load project environment before starting nvim
+      nvim_cmd = "direnv exec . nvim",
       -- Cache TTL in seconds (0 to disable)
       cache_ttl = 300,
     })
