@@ -29,8 +29,8 @@
       -- Maximum depth to search (for fd)
       max_depth = 5,
       -- Command to start neovim in new sessions
-      -- Using direnv exec to load project environment before starting nvim
-      nvim_cmd = "direnv exec . nvim",
+      -- Source direnv environment then run nvim (preserves user shell)
+      nvim_cmd = "eval \"$(direnv export zsh 2>/dev/null)\"; exec nvim",
       -- Cache TTL in seconds (0 to disable)
       cache_ttl = 300,
     })
