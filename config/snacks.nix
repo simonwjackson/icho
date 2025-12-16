@@ -50,11 +50,11 @@
     { key = "<leader>sr"; action.__raw = "function() Snacks.picker.resume() end"; options.desc = "Resume last picker"; }
 
     # Git
-    { key = "<leader>gg"; action.__raw = "function() Snacks.lazygit() end"; options.desc = "Lazygit"; }
+    { key = "<leader>gg"; action.__raw = "function() Snacks.lazygit({ env = vim.fn.environ() }) end"; options.desc = "Lazygit"; }
     { key = "<leader>gl"; action.__raw = "function() Snacks.picker.git_log() end"; options.desc = "Git log"; }
     { key = "<leader>gs"; action.__raw = "function() Snacks.picker.git_status() end"; options.desc = "Git status"; }
-    { key = "<leader>gf"; action.__raw = "function() Snacks.lazygit.log_file() end"; options.desc = "Lazygit file history"; }
-    { key = "<leader>gL"; action.__raw = "function() Snacks.lazygit.log() end"; options.desc = "Lazygit log (cwd)"; }
+    { key = "<leader>gf"; action.__raw = "function() Snacks.lazygit.log_file({ env = vim.fn.environ() }) end"; options.desc = "Lazygit file history"; }
+    { key = "<leader>gL"; action.__raw = "function() Snacks.lazygit.log({ env = vim.fn.environ() }) end"; options.desc = "Lazygit log (cwd)"; }
 
     # Terminal
     { key = "<A-.>"; action.__raw = "function() Snacks.terminal.toggle() end"; options.desc = "Toggle terminal"; mode = ["n" "t"]; }
