@@ -8,6 +8,10 @@
   # Always show sign column to prevent text shifting
   opts.signcolumn = "yes";
 
+  # Case-insensitive searching, but smart when uppercase is used
+  opts.ignorecase = true;
+  opts.smartcase = true;
+
   # Default indentation: 2 spaces
   opts.tabstop = 2;
   opts.shiftwidth = 2;
