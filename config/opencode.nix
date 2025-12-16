@@ -1,14 +1,9 @@
-{pkgs, ...}: let
-  opencode-wrapper = pkgs.writeShellScriptBin "opencode" ''
-    exec /run/current-system/sw/bin/nix run github:simonwjackson/opencode -- "$@"
-  '';
-in {
+{pkgs, ...}: {
   extraPlugins = [
     pkgs.vimPlugins.opencode-nvim
   ];
 
   extraPackages = [
-    opencode-wrapper
     pkgs.lsof
   ];
 
