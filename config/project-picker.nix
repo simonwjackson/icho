@@ -25,6 +25,7 @@
         "~/projects",
         "~/code",
         "/snowscape/code",
+        "~/.config/opencode"
       },
       -- Maximum depth to search (for fd)
       max_depth = 5,
